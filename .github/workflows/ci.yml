@@ -57,6 +57,20 @@ jobs:
         if: always() && steps.browser.outcome != 'skipped'
         run: bin/shipwake add -f json --file browser/run.json --context runner=github-ubuntu $PUSH
         env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+      - name: Acceptance
+        id: acceptance
+        continue-on-error: true
+        working-directory: web
+        env:
+          SHIPWAKE_OUTPUT: ${{ github.workspace }}/acceptance/run.json
+          SHIPWAKE_NAME: Acceptance
+        run: |
+          pnpm exec bddgen -c acceptance.config.mjs
+          pnpm exec playwright test -c acceptance.config.mjs --reporter=list,../packages/playwright/src/reporter.ts
+      - name: Record acceptance
+        if: always() && steps.acceptance.outcome != 'skipped'
+        run: bin/shipwake add -f json --file acceptance/run.json --context runner=github-ubuntu $PUSH
+        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
 
       - name: Benchmark fixtures
         uses: actions/cache@v6
@@ -75,5 +89,6 @@ jobs:
         run: |
           test "${{ steps.go.outcome }}" = success
           test "${{ steps.browser.outcome }}" = success
+          test "${{ steps.acceptance.outcome }}" = success
           test "${{ steps.bench.outcome }}" = success
           bin/shipwake check --against previous
