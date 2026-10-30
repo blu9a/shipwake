@@ -140,7 +140,7 @@ code,
   display: grid;
   gap: 8px;
   padding: 6px;
-  width: min(520px, calc(100vw - 64px));
+  min-width: 0;
 }
 .prompt > span {
   font-size: 12px;
