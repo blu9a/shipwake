@@ -1,4 +1,5 @@
-# Push an annotated tag (v1.2.3) to publish binaries. Its message is the release notes.
+# Push an annotated tag (v1.2.3) to draft a GitHub release with binaries; its message is the release
+# notes. The draft is published by hand, once checked.
 name: Release
 on:
   push:

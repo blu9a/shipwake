@@ -51,12 +51,17 @@ no account, no hosting platform required.
 
 ## Install
 
+Download the binary for your system from [Releases](https://github.com/blu9a/shipwake/releases): Linux, macOS or
+Windows, on amd64 or arm64. On Linux or macOS:
+
 ```sh
-go install github.com/blu9a/shipwake/cmd/shipwake@latest
+os=$(uname -s | tr A-Z a-z); arch=$(uname -m | sed 's/x86_64/amd64/; s/aarch64/arm64/')
+curl -fsSL "https://github.com/blu9a/shipwake/releases/latest/download/shipwake_${os}_${arch}.tar.gz" | tar xz shipwake
+sudo mv shipwake /usr/local/bin/
 ```
 
-Or download a binary for Linux, macOS or Windows from [Releases](https://github.com/blu9a/shipwake/releases).
-In CI, the GitHub Action installs it for you.
+In CI, the GitHub Action installs it for you. To build it yourself, see [CONTRIBUTING.md](CONTRIBUTING.md): the web
+app is built into the binary, so `go install` alone isn't enough.
 
 ## Start
 
@@ -170,7 +175,7 @@ Apache-2.0.
 
 ## 开始使用
 
-**安装：** `go install github.com/blu9a/shipwake/cmd/shipwake@latest`，或从 [Releases](https://github.com/blu9a/shipwake/releases) 下载 Linux、macOS、Windows 的二进制文件；在 CI 中由 GitHub Action 安装。在线示例：[Shipwake 自己的网站](https://blu9a.github.io/shipwake/)。
+**安装：** 从 [Releases](https://github.com/blu9a/shipwake/releases) 下载适合你系统的二进制文件（Linux、macOS、Windows，amd64 或 arm64；命令见英文部分）；网页应用内置在二进制文件中，所以单靠 `go install` 不够，自行构建见 [CONTRIBUTING.md](CONTRIBUTING.md)；在 CI 中由 GitHub Action 安装。在线示例：[Shipwake 自己的网站](https://blu9a.github.io/shipwake/)。
 
 **交给你的智能体。** 把 [Shipwake 技能](skill/shipwake/SKILL.md)交给它，让它在你的仓库里接入 Shipwake。接入是智能体的工作：找到你的测试工具，记录它们的结果（格式还不支持时写一个小转换器），并为产品现有的行为提出场景，供你批准。也可以按英文部分的命令手动开始。
 
