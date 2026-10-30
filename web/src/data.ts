@@ -60,7 +60,9 @@ export interface StoryFeature {
   name: string;
   scenarios: StoryScenario[];
 }
-export const loadStories = (id: string) => load<StoryFeature[]>(`${id}/stories.json`);
+/** The trunk's requirements, or a branch's still waiting for approval (its key from the index). */
+const storiesDir = (id: string, branch?: string) => (branch ? `${id}/branches/${branch}` : id);
+export const loadStories = (id: string, branch?: string) => load<StoryFeature[]>(`${storiesDir(id, branch)}/stories.json`);
 
 // Measured requirements (internal/story, metrics.go).
 export interface MetricEvent {
@@ -95,12 +97,14 @@ export interface MetricStory {
 }
 /** Sites built before measured requirements have no such file: none, then. The fallback is cached
  *  with the file, so every render gets the same promise and forget() refreshes it. */
-export const loadMetricStories = (id: string) => loadOr<MetricStory[]>(`${id}/metric-stories.json`, []);
+export const loadMetricStories = (id: string, branch?: string) =>
+  loadOr<MetricStory[]>(`${storiesDir(id, branch)}/metric-stories.json`, []);
 
 /** The local workspace: present only when the site is served by `shipwake serve`. */
 export interface Session {
   edit: boolean;
   user: string;
+  checkedOut?: Record<string, string>; // project → its checked-out branch, where approvals are committed
 }
 let session: Promise<Session> | undefined;
 export const loadSession = () => {

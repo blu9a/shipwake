@@ -89,13 +89,15 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(strings.Trim(strings.TrimPrefix(r.URL.Path, "/api/"), "/"), "/")
 	if parts[0] == "session" {
 		user := ""
-		for _, dir := range w.repos {
-			if out, err := (gitx.Repo{Dir: dir}).Git(w.ctx, "config", "user.name"); err == nil {
+		checkedOut := map[string]string{} // project → the branch its requirements are edited on
+		for id, dir := range w.repos {
+			repo := gitx.Repo{Dir: dir}
+			if out, err := repo.Git(w.ctx, "config", "user.name"); err == nil && user == "" {
 				user = strings.TrimSpace(out)
-				break
 			}
+			checkedOut[id] = w.checkedOut(repo)
 		}
-		reply(map[string]any{"edit": true, "user": user}, nil)
+		reply(map[string]any{"edit": true, "user": user, "checkedOut": checkedOut}, nil)
 		return
 	}
 	if len(parts) != 2 {
@@ -118,8 +120,8 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		text, err := w.committed(repo, path)
 		reply(map[string]string{"text": text}, err)
 	case parts[1] == "feature" && r.Method == http.MethodPost:
-		var req struct{ Path, Text string }
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var req struct{ Path, Text, Branch string }
+		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -137,18 +139,18 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		}
 		reply(map[string]string{"text": proposalOf(text)}, nil)
 	case parts[1] == "proposal" && r.Method == http.MethodPost:
-		var req struct{ Path, Text string }
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var req struct{ Path, Text, Branch string }
+		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
 		reply(w.saveProposal(repo, req.Path, req.Text))
 	case parts[1] == "approve" && r.Method == http.MethodPost:
 		var req struct {
-			Path      string
-			Scenarios []string
+			Path, Branch string
+			Scenarios    []string
 		}
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -156,8 +158,8 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	case parts[1] == "metric" && r.Method == http.MethodGet:
 		reply(w.metric(repo, r.URL.Query().Get("path")))
 	case parts[1] == "metric" && r.Method == http.MethodPost:
-		var req struct{ Path, Text string }
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var req struct{ Path, Text, Branch string }
+		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -170,8 +172,8 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		}
 		reply(checkMetric(req.Path, req.Text))
 	case parts[1] == "approve-metric" && r.Method == http.MethodPost:
-		var req struct{ Path string }
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var req struct{ Path, Branch string }
+		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -189,6 +191,33 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	default:
 		http.NotFound(rw, r)
 	}
+}
+
+// checkedOut is the branch requirements are edited on: the one checked out, where the person's
+// commits go. None when HEAD is detached.
+func (w *workspace) checkedOut(repo gitx.Repo) string {
+	out, err := repo.Git(w.ctx, "symbolic-ref", "--short", "-q", "HEAD")
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(out)
+}
+
+// decode reads a request that changes requirements, made on the page of branch. It is refused unless
+// that branch is checked out: the commit would land on another branch than the one the person saw.
+func (w *workspace) decode(r *http.Request, repo gitx.Repo, req any, branch *string) error {
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		return err
+	}
+	switch here := w.checkedOut(repo); {
+	case *branch == "":
+		return fmt.Errorf("say which branch this change is for")
+	case here == "":
+		return fmt.Errorf("no branch is checked out; check out %s to change its requirements", *branch)
+	case here != *branch:
+		return fmt.Errorf("%s is checked out, not %s; check out %s to change its requirements", here, *branch, *branch)
+	}
+	return nil
 }
 
 // featurePath checks that a path names a .feature file inside the repository.

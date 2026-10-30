@@ -290,7 +290,7 @@ func (h *History) branches(ctx context.Context, r gitx.Repo) ([]model.Branch, er
 		if err != nil || len(ahead) == 0 {
 			continue // merged, or unreadable
 		}
-		b := model.Branch{Name: name, Updated: ahead[0].Date}
+		b := model.Branch{Name: name, Ref: ref, Updated: ahead[0].Date}
 		for _, c := range ahead {
 			b.Ahead = append(b.Ahead, c.SHA)
 		}

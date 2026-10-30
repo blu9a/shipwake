@@ -32,12 +32,12 @@ type Metric struct {
 	Events      []Event           `json:"events"`
 }
 
-// BuildMetrics reads every commit that changed a .metric file, oldest first, then the runs. Runs
-// must already be judged: a metric is met when its comparison's status is ok.
-func BuildMetrics(ctx context.Context, r gitx.Repo, runs []*model.Run) ([]*Metric, error) {
+// BuildMetrics reads every commit in rev's history that changed a .metric file, oldest first, then
+// the runs. Runs must already be judged: a metric is met when its comparison's status is ok.
+func BuildMetrics(ctx context.Context, r gitx.Repo, rev string, runs []*model.Run) ([]*Metric, error) {
 	const sep = "\x1f"
 	out, err := r.Git(ctx, "log", "--reverse", "--format=%H"+sep+"%P"+sep+"%an"+sep+"%cI"+sep+"%s"+sep+
-		"%(trailers:key=Approved-by,valueonly,separator=%x2C)"+"\x1e", "--", "*.metric")
+		"%(trailers:key=Approved-by,valueonly,separator=%x2C)"+"\x1e", rev, "--", "*.metric")
 	if err != nil {
 		return nil, err
 	}
