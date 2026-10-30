@@ -99,8 +99,11 @@ func Blob(oid, path, text string, upTo int) []string {
 	if cache.lines == nil {
 		cache.lines = map[string]colored{}
 	}
-	cache.lines[key] = c
-	cache.bytes += len(src)
+	// Two diffs may color the same file at once: keep whichever read further.
+	if old, ok := cache.lines[key]; !ok || c.covers(old) {
+		cache.lines[key] = c
+		cache.bytes += len(src)
+	}
 	cache.Unlock()
 	return c.lines
 }
@@ -112,6 +115,11 @@ type colored struct {
 	lines []string
 	upTo  int  // lines up to this one are right
 	whole bool // the whole file was read
+}
+
+// covers says whether c reads at least as far as old.
+func (c colored) covers(old colored) bool {
+	return c.whole || !old.whole && c.upTo >= old.upTo
 }
 
 // lineEnd is the offset just past line n's newline, or len(text) when the text is shorter.
