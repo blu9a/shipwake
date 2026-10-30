@@ -83,3 +83,53 @@ Then('the release shows the feature and the fix as its changelog says', async ({
   await expect(fix.getByRole('link', { name: '#12' })).toHaveAttribute('href', 'https://example.com/bills/pull/12');
   await prove(f, fix.locator('xpath=ancestor::*[.//h4][1]'), ['Split a bill between friends', 'totals: Shares add up to the total (#12)']);
 });
+
+// Results without evidence
+
+const step = (name) => ({ name, status: 'passed', duration: 5 });
+
+Given('a run in which some scenarios recorded what their result steps saw', async ({ world }) => {
+  world.tests = [
+    {
+      feature: 'Splitting a bill',
+      name: 'Even split',
+      status: 'passed',
+      duration: 12,
+      steps: [step('Given a bill of 90.00'), step('Then each person pays 30.00')],
+      evidence: [{ step: 'each person pays 30.00', expected: ['30.00'], observed: 'Each person pays 30.00' }],
+    },
+  ];
+});
+
+Given('one scenario whose result step recorded nothing', async ({ repo, world }) => {
+  world.tests.push({
+    feature: 'Splitting a bill',
+    name: 'Uneven split',
+    status: 'passed',
+    duration: 12,
+    steps: [step('Given a bill of 100.00'), step('Then the shares add up to 100.00')],
+  });
+  repo.record(repo.commit('feat: split a bill between friends'), 'Acceptance', world.tests);
+});
+
+When('I open that scenario in the run', async ({ page, served }) => {
+  await served.open(page);
+  await page.getByRole('link', { name: 'Acceptance', exact: true }).click();
+  await page.getByText('Uneven split', { exact: true }).click();
+});
+
+Then('its result says no evidence was recorded', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
+  const none = page.getByText('No evidence recorded', { exact: true });
+  await expect(none).toHaveCount(1);
+  await expect(none).toBeVisible();
+  await prove(f, none, ['No evidence recorded']);
+});
+
+Then('the scenarios with evidence show what was observed', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
+  await page.getByText('Even split', { exact: true }).click();
+  const observed = page.getByText('Observed', { exact: true }).locator('..');
+  await expect(observed).toContainText('Each person pays 30.00');
+  await prove(f, observed, ['30.00']);
+});
