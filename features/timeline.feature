@@ -27,7 +27,6 @@ Feature: Seeing what every change did
     Then its result says no evidence was recorded
     And the scenarios with evidence show what was observed
 
-  @proposed
   Scenario: Copying a scenario's name
     Given a run with a scenario of a feature
     When I copy the scenario's name from the run
