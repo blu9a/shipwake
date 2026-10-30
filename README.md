@@ -46,8 +46,8 @@ It is a methodology with a dashboard: your agent sets it up and does the work; y
 4. **Release.** The release page checks the newest commit, drafts the changelog, and records the release when you
    approve it.
 
-Verdicts are deterministic: pass, fail and thresholds never depend on a model. Everything lives in Git: no server,
-no account, no hosting platform required.
+Verdicts are deterministic: pass, fail and thresholds never depend on a model. Everything lives in Git: no account,
+no database, no service to run.
 
 ## Install
 
@@ -177,7 +177,7 @@ Apache-2.0.
 3. **构建和检查。** 智能体实现；CI 记录运行结果：带录屏的测试、基准测试、评测。每次变更都与你批准的内容、上一次运行和上一个发布对比判定。
 4. **发布。** 发布页检查最新的提交，起草变更日志，你批准后记录发布。
 
-判定是确定的：通过、失败和阈值从不依赖模型。一切都在 Git 里：不需要服务器、账号或托管平台。
+判定是确定的：通过、失败和阈值从不依赖模型。一切都在 Git 里：不需要账号，不需要数据库，也没有需要运维的服务。
 
 ## 开始使用
 

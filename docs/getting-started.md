@@ -1,7 +1,7 @@
 # Getting started
 
 Shipwake needs two things: a Git repository, and the result files your tests already write. It keeps the
-results on a branch of the same repository, so there is no server, bucket or account to set up.
+results on a branch of the same repository, so there is no database, bucket or account to set up.
 
 ## 1. Look at your repository
 
