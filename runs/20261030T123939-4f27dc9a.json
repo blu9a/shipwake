@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "id": "20261030T123939-4f27dc9a",
+  "kind": "test",
+  "name": "Browser checks",
+  "commit": "49c36c5afde079a6062c5d16ad583968a5ff5e6c",
+  "branch": "main",
+  "start": "2026-10-30T12:39:39.983Z",
+  "duration": 48355.72,
+  "format": "json",
+  "context": {
+    "runner": "github-ubuntu"
+  },
+  "tests": [
+    {
+      "feature": "attachments.spec.mjs",
+      "name": "zh: file previews are opt-in and attachment rows have a count-free marker",
+      "status": "passed",
+      "start": "2026-10-30T12:39:41.117Z",
+      "duration": 4460,
+      "attempts": 1
+    },
+    {
+      "feature": "attachments.spec.mjs",
+      "name": "en: file previews are opt-in and attachment rows have a count-free marker",
+      "status": "passed",
+      "start": "2026-10-30T12:39:41.066Z",
+      "duration": 4646,
+      "attempts": 1
+    },
+    {
+      "feature": "attachments.spec.mjs",
+      "name": "en: long step/file names ellipsize and scroll within fixed rows on hover or focus",
+      "status": "passed",
+      "start": "2026-10-30T12:39:46.257Z",
+      "duration": 7728,
+      "attempts": 1
+    },
+    {
+      "feature": "attachments.spec.mjs",
+      "name": "zh: long step/file names ellipsize and scroll within fixed rows on hover or focus",
+      "status": "passed",
+      "start": "2026-10-30T12:39:46.461Z",
+      "duration": 7596,
+      "attempts": 1
+    },
+    {
+      "feature": "benchmark-display.spec.mjs",
+      "name": "binary storage scales consistently through EiB",
+      "status": "passed",
+      "start": "2026-10-30T12:39:54.105Z",
+      "duration": 39,
+      "attempts": 1
+    },
+    {
+      "feature": "benchmark-display.spec.mjs",
+      "name": "an unjudged benchmark keeps measurements and hides the three zero verdicts",
+      "status": "passed",
+      "start": "2026-10-30T12:39:54.188Z",
+      "duration": 1026,
+      "attempts": 1
+    },
+    {
+      "feature": "Touch access to truncated names",
+      "name": "tapping a long step focuses and scrolls its full name without opening file previews",
+      "status": "passed",
+      "start": "2026-10-30T12:39:54.015Z",
+      "duration": 1641,
+      "attempts": 1
+    },
+    {
+      "feature": "benchmark-display.spec.mjs",
+      "name": "the chosen baseline controls verdict visibility, including all-OK results",
+      "status": "passed",
+      "start": "2026-10-30T12:39:55.239Z",
+      "duration": 924,
+      "attempts": 1
+    },
+    {
+      "feature": "benchmark-display.spec.mjs",
+      "name": "en: verdict boxes stay in one row when their content fits, independent of their maximum width",
+      "status": "passed",
+      "start": "2026-10-30T12:39:55.693Z",
+      "duration": 1125,
+      "attempts": 1
+    },
+    {
+      "feature": "benchmark-display.spec.mjs",
+      "name": "zh: verdict boxes stay in one row when their content fits, independent of their maximum width",
+      "status": "passed",
+      "start": "2026-10-30T12:39:56.181Z",
+      "duration": 1606,
+      "attempts": 1
+    },
+    {
+      "feature": "proposals.spec.mjs",
+      "name": "scenario: approval refreshes the production timeline without reloading",
+      "status": "passed",
+      "start": "2026-10-30T12:39:56.85Z",
+      "duration": 1727,
+      "attempts": 1
+    },
+    {
+      "feature": "proposals.spec.mjs",
+      "name": "scenario: completed approval cannot be submitted again while data refreshes",
+      "status": "passed",
+      "start": "2026-10-30T12:39:57.832Z",
+      "duration": 1179,
+      "attempts": 1
+    },
+    {
+      "feature": "proposals.spec.mjs",
+      "name": "scenario: rejected approval keeps the proposal available for retry",
+      "status": "passed",
+      "start": "2026-10-30T12:39:58.612Z",
+      "duration": 1079,
+      "attempts": 1
+    },
+    {
+      "feature": "proposals.spec.mjs",
+      "name": "metric: approval refreshes the production timeline without reloading",
+      "status": "passed",
+      "start": "2026-10-30T12:39:59.045Z",
+      "duration": 1586,
+      "attempts": 1
+    },
+    {
+      "feature": "proposals.spec.mjs",
+      "name": "metric: completed approval cannot be submitted again while data refreshes",
+      "status": "passed",
+      "start": "2026-10-30T12:39:59.72Z",
+      "duration": 1133,
+      "attempts": 1
+    },
+    {
+      "feature": "proposals.spec.mjs",
+      "name": "metric: rejected approval keeps the proposal available for retry",
+      "status": "passed",
+      "start": "2026-10-30T12:40:00.646Z",
+      "duration": 1275,
+      "attempts": 1
+    },
+    {
+      "feature": "proposals.spec.mjs",
+      "name": "approving one proposal preserves another proposal's open editor and unsaved text",
+      "status": "passed",
+      "start": "2026-10-30T12:40:00.884Z",
+      "duration": 1235,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /fixture stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:01.978Z",
+      "duration": 1932,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /fixture/branch/feat/responsive-components-with-a-very-long-unbroken-branch-name stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:02.173Z",
+      "duration": 1918,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /fixture/commit/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:03.944Z",
+      "duration": 1971,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /fixture/run/current stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:04.14Z",
+      "duration": 2079,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /fixture/run/tests stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:05.94Z",
+      "duration": 2133,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /fixture/measure/current/latency stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:06.293Z",
+      "duration": 1838,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /fixture/release stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:08.104Z",
+      "duration": 1870,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: /empty stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:08.179Z",
+      "duration": 1811,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /fixture/branch/feat/responsive-components-with-a-very-long-unbroken-branch-name stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:10.027Z",
+      "duration": 1891,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /fixture stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:09.999Z",
+      "duration": 2032,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /fixture/commit/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:11.947Z",
+      "duration": 2078,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /fixture/run/current stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:12.071Z",
+      "duration": 2011,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /fixture/measure/current/latency stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:14.132Z",
+      "duration": 2025,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /fixture/run/tests stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:14.047Z",
+      "duration": 2451,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /fixture/release stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:16.189Z",
+      "duration": 1753,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: /empty stays readable through resize",
+      "status": "passed",
+      "start": "2026-10-30T12:40:16.528Z",
+      "duration": 1810,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "menus fit and keep long branch names available at every width",
+      "status": "passed",
+      "start": "2026-10-30T12:40:17.974Z",
+      "duration": 3545,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "en: short menus retain their desktop width while open on phones",
+      "status": "passed",
+      "start": "2026-10-30T12:40:18.377Z",
+      "duration": 3766,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "baseline and full measurement values survive resizing and reload",
+      "status": "passed",
+      "start": "2026-10-30T12:40:22.176Z",
+      "duration": 1681,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "zh: short menus retain their desktop width while open on phones",
+      "status": "passed",
+      "start": "2026-10-30T12:40:21.548Z",
+      "duration": 3690,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "expanded scenarios and independently scrollable diffs stay contained",
+      "status": "passed",
+      "start": "2026-10-30T12:40:23.879Z",
+      "duration": 2146,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "200% text remains readable on a narrow screen",
+      "status": "passed",
+      "start": "2026-10-30T12:40:26.062Z",
+      "duration": 795,
+      "attempts": 1
+    },
+    {
+      "feature": "timeline-order.spec.mjs",
+      "name": "runs sit with the commit they tested, not when they ran",
+      "status": "passed",
+      "start": "2026-10-30T12:40:26.887Z",
+      "duration": 1,
+      "attempts": 1
+    },
+    {
+      "feature": "responsive.spec.mjs",
+      "name": "release notes retain content through resizing, language and theme changes, and refresh",
+      "status": "passed",
+      "start": "2026-10-30T12:40:25.259Z",
+      "duration": 1818,
+      "attempts": 1
+    },
+    {
+      "feature": "timeline-order.spec.mjs",
+      "name": "the timeline of shipwake in /home/runner/work/shipwake/shipwake/.cache/self-site is in history order",
+      "status": "passed",
+      "start": "2026-10-30T12:40:27.119Z",
+      "duration": 14,
+      "attempts": 1
+    },
+    {
+      "feature": "timeline-order.spec.mjs",
+      "name": "the page puts a backfilled run with its commit",
+      "status": "passed",
+      "start": "2026-10-30T12:40:26.897Z",
+      "duration": 733,
+      "attempts": 1
+    }
+  ]
+}
