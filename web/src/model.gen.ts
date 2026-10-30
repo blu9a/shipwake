@@ -221,6 +221,7 @@ export interface FileDiff {
  * via the `definition` "Run".
  */
 export interface Run {
+  schemaVersion?: number;
   id: string;
   kind: string;
   name: string;

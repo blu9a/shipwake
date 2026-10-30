@@ -62,6 +62,7 @@ Anything without a reader can write this. The full schema is `shipwake schema` (
   Binary storage units (`B`, `KiB`, `MiB`, `GiB`, `TiB`, `PiB`, `EiB`) scale upward by 1024 for display;
   for example, 62943 KiB is shown as 61.5 MiB. Stored values, deltas and thresholds keep their recorded unit.
 - A file may name its `commit` and `branch`; flags override them.
+- `schemaVersion` is optional: a file without it is format 1. See [Compatibility](compatibility.md).
 - Tests use the same shape as every reader produces: `{"tests": [{"feature", "name", "target", "status", "duration", "steps", "attachments"}]}`.
 
 An agent can usually write the converter from your eval runner or load tool to this format in one go; see

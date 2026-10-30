@@ -3,7 +3,10 @@
 // types in web/ are generated from it.
 package model
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // SchemaVersion changes when a file written by Shipwake changes incompatibly.
 const SchemaVersion = 1
@@ -153,8 +156,14 @@ type ScenarioChange struct {
 	Was     []string `json:"was,omitempty"` // steps before, for changed scenarios
 }
 
+// RunSchema is the version of the run format this Shipwake writes. It changes only when a change
+// isn't additive; new optional fields keep it. Every Shipwake reads runs of its own version and all
+// earlier ones, so results recorded years ago keep working (docs/compatibility.md).
+const RunSchema = 1
+
 // Run is one execution of a test suite or a measurement suite against one commit.
 type Run struct {
+	Schema   int               `json:"schemaVersion,omitempty"` // RunSchema when written; absent means 1
 	ID       string            `json:"id"`
 	Kind     string            `json:"kind"` // the project's own word: test, eval, load test, benchmark…
 	Name     string            `json:"name"`
@@ -167,6 +176,15 @@ type Run struct {
 	Tests    []Test            `json:"tests,omitempty"`
 	Metrics  []Metric          `json:"metrics,omitempty"`
 	Cases    []Case            `json:"cases,omitempty"` // an evaluation's dataset items, with what each scored
+}
+
+// CheckSchema says whether this Shipwake can read the run: one written by a newer Shipwake, in a format
+// it doesn't know, would be misread.
+func (r Run) CheckSchema() error {
+	if r.Schema > RunSchema {
+		return fmt.Errorf("written in run format %d by a newer Shipwake; this one reads up to format %d: upgrade shipwake", r.Schema, RunSchema)
+	}
+	return nil
 }
 
 // Case is one item of an evaluation's dataset: what went in, what came out, its score and why. The

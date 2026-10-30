@@ -81,6 +81,7 @@ func (s Store) Save(run *model.Run, srcDir string) error {
 	if err := os.MkdirAll(filepath.Join(s.Dir, "runs"), 0o755); err != nil {
 		return err
 	}
+	run.Schema = model.RunSchema
 	data, err := json.MarshalIndent(run, "", "  ")
 	if err != nil {
 		return err
@@ -108,6 +109,9 @@ func (s Store) List() ([]model.Run, error) {
 		}
 		var r model.Run
 		if err := json.Unmarshal(data, &r); err != nil {
+			return nil, fmt.Errorf("%s: %w", e.Name(), err)
+		}
+		if err := r.CheckSchema(); err != nil {
 			return nil, fmt.Errorf("%s: %w", e.Name(), err)
 		}
 		runs = append(runs, r)
