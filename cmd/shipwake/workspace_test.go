@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -243,5 +244,43 @@ func TestOnlyTheCheckedOutBranch(t *testing.T) {
 	}
 	if err := ask("main"); err == nil || !strings.Contains(err.Error(), "no branch is checked out") {
 		t.Errorf("detached: %v", err)
+	}
+}
+
+// A clone checked out on a branch other than its default one: the workspace follows it before the
+// settings are written, and nothing is written into the repository.
+func TestInitLocalOnAnotherBranch(t *testing.T) {
+	ctx := context.Background()
+	root := t.TempDir()
+	t.Setenv("SHIPWAKE_HOME", filepath.Join(root, "home"))
+	t.Setenv("GIT_CONFIG_GLOBAL", os.DevNull)
+	dir := filepath.Join(root, "bills")
+	repo := gitx.Repo{Dir: dir}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, args := range [][]string{
+		{"init", "-q", "-b", "master"}, {"config", "user.name", "Ana"}, {"config", "user.email", "ana@example.com"},
+		{"commit", "-q", "--allow-empty", "-m", "start"}, {"switch", "-q", "-c", "main"},
+	} {
+		if _, err := repo.Git(ctx, args...); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := initCmd()
+	c.SetArgs([]string{"--local", "--write", dir})
+	c.SetOut(io.Discard)
+	if err := c.ExecuteContext(ctx); err != nil {
+		t.Fatal(err)
+	}
+	ws := gitx.Repo{Dir: filepath.Join(root, "home", "bills")}
+	if b, _ := ws.Git(ctx, "branch", "--show-current"); strings.TrimSpace(b) != "main" {
+		t.Errorf("workspace on %q, want the repository's branch", b)
+	}
+	if files, _ := ws.Git(ctx, "ls-files"); strings.TrimSpace(files) != ".shipwake.yaml" {
+		t.Errorf("workspace has %q", files)
+	}
+	if st, _ := repo.Git(ctx, "status", "--porcelain", "--ignored"); st != "" {
+		t.Errorf("the repository changed: %q", st)
 	}
 }

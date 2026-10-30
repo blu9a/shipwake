@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"io/fs"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"github.com/blu9a/shipwake/internal/build"
 	"github.com/blu9a/shipwake/internal/gitx"
 	"github.com/blu9a/shipwake/internal/judge"
+	"github.com/blu9a/shipwake/internal/local"
 	"github.com/blu9a/shipwake/internal/readers"
 	"github.com/blu9a/shipwake/internal/store"
 )
@@ -27,7 +29,7 @@ type stack struct {
 }
 
 func initCmd() *cobra.Command {
-	var write bool
+	var write, toLocal bool
 	c := &cobra.Command{
 		Use:   "init [repo]",
 		Short: "Look at a repository and show how to record its results (nothing is changed unless --write)",
@@ -45,6 +47,13 @@ func initCmd() *cobra.Command {
 			}
 			top = strings.TrimSpace(top)
 			out := cmd.OutOrStdout()
+			// In local mode Shipwake's files are in the project's workspace, never in the repository.
+			if toLocal {
+				if _, err := open(ctx, top); err != nil {
+					return err
+				}
+			}
+			proj := withLocal(build.Project{Dir: top})
 			found := detect(top)
 			features := count(top, ".feature")
 			fmt.Fprintf(out, "%s\n\n", filepath.Base(top))
@@ -59,19 +68,29 @@ func initCmd() *cobra.Command {
 			if features > 0 {
 				fmt.Fprintf(out, "  • %d .feature files: scenario changes will show on each commit\n", features)
 			}
-			fmt.Fprintln(out, "\nIn CI, after the tests:")
+			if proj.Spec != "" {
+				fmt.Fprintf(out, "\nLocal mode: nothing is written into this repository. Settings, requirements and results are in\nthe workspace %s.\n", proj.Spec)
+				fmt.Fprintln(out, "\nAfter running the tests here:")
+			} else {
+				fmt.Fprintln(out, "\nIn CI, after the tests:")
+			}
 			for _, s := range found {
 				fmt.Fprintf(out, "  %s\n  shipwake add -f %s --file %s -n %q\n", s.Run, s.Format, s.File, s.RunName)
 			}
 			if len(found) == 0 {
 				fmt.Fprintln(out, "  shipwake add -f junit --file report.xml -n \"Tests\"")
 			}
-			fmt.Fprintf(out, "\nResults go to the branch %q in this repository: no server or bucket needed.\n", store.Branch(store.DefaultBranch))
-			fmt.Fprintln(out, "Shipwake never pushes on its own. To keep runs from CI, add --push: it sends that branch to origin.")
+			if proj.Spec != "" {
+				fmt.Fprintln(out, "\nRuns go to the workspace's results branch.")
+			} else {
+				fmt.Fprintf(out, "\nResults go to the branch %q in this repository: no server or bucket needed.\n", store.Branch(store.DefaultBranch))
+				fmt.Fprintln(out, "Shipwake never pushes on its own. To keep runs from CI, add --push: it sends that branch to origin.")
+			}
 			fmt.Fprintln(out, "Then: shipwake serve        (look at it locally)")
 			fmt.Fprintln(out, "      shipwake build -o site  (publish the folder, e.g. on GitHub Pages)")
 			fmt.Fprintln(out, "      shipwake check          (a CI gate: exit 1 when something blocks)")
-			cfgPath := filepath.Join(top, ".shipwake.yaml")
+			specDir := cmp.Or(proj.Spec, top)
+			cfgPath := filepath.Join(specDir, ".shipwake.yaml")
 			if write {
 				if _, err := os.Stat(cfgPath); err == nil {
 					fmt.Fprintf(out, "\n%s already exists; left as it is.\n", ".shipwake.yaml")
@@ -82,17 +101,35 @@ func initCmd() *cobra.Command {
 					trunk = "master"
 				}
 				cfg := fmt.Sprintf(starterConfig, filepath.Base(top), trunk)
+				ws := gitx.Repo{Dir: proj.Spec}
+				if proj.Spec != "" {
+					// on the repository's branch first: the settings belong to it
+					if err := local.Follow(ctx, repo, ws, build.DefaultTrunk(ctx, repo)); err != nil {
+						return err
+					}
+				}
 				if err := os.WriteFile(cfgPath, []byte(cfg), 0o644); err != nil {
 					return err
 				}
-				fmt.Fprintf(out, "\nWrote .shipwake.yaml. Everything in it is optional.\n")
+				if proj.Spec != "" {
+					if _, err := ws.Git(ctx, "add", ".shipwake.yaml"); err != nil {
+						return err
+					}
+					if _, err := local.Commit(ctx, top, ws, "chore: add Shipwake's settings"); err != nil {
+						return err
+					}
+					fmt.Fprintf(out, "\nWrote and committed .shipwake.yaml in the workspace. Everything in it is optional.\n")
+				} else {
+					fmt.Fprintf(out, "\nWrote .shipwake.yaml. Everything in it is optional.\n")
+				}
 			} else {
 				fmt.Fprintln(out, "\nOptional: shipwake init --write  adds a commented .shipwake.yaml (names, languages, thresholds).")
 			}
 			return nil
 		},
 	}
-	c.Flags().BoolVar(&write, "write", false, "write a starter .shipwake.yaml")
+	c.Flags().BoolVar(&write, "write", false, "write a starter .shipwake.yaml (in local mode, into the workspace, committed)")
+	c.Flags().BoolVar(&toLocal, "local", false, "put the repository in local mode: Shipwake's files go to a workspace of its own, never into the repository")
 	return c
 }
 
