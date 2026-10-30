@@ -1,4 +1,4 @@
-# @shipwake/playwright
+# shipwake-playwright
 
 Playwright reporter and recording helpers for [Shipwake](https://github.com/blu9a/shipwake).
 
@@ -6,12 +6,12 @@ Shipwake reads Playwright's own JSON reporter already. This package adds what th
 subtitles in step with each recording, Gherkin Background steps where they belong, and the helpers below.
 
 ```sh
-npm i -D @shipwake/playwright
+npm i -D shipwake-playwright
 ```
 
 ```ts
 // playwright.config.ts
-reporter: [['list'], ['@shipwake/playwright/reporter', { outputFile: 'shipwake/run.json', name: 'Web tests' }]],
+reporter: [['list'], ['shipwake-playwright/reporter', { outputFile: 'shipwake/run.json', name: 'Web tests' }]],
 use: { video: 'on' },
 ```
 

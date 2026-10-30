@@ -2,7 +2,7 @@
 // every scenario step, including Background steps that run inside hooks; attachments saved as files
 // next to the report; and the "observed" evidence recorded by `decisive()`.
 //
-//   reporter: [['list'], ['@shipwake/playwright/reporter', { outputFile: 'shipwake/run.json', name: 'Web tests' }]]
+//   reporter: [['list'], ['shipwake-playwright/reporter', { outputFile: 'shipwake/run.json', name: 'Web tests' }]]
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import type { FullConfig, FullResult, Reporter, Suite, TestCase, TestResult, TestStep } from '@playwright/test/reporter';

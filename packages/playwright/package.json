@@ -1,5 +1,5 @@
 {
-  "name": "@shipwake/playwright",
+  "name": "shipwake-playwright",
   "version": "0.1.0",
   "description": "Shipwake reporter and recording helpers for Playwright: every step, attachments as files, observed evidence.",
   "license": "Apache-2.0",
