@@ -174,6 +174,9 @@ func Load(ctx context.Context, p Project, maxRows int, log func(string, ...any))
 		return nil, err
 	}
 	l := &Loaded{Index: idx, Files: map[string]string{}, Repo: repo, Trunk: h.Trunk, Spec: specRepo, Local: specDir != top}
+	if l.Local {
+		idx.Kept = kept(ctx, specRepo, idx)
+	}
 
 	// Where the runs are: an explicit location, the config's, or the default results branch.
 	spec := p.Results
@@ -585,4 +588,43 @@ func writeStories(ctx context.Context, l *Loaded, rev, dir string, pending bool)
 func branchKey(name string) string {
 	sum := sha256.Sum256([]byte(name))
 	return strings.Trim(idRe.ReplaceAllString(strings.ToLower(name), "-"), "-") + "-" + hex.EncodeToString(sum[:4])
+}
+
+// kept reads a workspace's commits, on every branch but the results', and places each above the
+// repository commit that was checked out when it was made: the one its Repository-commit trailer names,
+// else the newest one known from before it. The commit that started the workspace isn't shown.
+func kept(ctx context.Context, ws gitx.Repo, idx *model.Project) []model.Kept {
+	const us, rs = "\x1f", "\x1e"
+	out, err := ws.Git(ctx, "log", "--exclude=shipwake-results", "--branches", "--format=%H"+us+"%h"+us+"%s"+us+"%cI"+us+
+		"%(trailers:key=Approved-by,valueonly,separator=%x2C)"+us+"%(trailers:key=Repository-commit,valueonly)"+us+"%P"+rs)
+	if err != nil {
+		return nil
+	}
+	var res []model.Kept
+	for _, rec := range strings.Split(out, rs) {
+		f := strings.Split(strings.TrimSpace(rec), us)
+		if len(f) < 7 || strings.TrimSpace(f[6]) == "" {
+			continue // the workspace's first commit
+		}
+		k := model.Kept{SHA: f[0], Short: f[1], Subject: f[2]}
+		k.Date, _ = time.Parse(time.RFC3339, f[3])
+		k.By, _, _ = strings.Cut(strings.TrimSpace(f[4]), " <")
+		if c := strings.TrimSpace(f[5]); c != "" {
+			if _, ok := idx.Commits[c]; ok {
+				k.Commit = c
+			}
+		}
+		if k.Commit == "" {
+			var at time.Time
+			for sha, c := range idx.Commits {
+				if !c.Date.After(k.Date) && (c.Date.After(at) || c.Date.Equal(at) && sha < k.Commit) {
+					k.Commit, at = sha, c.Date
+				}
+			}
+		}
+		if k.Commit != "" {
+			res = append(res, k)
+		}
+	}
+	return res
 }

@@ -171,6 +171,9 @@ const en = {
   roles: { before: 'Before', action: 'Action', result: 'Result' } as Record<string, string>,
   observed: 'Observed',
   noEvidence: 'No evidence recorded',
+  keptInWorkspace: 'In the workspace',
+  copyName: 'Copy the name',
+  copiedName: 'Name copied',
   passedOnRetry: 'passed on retry',
   counts: {
     failed: (n: number) => `${n} failed`,
@@ -368,6 +371,9 @@ const zh: Messages = {
   roles: { before: '前提', action: '操作', result: '结果' },
   observed: '实际看到',
   noEvidence: '没有记录证据',
+  keptInWorkspace: '在工作区中',
+  copyName: '复制名称',
+  copiedName: '已复制名称',
   passedOnRetry: '重试后通过',
   counts: {
     failed: (n) => `${n} 个失败`,

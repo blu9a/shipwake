@@ -338,6 +338,38 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "Kept": {
+      "properties": {
+        "sha": {
+          "type": "string"
+        },
+        "short": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "by": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "commit": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "sha",
+        "short",
+        "subject",
+        "date",
+        "commit"
+      ]
+    },
     "Kind": {
       "properties": {
         "icon": {
@@ -469,6 +501,12 @@
         },
         "truncated": {
           "type": "boolean"
+        },
+        "kept": {
+          "items": {
+            "$ref": "#/$defs/Kept"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,

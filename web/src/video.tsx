@@ -272,10 +272,15 @@ export function useNoBlanks(ref: RefObject<HTMLVideoElement | null>, src: string
     setStill(undefined);
     if (!src) return;
     findBlanks(src, ctl.signal)
-      .then((b) => !ctl.signal.aborted && setBlanks(b))
+      .then((b) => {
+        if (ctl.signal.aborted) return;
+        // the scan's result, for anyone checking the player: blank stretches as start-end seconds
+        if (ref.current) ref.current.dataset.blanks = b.map((x) => `${x.start.toFixed(1)}-${x.end.toFixed(1)}`).join(' ');
+        setBlanks(b);
+      })
       .catch(() => {}); // unreadable: shown as recorded
     return () => ctl.abort();
-  }, [src]);
+  }, [ref, src]);
   useEffect(() => {
     const v = ref.current;
     if (!v || blanks.length === 0) return;

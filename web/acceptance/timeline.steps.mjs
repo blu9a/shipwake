@@ -133,3 +133,28 @@ Then('the scenarios with evidence show what was observed', async ({ page, $testI
   await expect(observed).toContainText('Each person pays 30.00');
   await prove(f, observed, ['30.00']);
 });
+
+// Copying a scenario's name
+
+Given('a run with a scenario of a feature', async ({ repo }) => {
+  repo.record(repo.commit('feat: split a bill between friends'), 'Acceptance', [passed('Even split')]);
+});
+
+When("I copy the scenario's name from the run", async ({ page, context, served }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await served.open(page);
+  await page.getByRole('link', { name: 'Acceptance', exact: true }).click();
+  const row = page.locator('details.row').filter({ has: page.locator('summary', { hasText: 'Even split' }) });
+  await row.locator('summary').hover();
+  await row.getByRole('button', { name: 'Copy the name' }).click();
+});
+
+Then("I have the feature's and the scenario's names together, ready to paste", async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
+  const copied = page.getByRole('button', { name: 'Name copied' });
+  await expect(copied).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Splitting a bill › Even split');
+  // the row stays closed: copying isn't opening
+  await expect(page.locator('details.row').filter({ hasText: 'Even split' })).not.toHaveAttribute('open', '');
+  await prove(f, copied.locator('xpath=ancestor::summary[1]').getByText('Even split', { exact: true }), ['Even split']);
+});

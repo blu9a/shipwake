@@ -41,6 +41,19 @@ type Project struct {
 	Rules     map[string]Rule   `json:"rules,omitempty"`     // direction and thresholds by metric ID or pattern ("api.*.p95")
 	Kinds     map[string]Kind   `json:"kinds,omitempty"`     // how the project's own run kinds are shown
 	Truncated bool              `json:"truncated,omitempty"` // older history was left out
+	// In local mode, the workspace's commits (proposals, edits, approvals), each placed above a commit of
+	// the repository, as runs are.
+	Kept []Kept `json:"kept,omitempty"`
+}
+
+// Kept is a commit in a local mode project's workspace, where its requirements are kept.
+type Kept struct {
+	SHA     string    `json:"sha"`
+	Short   string    `json:"short"`
+	Subject string    `json:"subject"`
+	By      string    `json:"by,omitempty"` // the approver, from Approved-by
+	Date    time.Time `json:"date"`
+	Commit  string    `json:"commit"` // the repository commit it sits above: the one checked out when it was made
 }
 
 // Rule is what a project says about a measurement: which way is better, overriding what the run

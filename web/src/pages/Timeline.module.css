@@ -61,6 +61,11 @@
 .sync {
   color: var(--ink-2);
 }
+/* a workspace commit: outside the repository's history, so its marker is hollow and dashed */
+.kept .dot {
+  border-style: dashed;
+  border-color: var(--accent);
+}
 .sync .dot {
   border-style: dashed;
 }
