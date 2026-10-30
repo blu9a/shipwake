@@ -1,0 +1,26 @@
+# Publishes @shipwake/playwright to npm when a GitHub release is published, at the release's version. A tag
+# alone only drafts the release (release.yml): nothing reaches npm until a person publishes the draft.
+name: npm
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+  id-token: write # npm provenance: the package says which workflow built it
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 24, registry-url: https://registry.npmjs.org }
+      - name: Build
+        working-directory: packages/playwright
+        run: |
+          npm version --no-git-tag-version "${GITHUB_REF_NAME#v}"
+          npm install --no-package-lock
+          npm run build
+      - name: Publish
+        working-directory: packages/playwright
+        run: npm publish --provenance --access public $([ "${{ github.event.release.prerelease }}" = true ] && echo --tag next)
+        env: { NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}" }

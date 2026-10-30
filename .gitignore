@@ -10,3 +10,5 @@ node_modules/
 web/test-results/
 web/playwright-report/
 web/.features-gen/
+packages/playwright/dist/
+packages/playwright/node_modules/

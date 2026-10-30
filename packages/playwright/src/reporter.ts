@@ -85,7 +85,7 @@ export default class ShipwakeReporter implements Reporter {
     const walk = (list: TestStep[]) => {
       for (const s of list) {
         if (s.category === 'test.step' && !/\bhook$/i.test(s.title)) {
-          const own = (s.attachments ?? []).map((a) => (used.add(a), save(a))).filter((a): a is Attachment => !!a);
+          const own = (s.attachments ?? []).map((a: TestResult['attachments'][number]) => (used.add(a), save(a))).filter((a): a is Attachment => !!a);
           steps.push({
             name: s.title,
             status: s.error ? 'failed' : 'passed',
