@@ -56,12 +56,18 @@ Then('opening the run shows the failing test with its error', async ({ page }) =
 
 Given('a release whose changelog lists a new feature and a fix', async ({ repo }) => {
   repo.commit('feat: split a bill between friends');
-  repo.release('v0.1.0', { Features: ['Split a bill between friends'], Fixes: ['Shares add up to the total'] });
+  // written the way changelog tools write them: links, bold, code
+  repo.release('v0.1.0', {
+    Features: ['Split a bill between friends'],
+    Fixes: ['**totals:** Shares add up to the `total` ([#12](https://example.com/bills/pull/12))'],
+  });
 });
 
 Then('the release shows the feature and the fix as its changelog says', async ({ page }) => {
   const release = page.locator('main').getByText('v0.1.0', { exact: true }).first();
   await expect(release).toBeVisible();
   await expect(page.locator('main').getByText('Split a bill between friends', { exact: true })).toBeVisible();
-  await expect(page.locator('main').getByText('Shares add up to the total', { exact: true })).toBeVisible();
+  const fix = page.locator('main li').filter({ hasText: 'Shares add up to the' });
+  await expect(fix).toHaveText('totals: Shares add up to the total (#12)');
+  await expect(fix.getByRole('link', { name: '#12' })).toHaveAttribute('href', 'https://example.com/bills/pull/12');
 });
