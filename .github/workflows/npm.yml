@@ -4,6 +4,9 @@ name: npm
 on:
   release:
     types: [published]
+  workflow_dispatch: # again for a release already published, should publishing have failed
+    inputs:
+      tag: { description: "The release's tag, such as v0.1.0", required: true }
 permissions:
   contents: read
   id-token: write # npm provenance: the package says which workflow built it
@@ -12,16 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with: { ref: "${{ inputs.tag || github.ref }}" }
       - uses: actions/setup-node@v7
         with: { node-version: 24, registry-url: https://registry.npmjs.org }
       - name: Build
         working-directory: packages/playwright
+        env: { TAG: "${{ inputs.tag || github.ref_name }}" }
         run: |
-          npm version --no-git-tag-version "${GITHUB_REF_NAME#v}"
+          npm version --no-git-tag-version --allow-same-version "${TAG#v}"
           npm install --no-package-lock
           npm run build
       - name: Publish
         working-directory: packages/playwright
         # a version with a suffix (0.2.0-rc.1) goes out as "next"; others as the version everyone installs
-        run: npm publish --provenance --access public $(case "$GITHUB_REF_NAME" in *-*) echo --tag next;; esac)
-        env: { NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}" }
+        run: npm publish --provenance --access public $(case "$TAG" in *-*) echo --tag next;; esac)
+        env: { NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}", TAG: "${{ inputs.tag || github.ref_name }}" }
