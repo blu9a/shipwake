@@ -10,14 +10,13 @@ concurrency:
   cancel-in-progress: true
 
 # Shipwake records its own runs: tests, browser checks and benchmarks go to its results branch.
+# The suites run side by side, each building what it needs; the last job records every run in one
+# place, so the results branch gets one push, and judges them.
 jobs:
-  build:
+  checks:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # to push the results branch
     steps:
       - uses: actions/checkout@v7
-        with: { fetch-depth: 0 } # the whole history: the timeline's order is checked on this repository's own
       - uses: actions/setup-go@v7
         with: { go-version-file: go.mod }
       - uses: pnpm/action-setup@v6 # the version comes from package.json
@@ -28,67 +27,102 @@ jobs:
       - run: make lint
       - name: Schema and types are up to date
         run: make schema && git diff --exit-code spec web/src/model.gen.ts
-
       - name: Go tests
-        id: go
-        continue-on-error: true
         run: go test -json ./... > go-test.json
-      - name: Record Go tests
-        if: always() && steps.go.outcome != 'skipped'
-        run: bin/shipwake add -f go-test --file go-test.json -n "Go tests" --context runner=github-ubuntu $PUSH
-        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: { name: go-test, path: go-test.json, if-no-files-found: ignore }
 
+  browser:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - { name: Browser checks, file: browser, config: playwright.config.mjs }
+          - { name: Acceptance, file: acceptance, config: acceptance.config.mjs }
+    steps:
+      - uses: actions/checkout@v7
+        with: { fetch-depth: 0 } # the whole history: the timeline's order is checked on this repository's own
+      - uses: actions/setup-go@v7
+        with: { go-version-file: go.mod }
+      - uses: pnpm/action-setup@v6
+        with: { package_json_file: web/package.json }
+      - uses: actions/setup-node@v7
+        with: { node-version: 24, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
+      - run: make web build
+      - name: Chromium
+        uses: actions/cache@v6
+        with: { path: ~/.cache/ms-playwright, key: "chromium-${{ hashFiles('web/pnpm-lock.yaml') }}" }
+      - working-directory: web
+        run: pnpm exec playwright install chromium # the runner image has its system libraries
       - name: This repository's own site
+        if: matrix.suite.file == 'browser'
         run: |
           git fetch -q origin shipwake-results:shipwake-results || true
           bin/shipwake build -o .cache/self-site .
-      - name: Browser checks
-        id: browser
-        continue-on-error: true
+      - name: ${{ matrix.suite.name }}
         working-directory: web
         env:
-          SHIPWAKE_OUTPUT: ${{ github.workspace }}/browser/run.json
-          SHIPWAKE_NAME: Browser checks
-          SHIPWAKE_CHECK_SITES: ${{ github.workspace }}/.cache/self-site
+          SHIPWAKE_OUTPUT: ${{ github.workspace }}/${{ matrix.suite.file }}/run.json
+          SHIPWAKE_NAME: ${{ matrix.suite.name }}
+          SHIPWAKE_CHECK_SITES: ${{ matrix.suite.file == 'browser' && format('{0}/.cache/self-site', github.workspace) || '' }}
         run: |
-          pnpm exec playwright install --with-deps chromium
-          pnpm exec playwright test --reporter=list,../packages/playwright/src/reporter.ts
-      - name: Record browser checks
-        if: always() && steps.browser.outcome != 'skipped'
-        run: bin/shipwake add -f json --file browser/run.json --context runner=github-ubuntu $PUSH
-        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
-      - name: Acceptance
-        id: acceptance
-        continue-on-error: true
-        working-directory: web
-        env:
-          SHIPWAKE_OUTPUT: ${{ github.workspace }}/acceptance/run.json
-          SHIPWAKE_NAME: Acceptance
-        run: |
-          pnpm exec bddgen -c acceptance.config.mjs
-          pnpm exec playwright test -c acceptance.config.mjs --reporter=list,../packages/playwright/src/reporter.ts
-      - name: Record acceptance
-        if: always() && steps.acceptance.outcome != 'skipped'
-        run: bin/shipwake add -f json --file acceptance/run.json --context runner=github-ubuntu $PUSH
-        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+          if [ ${{ matrix.suite.file }} = acceptance ]; then pnpm exec bddgen -c acceptance.config.mjs; fi
+          pnpm exec playwright test -c ${{ matrix.suite.config }} --reporter=list,../packages/playwright/src/reporter.ts
+      # the report, and the recordings it points to, in their places relative to each other
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ${{ matrix.suite.file }}
+          if-no-files-found: ignore
+          path: |
+            ${{ matrix.suite.file }}/
+            web/test-results/
 
+  benchmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with: { go-version-file: go.mod }
       - name: Benchmark fixtures
         uses: actions/cache@v6
         with: { path: .cache/fixtures, key: "fixtures-${{ hashFiles('tools/fixtures.sh') }}" }
       - run: tools/fixtures.sh
+      # Five samples of each on the trunk, where the trend is kept; three on pull requests, to judge sooner.
       - name: Benchmarks
-        id: bench
-        continue-on-error: true
-        run: go test -run '^$' -bench . -benchmem -count 5 ./... > bench.txt
-      - name: Record benchmarks
-        if: always() && steps.bench.outcome != 'skipped'
-        run: bin/shipwake add -f go-bench --file bench.txt -n "Benchmarks" --context runner=github-ubuntu $PUSH
-        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+        run: go test -run '^$' -bench . -benchmem -count ${{ github.event_name == 'push' && 5 || 3 }} ./... > bench.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with: { name: bench, path: bench.txt, if-no-files-found: ignore }
 
+  record:
+    needs: [checks, browser, benchmarks]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to push the results branch
+    env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+    steps:
+      - uses: actions/checkout@v7
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-go@v7
+        with: { go-version-file: go.mod }
+      - run: make build # recording and judging need no web app
+      - uses: actions/download-artifact@v8
+        with: { path: runs }
+      - name: Record
+        run: |
+          # a suite that stopped before writing its report has nothing to record; Check still fails
+          record() { f=$1; shift; if [ -e "$f" ]; then bin/shipwake add --file "$f" "$@" --context runner=github-ubuntu $PUSH; fi; }
+          record runs/go-test/go-test.json -f go-test -n "Go tests"
+          record runs/browser/browser/run.json -f json
+          record runs/acceptance/acceptance/run.json -f json
+          record runs/bench/bench.txt -f go-bench -n "Benchmarks"
       - name: Check
         run: |
-          test "${{ steps.go.outcome }}" = success
-          test "${{ steps.browser.outcome }}" = success
-          test "${{ steps.acceptance.outcome }}" = success
-          test "${{ steps.bench.outcome }}" = success
+          test "${{ needs.checks.result }}" = success
+          test "${{ needs.browser.result }}" = success
+          test "${{ needs.benchmarks.result }}" = success
           bin/shipwake check --against previous
