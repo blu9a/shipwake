@@ -68,6 +68,10 @@
   left: auto;
   right: 0;
 }
+/* the agent prompt is long text: wider than a list, never past the screen */
+.menu:has(> :global(.prompt)) {
+  max-width: min(34rem, calc(100vw - 32px));
+}
 /* settings are two short switches: the menu fits them instead of the pickers' list width */
 .menu:has(> :global(.settings)) {
   min-width: 0;

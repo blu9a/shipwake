@@ -12,6 +12,7 @@
 package build
 
 import (
+	"cmp"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -43,7 +44,13 @@ import (
 // Project is one repository to include.
 type Project struct {
 	Dir     string // the repository
-	Results string // a results store; empty for none
+	Results string // a results store; empty for the config's, else the default branch
+	// In local mode, the workspace beside the repository: Shipwake's files (config, features, metrics)
+	// and their history are read there, never from the repository. Empty: the repository.
+	Spec string
+	// The Git repository whose results branch holds the runs: the workspace's in local mode, and
+	// still after adopting. Empty: Spec's.
+	ResultsRepo string
 }
 
 // Options control a build.
@@ -74,7 +81,7 @@ func Run(ctx context.Context, o Options) error {
 			return fmt.Errorf("web app: %w", err)
 		}
 	}
-	site := model.Site{Version: model.SchemaVersion, GeneratedAt: time.Now().UTC()}
+	site := model.Site{Version: model.SchemaVersion, GeneratedAt: time.Now().UTC(), Projects: []model.ProjectRef{}}
 	used := map[string]bool{}
 	for _, p := range o.Projects {
 		ref, err := project(ctx, p, o, used)
@@ -94,7 +101,9 @@ type Loaded struct {
 	Runs  []*model.Run
 	Files map[string]string // run ID → directory with its attachments
 	Repo  gitx.Repo
-	Trunk string // the trunk for Git: its local branch, or origin's
+	Trunk string    // the trunk for Git: its local branch, or origin's
+	Spec  gitx.Repo // where Shipwake's files and their history are: Repo, or its workspace
+	Local bool      // Spec is a workspace beside the repository
 	clean []func()
 }
 
@@ -117,7 +126,9 @@ func Load(ctx context.Context, p Project, maxRows int, log func(string, ...any))
 	}
 	top = strings.TrimSpace(top)
 	repo = gitx.Repo{Dir: top}
-	cfg, err := LoadConfig(top)
+	specDir := cmp.Or(p.Spec, top)
+	specRepo := gitx.Repo{Dir: specDir}
+	cfg, err := LoadConfig(specDir)
 	if err != nil {
 		return nil, err
 	}
@@ -153,16 +164,16 @@ func Load(ctx context.Context, p Project, maxRows int, log func(string, ...any))
 		}
 	}
 	// Approved .metric files are thresholds too, and win over the config's for their ID.
-	for id, r := range agreedMetrics(ctx, repo) {
+	for id, r := range agreedMetrics(ctx, specRepo) {
 		if idx.Rules == nil {
 			idx.Rules = map[string]model.Rule{}
 		}
 		idx.Rules[id] = r
 	}
-	if idx.Text, err = loadText(top, cfg.Text); err != nil {
+	if idx.Text, err = loadText(specDir, cfg.Text); err != nil {
 		return nil, err
 	}
-	l := &Loaded{Index: idx, Files: map[string]string{}, Repo: repo, Trunk: h.Trunk}
+	l := &Loaded{Index: idx, Files: map[string]string{}, Repo: repo, Trunk: h.Trunk, Spec: specRepo, Local: specDir != top}
 
 	// Where the runs are: an explicit location, the config's, or the default results branch.
 	spec := p.Results
@@ -179,7 +190,7 @@ func Load(ctx context.Context, p Project, maxRows int, log func(string, ...any))
 			return nil, err
 		}
 		l.clean = append(l.clean, func() { _ = os.RemoveAll(tmp) })
-		found, err := store.Export(ctx, repo, branch, tmp)
+		found, err := store.Export(ctx, gitx.Repo{Dir: cmp.Or(p.ResultsRepo, specDir)}, branch, tmp)
 		if err != nil {
 			l.Close()
 			return nil, fmt.Errorf("results branch %s: %w", branch, err)
@@ -437,6 +448,9 @@ func summarize(r model.Run) model.RunSummary {
 	return s
 }
 
+// DefaultTrunk is the repository's main branch: origin's HEAD, else main, master or trunk.
+func DefaultTrunk(ctx context.Context, r gitx.Repo) string { return defaultTrunk(ctx, r) }
+
 func defaultTrunk(ctx context.Context, r gitx.Repo) string {
 	if out, err := r.Git(ctx, "symbolic-ref", "--short", "refs/remotes/origin/HEAD"); err == nil {
 		if b := strings.TrimPrefix(strings.TrimSpace(out), "origin/"); b != "" {
@@ -532,12 +546,25 @@ func exists(p string) bool { _, err := os.Stat(p); return err == nil }
 
 // writeStories writes the requirements as of rev. For a branch, only what still waits for approval:
 // the rest is the trunk's story, told on the feature pages.
+// In local mode the workspace holds them, a branch for each of the repository's: rev's namesake there,
+// or nothing when it has none.
 func writeStories(ctx context.Context, l *Loaded, rev, dir string, pending bool) error {
-	stories, err := story.Build(ctx, l.Repo, rev, l.Runs)
+	src := story.Source{Repo: l.Spec, Rev: rev}
+	if l.Local {
+		name := strings.TrimPrefix(strings.TrimPrefix(strings.TrimPrefix(rev, "refs/heads/"), "refs/remotes/origin/"), "origin/")
+		src = story.Source{Repo: l.Spec, Rev: "refs/heads/" + name, Beside: true}
+		if _, err := l.Spec.Resolve(ctx, src.Rev); err != nil {
+			if err := writeJSON(filepath.Join(dir, "stories.json"), []any{}); err != nil {
+				return err
+			}
+			return writeJSON(filepath.Join(dir, "metric-stories.json"), []any{})
+		}
+	}
+	stories, err := story.Build(ctx, src, l.Runs)
 	if err != nil {
 		return fmt.Errorf("stories: %w", err)
 	}
-	metrics, err := story.BuildMetrics(ctx, l.Repo, rev, l.Runs)
+	metrics, err := story.BuildMetrics(ctx, src, l.Runs)
 	if err != nil {
 		return fmt.Errorf("metric stories: %w", err)
 	}

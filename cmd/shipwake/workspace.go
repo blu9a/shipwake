@@ -22,41 +22,79 @@ import (
 	"github.com/blu9a/shipwake/internal/changelog"
 	"github.com/blu9a/shipwake/internal/gherkin"
 	"github.com/blu9a/shipwake/internal/gitx"
+	"github.com/blu9a/shipwake/internal/local"
 	"github.com/blu9a/shipwake/internal/model"
 )
 
 type workspace struct {
-	mu      sync.Mutex
-	ctx     context.Context
-	opts    build.Options
-	repos   map[string]string // project ID → repository directory
-	files   http.Handler
-	rebuild func() error
+	mu       sync.Mutex
+	ctx      context.Context
+	opts     build.Options
+	projects map[string]served // by project ID
+	files    http.Handler
+	rebuild  func() error
+}
+
+// served is a project the workspace can change. In local mode its requirements are in the workspace
+// beside the repository (spec), and the repository (code) is only read.
+type served struct {
+	code, spec gitx.Repo
+	local      bool
+	workspace  string // its workspace in local mode, or after adopting
 }
 
 func newWorkspace(ctx context.Context, o build.Options) (*workspace, error) {
 	w := &workspace{ctx: ctx, opts: o, files: http.FileServer(http.Dir(o.Out))}
-	w.rebuild = func() error { return build.Run(ctx, w.opts) }
+	w.rebuild = func() error {
+		if err := build.Run(ctx, w.opts); err != nil {
+			return err
+		}
+		return w.index()
+	}
 	if err := w.rebuild(); err != nil {
 		return nil, err
 	}
-	data, err := os.ReadFile(filepath.Join(o.Out, "data", "site.json"))
+	return w, nil
+}
+
+// index maps the built site's project IDs to their repositories.
+func (w *workspace) index() error {
+	data, err := os.ReadFile(filepath.Join(w.opts.Out, "data", "site.json"))
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var site model.Site
 	if err := json.Unmarshal(data, &site); err != nil {
-		return nil, err
+		return err
 	}
-	w.repos = map[string]string{}
+	w.projects = map[string]served{}
 	for i, ref := range site.Projects {
-		dir, err := filepath.Abs(o.Projects[i].Dir)
+		p := w.opts.Projects[i]
+		code, err := local.Top(w.ctx, p.Dir)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		w.repos[ref.ID] = dir
+		s := served{code: gitx.Repo{Dir: code}, spec: gitx.Repo{Dir: code}, workspace: p.ResultsRepo}
+		if p.Spec != "" {
+			s.spec, s.local = gitx.Repo{Dir: p.Spec}, true
+		}
+		w.projects[ref.ID] = s
 	}
-	return w, nil
+	return nil
+}
+
+// person is who works in the repository: the identity its Git gives them, used for commits in its
+// workspace as well.
+func (w *workspace) person(repo gitx.Repo) (name, email string) {
+	for _, p := range w.projects {
+		if p.spec.Dir == repo.Dir {
+			repo = p.code
+			break
+		}
+	}
+	n, _ := repo.Git(w.ctx, "config", "user.name")
+	e, _ := repo.Git(w.ctx, "config", "user.email")
+	return strings.TrimSpace(n), strings.TrimSpace(e)
 }
 
 func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -88,28 +126,35 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 	parts := strings.Split(strings.Trim(strings.TrimPrefix(r.URL.Path, "/api/"), "/"), "/")
 	if parts[0] == "session" {
-		user := ""
-		checkedOut := map[string]string{} // project → the branch its requirements are edited on
-		for id, dir := range w.repos {
-			repo := gitx.Repo{Dir: dir}
-			if out, err := repo.Git(w.ctx, "config", "user.name"); err == nil && user == "" {
-				user = strings.TrimSpace(out)
-			}
-			checkedOut[id] = w.checkedOut(repo)
+		reply(w.session(), nil)
+		return
+	}
+	if parts[0] == "open" && r.Method == http.MethodPost {
+		var req struct{ Path string }
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			reply(nil, err)
+			return
 		}
-		reply(map[string]any{"edit": true, "user": user, "checkedOut": checkedOut}, nil)
+		reply(w.open(req.Path))
 		return
 	}
 	if len(parts) != 2 {
 		http.NotFound(rw, r)
 		return
 	}
-	dir, ok := w.repos[parts[0]]
+	proj, ok := w.projects[parts[0]]
 	if !ok {
 		http.NotFound(rw, r)
 		return
 	}
-	repo := gitx.Repo{Dir: dir}
+	// Requirements are changed where they are kept: the repository, or its workspace in local mode.
+	repo, dir := proj.spec, proj.spec.Dir
+	if proj.local { // the workspace is on the repository's branch, for reading as for writing
+		if err := local.Follow(w.ctx, proj.code, proj.spec, build.DefaultTrunk(w.ctx, proj.code)); err != nil {
+			reply(nil, err)
+			return
+		}
+	}
 	switch {
 	case parts[1] == "feature" && r.Method == http.MethodGet:
 		path, err := featurePath(dir, r.URL.Query().Get("path"))
@@ -121,7 +166,7 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		reply(map[string]string{"text": text}, err)
 	case parts[1] == "feature" && r.Method == http.MethodPost:
 		var req struct{ Path, Text, Branch string }
-		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
+		if err := w.decode(r, proj, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -140,7 +185,7 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		reply(map[string]string{"text": proposalOf(text)}, nil)
 	case parts[1] == "proposal" && r.Method == http.MethodPost:
 		var req struct{ Path, Text, Branch string }
-		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
+		if err := w.decode(r, proj, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -150,7 +195,7 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 			Path, Branch string
 			Scenarios    []string
 		}
-		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
+		if err := w.decode(r, proj, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -159,7 +204,7 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		reply(w.metric(repo, r.URL.Query().Get("path")))
 	case parts[1] == "metric" && r.Method == http.MethodPost:
 		var req struct{ Path, Text, Branch string }
-		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
+		if err := w.decode(r, proj, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -173,7 +218,7 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		reply(checkMetric(req.Path, req.Text))
 	case parts[1] == "approve-metric" && r.Method == http.MethodPost:
 		var req struct{ Path, Branch string }
-		if err := w.decode(r, repo, &req, &req.Branch); err != nil {
+		if err := w.decode(r, proj, &req, &req.Branch); err != nil {
 			reply(nil, err)
 			return
 		}
@@ -187,7 +232,11 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 			reply(nil, err)
 			return
 		}
-		reply(w.release(repo, req.Version, req.Commit, req.Notes, req.Sections))
+		if proj.local {
+			reply(nil, fmt.Errorf("in local mode Shipwake writes nothing into the repository: tag the release there"))
+			return
+		}
+		reply(w.release(proj.code, req.Version, req.Commit, req.Notes, req.Sections))
 	default:
 		http.NotFound(rw, r)
 	}
@@ -205,17 +254,20 @@ func (w *workspace) checkedOut(repo gitx.Repo) string {
 
 // decode reads a request that changes requirements, made on the page of branch. It is refused unless
 // that branch is checked out: the commit would land on another branch than the one the person saw.
-func (w *workspace) decode(r *http.Request, repo gitx.Repo, req any, branch *string) error {
+func (w *workspace) decode(r *http.Request, p served, req any, branch *string) error {
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		return err
 	}
-	switch here := w.checkedOut(repo); {
+	switch here := w.checkedOut(p.code); {
 	case *branch == "":
 		return fmt.Errorf("say which branch this change is for")
 	case here == "":
 		return fmt.Errorf("no branch is checked out; check out %s to change its requirements", *branch)
 	case here != *branch:
 		return fmt.Errorf("%s is checked out, not %s; check out %s to change its requirements", here, *branch, *branch)
+	}
+	if p.local { // the workspace follows the repository to its branch
+		return local.Follow(w.ctx, p.code, p.spec, build.DefaultTrunk(w.ctx, p.code))
 	}
 	return nil
 }
@@ -300,8 +352,7 @@ func (w *workspace) approve(repo gitx.Repo, path string, scenarios []string) (an
 	if err := os.WriteFile(filepath.Join(repo.Dir, path), []byte(strings.Join(out, "\n")), 0o644); err != nil {
 		return nil, err
 	}
-	user, _ := repo.Git(w.ctx, "config", "user.name")
-	email, _ := repo.Git(w.ctx, "config", "user.email")
+	user, email := w.person(repo)
 	msg := fmt.Sprintf("spec: approve %d %s of %q\n\nApproved-by: %s <%s>", approved, map[bool]string{true: "scenario", false: "scenarios"}[approved == 1],
 		gherkin.Parse(string(data)).Name, strings.TrimSpace(user), strings.TrimSpace(email))
 	return w.commit(repo, path, msg)
@@ -326,8 +377,7 @@ func (w *workspace) release(repo gitx.Repo, version, commit, notes string, secti
 	if err != nil {
 		return nil, fmt.Errorf("%q is not a commit", commit)
 	}
-	user, _ := repo.Git(w.ctx, "config", "user.name")
-	email, _ := repo.Git(w.ctx, "config", "user.email")
+	user, email := w.person(repo)
 	if strings.TrimSpace(user) == "" {
 		return nil, fmt.Errorf("set your name in Git first: git config user.name")
 	}
@@ -413,7 +463,8 @@ func (w *workspace) commit(repo gitx.Repo, path, msg string) (any, error) {
 	if _, err := repo.Git(w.ctx, "add", "--", path); err != nil {
 		return nil, err
 	}
-	if _, err := repo.Git(w.ctx, "commit", "-q", "-m", msg, "--", path); err != nil {
+	name, email := w.person(repo)
+	if _, err := repo.Git(w.ctx, "-c", "user.name="+name, "-c", "user.email="+email, "commit", "-q", "-m", msg, "--", path); err != nil {
 		return nil, err
 	}
 	sha, _ := repo.Git(w.ctx, "rev-parse", "HEAD")
@@ -583,4 +634,57 @@ func (w *workspace) unsaved(repo gitx.Repo, path string) error {
 		return fmt.Errorf("%s has changes that aren't committed; commit or discard them first, so they aren't saved as part of this change", path)
 	}
 	return nil
+}
+
+// session is what the page needs to know about the person's machine: who they are, the branch each
+// project has checked out (where approvals are committed), where each project and its workspace are,
+// and the agent skill, for the agent prompt.
+func (w *workspace) session() map[string]any {
+	checkedOut := map[string]string{}
+	projects := map[string]any{}
+	user := ""
+	for id, p := range w.projects {
+		checkedOut[id] = w.checkedOut(p.code)
+		if user == "" {
+			user, _ = w.person(p.code)
+		}
+		projects[id] = map[string]any{"repo": p.code.Dir, "workspace": p.workspace, "local": p.local}
+	}
+	skill, _ := skillFile()
+	return map[string]any{"edit": true, "user": user, "checkedOut": checkedOut, "projects": projects, "skill": skill}
+}
+
+// open adds a repository to the served projects by its path: in local mode, unless it is set up the
+// usual way. It answers with the project's ID.
+func (w *workspace) open(path string) (any, error) {
+	path = strings.TrimSpace(path)
+	if strings.HasPrefix(path, "~/") {
+		if home, err := os.UserHomeDir(); err == nil {
+			path = filepath.Join(home, path[2:])
+		}
+	}
+	if !filepath.IsAbs(path) {
+		return nil, fmt.Errorf("give the repository's full path, such as /home/me/code/app")
+	}
+	p, err := open(w.ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	for id, s := range w.projects {
+		if s.code.Dir == p.Dir {
+			return map[string]string{"project": id}, nil
+		}
+	}
+	w.opts.Projects = append(w.opts.Projects, p)
+	if err := w.rebuild(); err != nil {
+		w.opts.Projects = w.opts.Projects[:len(w.opts.Projects)-1]
+		_ = w.rebuild()
+		return nil, err
+	}
+	for id, s := range w.projects {
+		if s.code.Dir == p.Dir {
+			return map[string]string{"project": id}, nil
+		}
+	}
+	return nil, fmt.Errorf("%s was opened but isn't served", path)
 }

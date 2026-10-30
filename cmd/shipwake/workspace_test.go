@@ -227,7 +227,7 @@ func TestOnlyTheCheckedOutBranch(t *testing.T) {
 	ask := func(branch string) error {
 		var req struct{ Path, Branch string }
 		r := httptest.NewRequest(http.MethodPost, "/api/p/approve", strings.NewReader(`{"path": "a.feature", "branch": "`+branch+`"}`))
-		return w.decode(r, repo, &req, &req.Branch)
+		return w.decode(r, served{code: repo, spec: repo}, &req, &req.Branch)
 	}
 	if err := ask("main"); err != nil {
 		t.Errorf("checked out: %v", err)

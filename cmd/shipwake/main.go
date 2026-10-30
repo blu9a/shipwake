@@ -3,6 +3,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -45,7 +46,7 @@ func main() {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	root.AddCommand(storiesCmd(), initCmd(), addCmd(), buildCmd(), serveCmd(), checkCmd(), doctorCmd(), formatsCmd(), schemaCmd(), versionCmd())
+	root.AddCommand(storiesCmd(), initCmd(), addCmd(), adoptCmd(), buildCmd(), serveCmd(), checkCmd(), doctorCmd(), formatsCmd(), schemaCmd(), versionCmd())
 	if err := root.ExecuteContext(ctx); err != nil {
 		var exit exitError
 		if errors.As(err, &exit) {
@@ -72,7 +73,7 @@ func projectsFrom(args []string, results string) []build.Project {
 		if res == "" && len(args) == 1 {
 			res = results
 		}
-		ps = append(ps, build.Project{Dir: dir, Results: res})
+		ps = append(ps, withLocal(build.Project{Dir: dir, Results: res}))
 	}
 	return ps
 }
@@ -111,6 +112,9 @@ func serveCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "serve [repo[=results]]...",
 		Short: "Build into a temporary directory and serve it locally",
+		Long: "Build into a temporary directory and serve it locally, as the person's workspace: proposals can be\n" +
+			"changed and approved, releases recorded. Without a repository, it serves every project opened before\n" +
+			"(" + "~/.shipwake/projects.yaml" + "), and the page can open more by their path.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir, err := os.MkdirTemp("", "shipwake-*")
 			if err != nil {
@@ -121,7 +125,11 @@ func serveCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ws, err := newWorkspace(cmd.Context(), build.Options{Projects: projectsFrom(args, results), Out: dir, MaxRows: rows, Web: web, Log: logf(cmd)})
+			projects, err := serveProjects(cmd.Context(), args, results)
+			if err != nil {
+				return err
+			}
+			ws, err := newWorkspace(cmd.Context(), build.Options{Projects: projects, Out: dir, MaxRows: rows, Web: web, Log: logf(cmd)})
 			if err != nil {
 				return err
 			}
@@ -164,7 +172,9 @@ func addCmd() *cobra.Command {
 				return err
 			}
 			repo = gitx.Repo{Dir: strings.TrimSpace(top)}
-			rd, err := readers.Find(format, repo.Dir) // the project's own converters first
+			proj := withLocal(build.Project{Dir: repo.Dir}) // in local mode, Shipwake's files are in the workspace
+			specDir := cmp.Or(proj.Spec, repo.Dir)
+			rd, err := readers.Find(format, specDir) // the project's own converters first
 			if err != nil {
 				return err
 			}
@@ -224,7 +234,7 @@ func addCmd() *cobra.Command {
 
 			spec := results
 			if spec == "" {
-				cfg, _ := build.LoadConfig(repo.Dir)
+				cfg, _ := build.LoadConfig(specDir)
 				spec = cfg.Results
 			}
 			if spec == "" {
@@ -233,7 +243,7 @@ func addCmd() *cobra.Command {
 			src, _ := filepath.Abs(filepath.Dir(file))
 			where := spec
 			if b := store.Branch(spec); b != "" {
-				dir, done, err := store.Checkout(ctx, repo, b)
+				dir, done, err := store.Checkout(ctx, gitx.Repo{Dir: cmp.Or(proj.ResultsRepo, specDir)}, b)
 				if err != nil {
 					return err
 				}
@@ -463,7 +473,7 @@ func storiesCmd() *cobra.Command {
 				return err
 			}
 			defer l.Close()
-			features, err := story.Build(cmd.Context(), l.Repo, l.Trunk, l.Runs)
+			features, err := story.Build(cmd.Context(), story.Source{Repo: l.Spec, Rev: l.Trunk, Beside: l.Local}, l.Runs)
 			if err != nil {
 				return err
 			}

@@ -14,6 +14,7 @@ package story
 import (
 	"context"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -57,9 +58,34 @@ type commit struct {
 	at                                       time.Time
 }
 
-// Build reads every commit in rev's history that changed a .feature file, oldest first, then the runs.
-// Each branch has its own requirements: rev is the trunk, or a branch.
-func Build(ctx context.Context, r gitx.Repo, rev string, runs []*model.Run) ([]*Feature, error) {
+// Source is where requirements are read: a Git repository and a revision in it. Each branch has its
+// own requirements: Rev is the trunk, or a branch.
+type Source struct {
+	Repo gitx.Repo
+	Rev  string
+	// Beside: the requirements are kept in a workspace beside the code (local mode), so the steps a run
+	// tested are those on Rev when it ran, not those at the code commit it tested.
+	Beside bool
+}
+
+// at is the commit whose requirements a run tested.
+func (s Source) at(ctx context.Context, run *model.Run, cache map[string]string) string {
+	if !s.Beside {
+		return run.Commit
+	}
+	key := run.Start.UTC().Format(time.RFC3339Nano)
+	if c, ok := cache[key]; ok {
+		return c
+	}
+	out, _ := s.Repo.Git(ctx, "rev-list", "-1", "--before="+strconv.FormatInt(run.Start.Unix(), 10), s.Rev)
+	cache[key] = strings.TrimSpace(out)
+	return cache[key]
+}
+
+// Build reads every commit in the source's history that changed a .feature file, oldest first, then
+// the runs.
+func Build(ctx context.Context, src Source, runs []*model.Run) ([]*Feature, error) {
+	r, rev := src.Repo, src.Rev
 	const sep = "\x1f"
 	out, err := r.Git(ctx, "log", "--reverse", "--format=%H"+sep+"%P"+sep+"%an"+sep+"%cI"+sep+"%s"+sep+
 		"%(trailers:key=Approved-by,valueonly,separator=%x2C)"+"\x1e",
@@ -113,7 +139,7 @@ func Build(ctx context.Context, r gitx.Repo, rev string, runs []*model.Run) ([]*
 	for _, path := range order {
 		res = append(res, features[path])
 	}
-	attachRuns(ctx, r, res, runs)
+	attachRuns(ctx, src, res, runs)
 	return res, nil
 }
 
@@ -190,7 +216,8 @@ func versions(s *Scenario) int {
 // attachRuns adds, for each version of each scenario, the first run where its test passed, and
 // failures after that. A test belongs to a scenario by feature and scenario name, as Gherkin runners
 // name them; the version is the scenario's steps at the commit the run tested.
-func attachRuns(ctx context.Context, r gitx.Repo, features []*Feature, runs []*model.Run) {
+func attachRuns(ctx context.Context, src Source, features []*Feature, runs []*model.Run) {
+	r, tested := src.Repo, map[string]string{}
 	sorted := slices.Clone(runs)
 	slices.SortFunc(sorted, func(a, b *model.Run) int { return a.Start.Compare(b.Start) })
 	at := map[string]map[string]gherkin.Feature{} // commit → path → parsed
@@ -216,7 +243,7 @@ func attachRuns(ctx context.Context, r gitx.Repo, features []*Feature, runs []*m
 					if t.Name != s.Title || (t.Feature != "" && t.Feature != f.Name) {
 						continue
 					}
-					steps := parsed(run.Commit, f.Path).Scenarios[s.Title]
+					steps := parsed(src.at(ctx, run, tested), f.Path).Scenarios[s.Title]
 					v := versionOf(s, steps)
 					if v == 0 {
 						continue
