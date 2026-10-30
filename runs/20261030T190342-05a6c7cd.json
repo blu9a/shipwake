@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "20261030T190342-05a6c7cd",
+  "kind": "benchmark",
+  "name": "Benchmarks",
+  "commit": "90916cc4c6e250d49b4f31468d7c92b605890965",
+  "branch": "main",
+  "start": "2026-10-30T19:03:42.084623505Z",
+  "duration": 0,
+  "format": "go-bench",
+  "context": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "goarch": "amd64",
+    "goos": "linux",
+    "runner": "github-ubuntu"
+  },
+  "metrics": [
+    {
+      "id": "BuildRealRepository.time",
+      "suite": "BuildRealRepository",
+      "name": "Time per operation",
+      "unit": "ns",
+      "direction": "lower",
+      "values": [
+        7015139260,
+        6745234001,
+        6621154616,
+        6508486881,
+        6706208708
+      ]
+    },
+    {
+      "id": "BuildRealRepository.bytes",
+      "suite": "BuildRealRepository",
+      "name": "Memory per operation",
+      "unit": "B",
+      "direction": "lower",
+      "values": [
+        2237595256,
+        2218552616,
+        2216673896,
+        2196799392,
+        2206518440
+      ]
+    },
+    {
+      "id": "BuildRealRepository.allocs",
+      "suite": "BuildRealRepository",
+      "name": "Allocations per operation",
+      "unit": "allocs",
+      "direction": "lower",
+      "values": [
+        30499616,
+        30230486,
+        30212040,
+        29941028,
+        30081084
+      ]
+    },
+    {
+      "id": "RebuildRealRepository.time",
+      "suite": "RebuildRealRepository",
+      "name": "Time per operation",
+      "unit": "ns",
+      "direction": "lower",
+      "values": [
+        1950522880,
+        1845154301,
+        1926205149
+      ]
+    },
+    {
+      "id": "RebuildRealRepository.bytes",
+      "suite": "RebuildRealRepository",
+      "name": "Memory per operation",
+      "unit": "B",
+      "direction": "lower",
+      "values": [
+        75592904,
+        75808392,
+        75650624
+      ]
+    },
+    {
+      "id": "RebuildRealRepository.allocs",
+      "suite": "RebuildRealRepository",
+      "name": "Allocations per operation",
+      "unit": "allocs",
+      "direction": "lower",
+      "values": [
+        189688,
+        189704,
+        189697
+      ]
+    }
+  ]
+}
