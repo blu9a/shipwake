@@ -40,6 +40,7 @@ type workspace struct {
 type served struct {
 	code, spec gitx.Repo
 	local      bool
+	index      int    // its place in the build's projects
 	workspace  string // its workspace in local mode, or after adopting
 }
 
@@ -55,6 +56,17 @@ func newWorkspace(ctx context.Context, o build.Options) (*workspace, error) {
 		return nil, err
 	}
 	return w, nil
+}
+
+// rebuildOf builds again only the project whose repository or workspace this is: an approval shouldn't
+// wait for every other project to be read again.
+func (w *workspace) rebuildOf(repo gitx.Repo) error {
+	for id, p := range w.projects {
+		if p.spec.Dir == repo.Dir || p.code.Dir == repo.Dir {
+			return build.RunOne(w.ctx, w.opts, p.index, id)
+		}
+	}
+	return w.rebuild()
 }
 
 // index maps the built site's project IDs to their repositories.
@@ -74,7 +86,7 @@ func (w *workspace) index() error {
 		if err != nil {
 			return err
 		}
-		s := served{code: gitx.Repo{Dir: code}, spec: gitx.Repo{Dir: code}, workspace: p.ResultsRepo}
+		s := served{code: gitx.Repo{Dir: code}, spec: gitx.Repo{Dir: code}, workspace: p.ResultsRepo, index: i}
 		if p.Spec != "" {
 			s.spec, s.local = gitx.Repo{Dir: p.Spec}, true
 		}
@@ -402,7 +414,7 @@ func (w *workspace) release(repo gitx.Repo, version, commit, notes string, secti
 	if _, err := repo.Git(w.ctx, "tag", "-a", version, strings.TrimSpace(sha), "-F", f.Name(), "--cleanup=verbatim"); err != nil {
 		return nil, err
 	}
-	if err := w.rebuild(); err != nil {
+	if err := w.rebuildOf(repo); err != nil {
 		return nil, err
 	}
 	return map[string]string{"tag": version, "commit": strings.TrimSpace(sha)}, nil
@@ -480,7 +492,7 @@ func (w *workspace) commit(repo gitx.Repo, path, msg string) (any, error) {
 		return nil, err
 	}
 	sha, _ := repo.Git(w.ctx, "rev-parse", "HEAD")
-	if err := w.rebuild(); err != nil {
+	if err := w.rebuildOf(repo); err != nil {
 		return nil, err
 	}
 	return map[string]string{"commit": strings.TrimSpace(sha)}, nil

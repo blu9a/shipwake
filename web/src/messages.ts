@@ -48,6 +48,7 @@ const en = {
   grader: 'Grader:',
   saveChanges: 'Save changes',
   approveProposal: 'Approve',
+  approving: 'Approving…',
   checkOutToApprove: (b: string) => `Check out ${b} to approve or change this proposal.`,
   storyState: {
     proposed: 'Proposed',
@@ -245,6 +246,7 @@ const zh: Messages = {
   grader: '评分说明：',
   saveChanges: '保存修改',
   approveProposal: '批准',
+  approving: '正在批准…',
   checkOutToApprove: (b) => `检出 ${b} 后才能批准或修改这个提议。`,
   storyState: {
     proposed: '提议中',
