@@ -1,0 +1,19 @@
+# Jest's --json output, which Vitest's json reporter also writes.
+format: jest-json
+about: Jest (--json) and Vitest (--reporter=json)
+input: json
+start: startTime
+tests:
+  each: testResults[].assertionResults[]
+  feature: ancestorTitles | join( › ) || ^.name | base
+  name: title
+  status: status
+  duration: duration
+  error: failureMessages[]
+totals:
+  total: numTotalTests
+  passed: numPassedTests
+  failed: numFailedTests
+  skipped: numPendingTests + numTodoTests
+sample: testdata/jest-json.vitest.json
+expected: testdata/jest-json.vitest.expected.json

@@ -1,0 +1,19 @@
+# Cucumber JSON: written by Gherkin runners in most languages: cucumber-js (--format json),
+# Cucumber-JVM (plugin json:…), godog (--godog.format=cucumber), Reqnroll, Behat and others.
+format: cucumber-json
+about: Cucumber JSON from any Gherkin runner (cucumber-js, Cucumber-JVM, godog, Reqnroll…)
+input: json
+tests:
+  each: "[].elements[]"
+  where: type != background # Cucumber-JVM lists a Background on its own; godog folds it into each scenario
+  feature: ^.name
+  name: name
+  error: steps[].result.error_message
+  steps:
+    each: steps[]
+    name: "{keyword}{name}"
+    status: result.status
+    duration: result.duration
+    duration_unit: ns
+sample: testdata/cucumber-json.godog.json
+expected: testdata/cucumber-json.godog.expected.json

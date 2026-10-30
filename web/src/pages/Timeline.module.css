@@ -1,0 +1,292 @@
+.head {
+  margin: 4px 0 14px;
+}
+.head h1 {
+  font-size: 20px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  margin: 0 0 2px;
+}
+
+.latest {
+  border: 1px solid var(--card-line);
+  border-radius: 16px;
+  padding: 4px 16px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+}
+
+/* the line runs from under the latest card; dots sit on it */
+.tl {
+  position: relative;
+  padding: 14px 0 0 44px;
+}
+.tl::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 0;
+  bottom: 8px;
+  width: 2px;
+  background: var(--line);
+  border-radius: 1px;
+}
+
+.item {
+  position: relative;
+  padding: 10px 0;
+}
+.dot {
+  position: absolute;
+  left: -29px;
+  top: 15px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--ink-2);
+  box-sizing: border-box;
+}
+.merge .dot {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.title {
+  font-weight: 550;
+  overflow-wrap: anywhere;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.sync {
+  color: var(--ink-2);
+}
+.sync .dot {
+  border-style: dashed;
+}
+
+/* folding sections: an arrow before the summary, turned when open */
+.toggle > summary {
+  cursor: pointer;
+  width: fit-content;
+  list-style: none;
+}
+.toggle > summary::-webkit-details-marker {
+  display: none;
+}
+.toggle > summary::before {
+  content: "▸ ";
+}
+.toggle[open] > summary::before {
+  content: "▾ ";
+}
+.more > summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--accent);
+  margin-top: 6px;
+  list-style: none;
+  width: fit-content;
+}
+.commits {
+  list-style: none;
+  margin: 6px 0 2px;
+  padding: 0 0 0 12px;
+  border-left: 2px solid var(--line);
+}
+.commits > * {
+  padding-left: 10px;
+  font-size: 14px;
+}
+/* a branch's history, folded: plain commits and compact run lines */
+.foldCommit {
+  padding: 4px 0;
+}
+.runLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 3px 0;
+  min-width: 0;
+}
+.lineIc {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--t-add);
+}
+.runName {
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.runMeta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  min-width: 0;
+}
+
+.release {
+  position: relative;
+  border: 1px solid var(--card-line);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: 10px 0;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+}
+.releaseDot {
+  position: absolute;
+  left: -32px;
+  top: 18px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--accent);
+}
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.version {
+  font-size: 17px;
+}
+.when {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.notesTitle {
+  margin: 6px 0 0;
+  font-weight: 600;
+}
+.notesBody {
+  margin: 6px 0 0;
+}
+.notesList {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+.notesList li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+.notesList code {
+  color: var(--ink-2);
+}
+/* a changelog section, as the change groups were styled */
+.notesHeading {
+  margin: 14px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.internal {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+.intH,
+.group h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+.group {
+  margin-top: 10px;
+}
+.group ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+.group li {
+  margin: 2px 0;
+}
+.group code {
+  color: var(--ink-2);
+}
+
+.end {
+  position: relative;
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 10px 0;
+}
+.endDot {
+  position: absolute;
+  left: -29px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--ink-2);
+}
+
+.headRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.textBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 2px;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.textBtn:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* runs: on the line their icon is the marker; in the top card or a fold it leads the title */
+.run .title b {
+  font-weight: 650;
+}
+.runDot {
+  position: absolute;
+  left: -37px;
+  top: 8px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--t-add);
+}
+.runIc {
+  display: inline-grid;
+  place-items: center;
+  margin-right: 8px;
+  color: var(--t-add);
+}
+.bad .runDot,
+.bad .runIc,
+.bad .lineIc {
+  color: var(--t-del);
+}
+.warnRun .runDot,
+.warnRun .runIc,
+.warnRun .lineIc {
+  color: var(--t-warn);
+}
+.unjudged .runDot,
+.unjudged .runIc,
+.unjudged .lineIc {
+  color: var(--ink-2);
+}

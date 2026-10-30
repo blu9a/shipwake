@@ -1,0 +1,107 @@
+/* A .metric file as sentences. The view and the editor share one text style, so the highlighted
+   backdrop and the text typed over it line up exactly. */
+.text {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: normal;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.kw {
+  color: var(--ink-2);
+}
+.title {
+  font-weight: 650;
+}
+.tag,
+.comment {
+  color: var(--ink-2);
+}
+.quiet {
+  color: var(--ink-2);
+}
+/* What varies in a sentence: a path, a direction, a threshold. Weight only, so the width matches
+   between the backdrop and the text typed over it. */
+.value {
+  color: var(--ink);
+  font-weight: 600;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 12%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.value.block {
+  background: color-mix(in srgb, var(--b-del) 14%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--b-del) 14%, transparent);
+}
+.value.warn {
+  background: color-mix(in srgb, var(--b-warn) 18%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--b-warn) 18%, transparent);
+}
+.error {
+  text-decoration: underline wavy var(--b-del);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 3px;
+}
+
+.editor {
+  position: relative;
+  margin: 12px 0 0;
+}
+/* The text typed is transparent, the backdrop shows it highlighted; the caret and selection stay. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--ink);
+}
+.input::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: transparent;
+}
+.backdrop {
+  pointer-events: none;
+}
+
+.check {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--t-add);
+}
+.check > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.check.bad {
+  color: var(--t-del);
+}
+/* Under typed text, weight would shift the letters: emphasis is color only there. */
+.backdrop .value,
+.backdrop .title {
+  font-weight: inherit;
+}
+.backdrop .title {
+  color: var(--accent);
+}
+
+/* Read only: the description, then the settings, a little apart. */
+.view {
+  display: grid;
+  gap: 10px;
+}
+.settings {
+  display: grid;
+  gap: 2px;
+}

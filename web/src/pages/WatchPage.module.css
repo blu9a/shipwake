@@ -1,0 +1,136 @@
+/* A dark viewer over the whole window, as in the draft: the video, a bar with a segment per scenario,
+   the viewer's settings, and the chapters beside it. */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+  background: #0b0b0c;
+  color: #fff;
+  overflow: auto;
+}
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 18px;
+  width: min(1200px, 100%);
+  max-height: 100%;
+}
+.main {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: #000;
+  border-radius: 10px;
+}
+.video {
+  display: block;
+  width: 100%;
+  max-height: 74vh;
+  border-radius: 10px;
+  background: #000;
+}
+/* the browser's own subtitles, used in full screen only */
+.video::cue {
+  font-size: 18px;
+  line-height: 1.35;
+}
+/* at the top, clear of the subtitles and the video's own controls */
+.card {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%);
+  max-width: 90%;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgb(20 20 24 / 86%);
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.card.show {
+  opacity: 1;
+}
+.bar {
+  display: flex;
+  gap: 4px;
+}
+.seg {
+  flex: 1;
+  height: 6px;
+  padding: 0;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 25%);
+  overflow: hidden;
+}
+.seg i {
+  display: block;
+  height: 100%;
+  background: #fff;
+}
+.side {
+  overflow: auto;
+}
+.title {
+  font-weight: 700;
+  font-size: 16px;
+}
+.sub {
+  color: rgb(255 255 255 / 65%);
+  font-size: 13px;
+  margin: 2px 0 12px;
+}
+.chapters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.chapters button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-align: start;
+  color: rgb(255 255 255 / 80%);
+  font-size: 14px;
+}
+.chapters button:hover {
+  background: rgb(255 255 255 / 8%);
+}
+.chapters .on {
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  font-weight: 600;
+}
+@media (max-width: 900px) {
+  .player {
+    grid-template-columns: 1fr;
+  }
+}

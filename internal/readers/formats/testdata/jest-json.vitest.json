@@ -1,0 +1,112 @@
+{
+ "numTotalTestSuites": 4,
+ "numPassedTestSuites": 2,
+ "numFailedTestSuites": 2,
+ "numPendingTestSuites": 0,
+ "numTotalTests": 6,
+ "numPassedTests": 3,
+ "numFailedTests": 1,
+ "numPendingTests": 1,
+ "numTodoTests": 1,
+ "snapshot": {
+  "added": 0,
+  "failure": false,
+  "filesAdded": 0,
+  "filesRemoved": 0,
+  "filesRemovedList": [],
+  "filesUnmatched": 0,
+  "filesUpdated": 0,
+  "matched": 0,
+  "total": 0,
+  "unchecked": 0,
+  "uncheckedKeysByFile": [],
+  "unmatched": 0,
+  "updated": 0,
+  "didUpdate": false
+ },
+ "startTime": 1793261401974,
+ "success": false,
+ "testResults": [
+  {
+   "assertionResults": [
+    {
+     "ancestorTitles": [
+      "math"
+     ],
+     "fullName": "math adds",
+     "status": "passed",
+     "title": "adds",
+     "duration": 1.4786129999999957,
+     "failureMessages": [],
+     "meta": {}
+    },
+    {
+     "ancestorTitles": [
+      "math"
+     ],
+     "fullName": "math divides by zero",
+     "status": "failed",
+     "title": "divides by zero",
+     "duration": 9.37056999999993,
+     "failureMessages": [
+      "AssertionError: expected Infinity to be +0 // Object.is equality\n    at /work/vitest/math.test.js:4:45\n    at file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at runSuite (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+     ],
+     "meta": {}
+    },
+    {
+     "ancestorTitles": [
+      "math"
+     ],
+     "fullName": "math rounds money",
+     "status": "skipped",
+     "title": "rounds money",
+     "failureMessages": [],
+     "meta": {}
+    },
+    {
+     "ancestorTitles": [
+      "math",
+      "nested"
+     ],
+     "fullName": "math nested multiplies",
+     "status": "passed",
+     "title": "multiplies",
+     "duration": 0.24082699999996748,
+     "failureMessages": [],
+     "meta": {}
+    }
+   ],
+   "startTime": 1793261402533,
+   "endTime": 1793261402544.2407,
+   "status": "failed",
+   "message": "",
+   "name": "/work/vitest/math.test.js"
+  },
+  {
+   "assertionResults": [
+    {
+     "ancestorTitles": [],
+     "fullName": "trims",
+     "status": "passed",
+     "title": "trims",
+     "duration": 1.5926899999999478,
+     "failureMessages": [],
+     "meta": {}
+    },
+    {
+     "ancestorTitles": [],
+     "fullName": "translates",
+     "status": "todo",
+     "title": "translates",
+     "failureMessages": [],
+     "meta": {}
+    }
+   ],
+   "startTime": 1793261402533,
+   "endTime": 1793261402534.5928,
+   "status": "passed",
+   "message": "",
+   "name": "/work/vitest/text.test.js"
+  }
+ ]
+}

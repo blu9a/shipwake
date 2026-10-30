@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ideas and questions
+    url: https://github.com/blu9a/shipwake/discussions
+    about: Ask, share how you use Shipwake, or propose a feature.
+  - name: A security problem
+    url: https://github.com/blu9a/shipwake/security/advisories/new
+    about: Report it privately.

@@ -1,0 +1,937 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Attachment": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "type",
+        "path",
+        "size"
+      ]
+    },
+    "Branch": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ahead": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "behind": {
+          "type": "integer"
+        },
+        "base": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "updated",
+        "ahead",
+        "behind",
+        "base"
+      ]
+    },
+    "Case": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "input": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "input",
+        "score"
+      ]
+    },
+    "Commit": {
+      "properties": {
+        "sha": {
+          "type": "string"
+        },
+        "short": {
+          "type": "string"
+        },
+        "parents": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "author": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "scenarios": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "sha",
+        "short",
+        "parents",
+        "author",
+        "date",
+        "subject"
+      ]
+    },
+    "CommitDetail": {
+      "properties": {
+        "sha": {
+          "type": "string"
+        },
+        "files": {
+          "items": {
+            "$ref": "#/$defs/FileChange"
+          },
+          "type": "array"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/ScenarioChange"
+          },
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "sha",
+        "files",
+        "scenarios",
+        "tags"
+      ]
+    },
+    "Comparison": {
+      "properties": {
+        "run": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        },
+        "delta": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "partial": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "run",
+        "label",
+        "status"
+      ]
+    },
+    "Config": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "trunk": {
+          "type": "string"
+        },
+        "languages": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "targets": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Names"
+          },
+          "type": "object"
+        },
+        "translations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "metrics": {
+          "additionalProperties": {
+            "properties": {
+              "direction": {
+                "type": "string"
+              },
+              "warn": true,
+              "block": true
+            },
+            "additionalProperties": false,
+            "type": "object"
+          },
+          "type": "object"
+        },
+        "kinds": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "object"
+        },
+        "changelog": true,
+        "results": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Evidence": {
+      "properties": {
+        "step": {
+          "type": "string"
+        },
+        "expected": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "observed": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "step",
+        "expected",
+        "observed"
+      ]
+    },
+    "FileChange": {
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "old": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "added": {
+          "type": "integer"
+        },
+        "deleted": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "path",
+        "status",
+        "added",
+        "deleted"
+      ]
+    },
+    "FileDiff": {
+      "properties": {
+        "lines": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "hl": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "more": {
+          "type": "integer"
+        },
+        "binary": {
+          "type": "boolean"
+        },
+        "skipped": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Kind": {
+      "properties": {
+        "icon": {
+          "type": "string"
+        },
+        "names": {
+          "$ref": "#/$defs/Names"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Metric": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "suite": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "direction": {
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "previous": {
+          "$ref": "#/$defs/Comparison"
+        },
+        "release": {
+          "$ref": "#/$defs/Comparison"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "unit",
+        "direction",
+        "values"
+      ]
+    },
+    "Names": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "Project": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "trunk": {
+          "type": "string"
+        },
+        "languages": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "targets": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Names"
+          },
+          "type": "object"
+        },
+        "text": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Names"
+          },
+          "type": "object"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/Row"
+          },
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "$ref": "#/$defs/Tag"
+          },
+          "type": "array"
+        },
+        "branches": {
+          "items": {
+            "$ref": "#/$defs/Branch"
+          },
+          "type": "array"
+        },
+        "runs": {
+          "items": {
+            "$ref": "#/$defs/RunSummary"
+          },
+          "type": "array"
+        },
+        "commits": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Commit"
+          },
+          "type": "object"
+        },
+        "rules": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Rule"
+          },
+          "type": "object"
+        },
+        "kinds": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Kind"
+          },
+          "type": "object"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "trunk",
+        "languages",
+        "rows",
+        "tags",
+        "branches",
+        "runs",
+        "commits"
+      ]
+    },
+    "ProjectRef": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Row": {
+      "properties": {
+        "sha": {
+          "type": "string"
+        },
+        "merge": {
+          "type": "boolean"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "commits": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "sha",
+        "merge",
+        "title"
+      ]
+    },
+    "Rule": {
+      "properties": {
+        "direction": {
+          "type": "string"
+        },
+        "warn": {
+          "type": "string"
+        },
+        "block": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Run": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "format": {
+          "type": "string"
+        },
+        "context": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "tests": {
+          "items": {
+            "$ref": "#/$defs/Test"
+          },
+          "type": "array"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "type": "array"
+        },
+        "cases": {
+          "items": {
+            "$ref": "#/$defs/Case"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "commit",
+        "start",
+        "duration",
+        "format"
+      ]
+    },
+    "RunSummary": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "passed": {
+          "type": "integer"
+        },
+        "failed": {
+          "type": "integer"
+        },
+        "skipped": {
+          "type": "integer"
+        },
+        "targets": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "context": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "metrics": {
+          "type": "integer"
+        },
+        "previous": {
+          "$ref": "#/$defs/Tally"
+        },
+        "release": {
+          "$ref": "#/$defs/Tally"
+        },
+        "changed": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "was": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "comparable": {
+          "type": "boolean"
+        },
+        "hasRelease": {
+          "type": "boolean"
+        },
+        "order": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "commit",
+        "start",
+        "duration",
+        "passed",
+        "failed",
+        "skipped",
+        "order"
+      ]
+    },
+    "ScenarioChange": {
+      "properties": {
+        "feature": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "was": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "feature",
+        "title",
+        "change",
+        "steps"
+      ]
+    },
+    "Site": {
+      "properties": {
+        "version": {
+          "type": "integer"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "projects": {
+          "items": {
+            "$ref": "#/$defs/ProjectRef"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "version",
+        "generatedAt",
+        "projects"
+      ]
+    },
+    "Step": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "attachments": {
+          "items": {
+            "$ref": "#/$defs/Attachment"
+          },
+          "type": "array"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "status",
+        "duration"
+      ]
+    },
+    "Tag": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "notes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "sha",
+        "date",
+        "subject"
+      ]
+    },
+    "Tally": {
+      "properties": {
+        "ok": {
+          "type": "integer"
+        },
+        "warn": {
+          "type": "integer"
+        },
+        "block": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Test": {
+      "properties": {
+        "feature": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "attempts": {
+          "type": "integer"
+        },
+        "error": {
+          "type": "string"
+        },
+        "retried": {
+          "type": "boolean"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "type": "array"
+        },
+        "attachments": {
+          "items": {
+            "$ref": "#/$defs/Attachment"
+          },
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "status",
+        "duration",
+        "attempts"
+      ]
+    }
+  },
+  "properties": {
+    "site": {
+      "$ref": "#/$defs/Site"
+    },
+    "index": {
+      "$ref": "#/$defs/Project"
+    },
+    "commit": {
+      "$ref": "#/$defs/CommitDetail"
+    },
+    "diffs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/FileDiff"
+      },
+      "type": "object"
+    },
+    "run": {
+      "$ref": "#/$defs/Run"
+    },
+    "config": {
+      "$ref": "#/$defs/Config"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "site",
+    "index",
+    "commit",
+    "diffs",
+    "run",
+    "config"
+  ],
+  "title": "Shipwake"
+}

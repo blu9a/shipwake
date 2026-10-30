@@ -1,0 +1,69 @@
+name: Shipwake
+description: Record test, eval and performance results with the commit they tested, on a branch of your repository.
+branding:
+  icon: git-commit
+  color: blue
+
+inputs:
+  format:
+    description: The tool's output format (junit, go-test, playwright, go-bench, k6, json). Leave empty to only install Shipwake.
+    default: ""
+  file:
+    description: The output file to record.
+    default: ""
+  name:
+    description: The run's name, such as "Web acceptance tests". Optional for the json format when the file has one.
+    default: ""
+  kind:
+    description: Your word for the kind of run, such as eval or load test (default from the format).
+    default: ""
+  context:
+    description: What the run used, one key=value per line (runner, model, load…). Runs are compared only with runs on the same runner.
+    default: ""
+  push:
+    description: "Push the results branch to origin: set it to true to keep results across jobs. Needs `permissions: contents: write`."
+    default: "false"
+  version:
+    description: The Shipwake version to install, such as v0.1.0.
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - name: Install Shipwake
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        if command -v shipwake >/dev/null && [ "$VERSION" = latest ]; then exit 0; fi
+        os=$(uname -s | tr '[:upper:]' '[:lower:]')
+        arch=$(uname -m); case $arch in x86_64) arch=amd64;; aarch64|arm64) arch=arm64;; esac
+        if [ "$VERSION" = latest ]; then base=https://github.com/blu9a/shipwake/releases/latest/download
+        else base=https://github.com/blu9a/shipwake/releases/download/$VERSION; fi
+        dir="$RUNNER_TEMP/shipwake"; mkdir -p "$dir"
+        curl -fsSL "$base/shipwake_${os}_${arch}.tar.gz" | tar xz -C "$dir" shipwake
+        echo "$dir" >> "$GITHUB_PATH"
+
+    - name: Record the run
+      if: inputs.format != ''
+      shell: bash
+      env:
+        FORMAT: ${{ inputs.format }}
+        FILE: ${{ inputs.file }}
+        NAME: ${{ inputs.name }}
+        KIND: ${{ inputs.kind }}
+        CONTEXT: ${{ inputs.context }}
+        PUSH: ${{ inputs.push }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: |
+        args=(add -f "$FORMAT" --file "$FILE")
+        [ -n "$NAME" ] && args+=(-n "$NAME")
+        [ -n "$KIND" ] && args+=(--kind "$KIND")
+        while IFS= read -r kv; do [ -n "$kv" ] && args+=(--context "$kv"); done <<< "$CONTEXT"
+        [ "$PUSH" = true ] && args+=(--push)
+        # On pull requests the checked-out merge commit is on no branch: record the branch's own commit.
+        if [ -n "$HEAD_SHA" ]; then
+          git cat-file -e "$HEAD_SHA^{commit}" 2>/dev/null || git fetch -q --depth 1 origin "$HEAD_SHA"
+          args+=(--commit "$HEAD_SHA")
+        fi
+        shipwake "${args[@]}"

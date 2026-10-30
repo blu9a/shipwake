@@ -1,0 +1,88 @@
+{
+  "id": "",
+  "kind": "test",
+  "name": "",
+  "commit": "",
+  "start": "0001-01-01T00:00:00Z",
+  "duration": 0,
+  "format": "",
+  "tests": [
+    {
+      "feature": "Shopping basket",
+      "name": "Adding an item",
+      "status": "passed",
+      "duration": 0.139237,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given an empty basket",
+          "status": "passed",
+          "duration": 0.074169
+        },
+        {
+          "name": "When I add \"tea\"",
+          "status": "passed",
+          "duration": 0.027698
+        },
+        {
+          "name": "Then the basket has 1 item",
+          "status": "passed",
+          "duration": 0.03737
+        }
+      ]
+    },
+    {
+      "feature": "Shopping basket",
+      "name": "Removing an item",
+      "status": "passed",
+      "duration": 0.09785100000000001,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given an empty basket",
+          "status": "passed",
+          "duration": 0.017603
+        },
+        {
+          "name": "When I add \"tea\"",
+          "status": "passed",
+          "duration": 0.044455
+        },
+        {
+          "name": "And I remove \"tea\"",
+          "status": "passed",
+          "duration": 0.020205
+        },
+        {
+          "name": "Then the basket has 0 items",
+          "status": "passed",
+          "duration": 0.015588
+        }
+      ]
+    },
+    {
+      "feature": "Shopping basket",
+      "name": "A discount that is not built yet",
+      "status": "skipped",
+      "duration": 0.022205,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given an empty basket",
+          "status": "passed",
+          "duration": 0.022205
+        },
+        {
+          "name": "When I apply the code \"SPRING\"",
+          "status": "skipped",
+          "duration": 0
+        },
+        {
+          "name": "Then the total is reduced",
+          "status": "skipped",
+          "duration": 0
+        }
+      ]
+    }
+  ]
+}

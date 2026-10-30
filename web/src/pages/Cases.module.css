@@ -1,0 +1,57 @@
+/* From the draft's case view. */
+.sec {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 10px;
+}
+.sec h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.none {
+  padding: 12px 14px;
+}
+.body {
+  display: grid;
+  gap: 10px;
+  padding: 4px 14px 14px 42px;
+  font-size: 14px;
+}
+.lab {
+  margin-bottom: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+span.lab {
+  display: inline;
+}
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 700px) {
+  .pair {
+    grid-template-columns: 1fr;
+  }
+}
+.out {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.out.worse {
+  background: var(--d-del);
+  border-color: transparent;
+}
+.out.better {
+  background: var(--d-add);
+  border-color: transparent;
+}

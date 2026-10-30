@@ -1,0 +1,243 @@
+.scrollName {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.scrollName > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scrollName:where([data-scrolling]) > span {
+  width: max-content;
+  overflow: visible;
+  text-overflow: clip;
+}
+.scrollName:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.menuWrap {
+  position: relative;
+  min-width: 0;
+}
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  min-width: 0;
+  max-width: min(18rem, calc(50vw - 48px));
+}
+.menuButton svg {
+  flex: none;
+}
+:global(.topbar) > .menuWrap:last-child {
+  flex: none;
+}
+.menuButton:hover,
+.menuButton[aria-expanded="true"] {
+  background: var(--fill);
+}
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  translate: var(--menu-shift, 0px) 0;
+  z-index: 20;
+  min-width: min(260px, calc(100vw - 32px));
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 32px));
+  max-height: calc(100dvh - 76px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+}
+.menu.end {
+  left: auto;
+  right: 0;
+}
+/* settings are two short switches: the menu fits them instead of the pickers' list width */
+.menu:has(> :global(.settings)) {
+  min-width: 0;
+}
+.menu :global(.menuLabel) {
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+}
+
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--fill);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+}
+.segmented button {
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  color: var(--ink-2);
+  font-size: 13px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.segmented button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.segmented button.on {
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+  font-weight: 600;
+}
+
+.tally {
+  display: inline-flex;
+  gap: 12px;
+  margin-left: 10px;
+}
+.cnt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.cnt i {
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--b-add);
+}
+.cnt.f i {
+  background: var(--b-del);
+}
+.cnt.w i {
+  background: var(--b-warn);
+}
+
+.status {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--b-add);
+  color: #fff;
+}
+.status.failed {
+  background: var(--b-del);
+}
+.status.skipped {
+  background: none;
+  color: var(--ink-2);
+}
+
+.loading {
+  height: 40vh;
+}
+
+.status.warn {
+  background: var(--b-warn);
+}
+
+/* Both measurement lists share column sizes and collapse as a unit. The list,
+   rather than the viewport, owns the available width. Numbers stay readable. */
+.resultRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 10rem) 4.5rem 4.75rem;
+  grid-template-areas: "name value delta status";
+  align-items: center;
+  gap: 6px 12px;
+  min-height: 44px;
+  padding: 4px 14px;
+  border-top: 1px solid var(--line);
+  color: inherit;
+  font-size: 14px;
+}
+.resultRow:has(.resultTrend) {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 10rem) 4.5rem 6rem 4.75rem;
+  grid-template-areas: "name value delta trend status";
+}
+.resultRow:first-child {
+  border-top: 0;
+}
+.resultRow:hover,
+.resultRow[aria-current="true"] {
+  background: color-mix(in srgb, var(--fill) 55%, transparent);
+}
+.resultName {
+  grid-area: name;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.resultName code {
+  display: block;
+}
+.resultValue {
+  grid-area: value;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0 0.3em;
+  min-width: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.resultValue > span,
+.resultValue small {
+  white-space: nowrap;
+}
+.resultValue small {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+.resultDelta {
+  grid-area: delta;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.resultTrend {
+  grid-area: trend;
+}
+.resultStatus {
+  grid-area: status;
+  display: flex;
+  justify-content: flex-end;
+}
+@container (max-width: 620px) {
+  .resultRow,
+  .resultRow:has(.resultTrend) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "name status" "value delta";
+    padding-block: 10px;
+  }
+  .resultValue {
+    justify-content: flex-start;
+  }
+  .resultTrend {
+    display: none;
+  }
+}

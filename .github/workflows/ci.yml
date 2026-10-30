@@ -1,0 +1,79 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Shipwake records its own runs: tests, browser checks and benchmarks go to its results branch.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to push the results branch
+    steps:
+      - uses: actions/checkout@v7
+        with: { fetch-depth: 0 } # the whole history: the timeline's order is checked on this repository's own
+      - uses: actions/setup-go@v7
+        with: { go-version-file: go.mod }
+      - uses: pnpm/action-setup@v6 # the version comes from package.json
+        with: { package_json_file: web/package.json }
+      - uses: actions/setup-node@v7
+        with: { node-version: 24, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
+      - run: make web build
+      - run: make lint
+      - name: Schema and types are up to date
+        run: make schema && git diff --exit-code spec web/src/model.gen.ts
+
+      - name: Go tests
+        id: go
+        continue-on-error: true
+        run: go test -json ./... > go-test.json
+      - name: Record Go tests
+        if: always() && steps.go.outcome != 'skipped'
+        run: bin/shipwake add -f go-test --file go-test.json -n "Go tests" --context runner=github-ubuntu $PUSH
+        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+
+      - name: This repository's own site
+        run: |
+          git fetch -q origin shipwake-results:shipwake-results || true
+          bin/shipwake build -o .cache/self-site .
+      - name: Browser checks
+        id: browser
+        continue-on-error: true
+        working-directory: web
+        env:
+          SHIPWAKE_OUTPUT: ${{ github.workspace }}/browser/run.json
+          SHIPWAKE_NAME: Browser checks
+          SHIPWAKE_CHECK_SITES: ${{ github.workspace }}/.cache/self-site
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm exec playwright test --reporter=list,../packages/playwright/src/reporter.ts
+      - name: Record browser checks
+        if: always() && steps.browser.outcome != 'skipped'
+        run: bin/shipwake add -f json --file browser/run.json --context runner=github-ubuntu $PUSH
+        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+
+      - name: Benchmark fixtures
+        uses: actions/cache@v6
+        with: { path: .cache/fixtures, key: "fixtures-${{ hashFiles('tools/fixtures.sh') }}" }
+      - run: tools/fixtures.sh
+      - name: Benchmarks
+        id: bench
+        continue-on-error: true
+        run: go test -run '^$' -bench . -benchmem -count 5 ./... > bench.txt
+      - name: Record benchmarks
+        if: always() && steps.bench.outcome != 'skipped'
+        run: bin/shipwake add -f go-bench --file bench.txt -n "Benchmarks" --context runner=github-ubuntu $PUSH
+        env: { PUSH: "${{ github.event_name == 'push' && '--push' || '' }}" }
+
+      - name: Check
+        run: |
+          test "${{ steps.go.outcome }}" = success
+          test "${{ steps.browser.outcome }}" = success
+          test "${{ steps.bench.outcome }}" = success
+          bin/shipwake check --against previous

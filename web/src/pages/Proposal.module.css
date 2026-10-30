@@ -1,0 +1,104 @@
+.state {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  background: var(--fill);
+  color: var(--ink-2);
+}
+.state.proposed {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+/* not approved yet: a dashed box, the proposal itself editable in place */
+.proposal {
+  margin: 18px 0 8px;
+  padding: 14px 16px 12px;
+  border: 1.5px dashed color-mix(in srgb, var(--accent) 45%, var(--line));
+  border-radius: 14px;
+}
+.proposalHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.proposalName {
+  font-weight: 600;
+}
+/* on the timeline: folded to one line, opened by the arrow */
+.folding {
+  margin-top: 4px;
+  padding-bottom: 14px;
+}
+.folding > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.folding > summary::-webkit-details-marker {
+  display: none;
+}
+.folding > summary::before {
+  content: "▸";
+  color: var(--ink-2);
+  width: 10px;
+}
+.folding[open] > summary::before {
+  content: "▾";
+}
+.editor {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0 6px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+}
+.readonly {
+  display: grid;
+  gap: 12px;
+  margin: 10px 0 2px;
+  font-size: 14px;
+}
+.block b {
+  display: block;
+  margin-bottom: 2px;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0;
+}
+.primary,
+.secondary {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 14px;
+}
+.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.secondary {
+  background: var(--fill);
+}
+.primary:disabled,
+.secondary:disabled {
+  opacity: 0.5;
+}
+.error {
+  color: var(--t-del);
+  font-size: 13px;
+}
+
+.metricView {
+  margin: 12px 0 2px;
+}

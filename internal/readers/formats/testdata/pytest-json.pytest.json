@@ -1,0 +1,243 @@
+{
+ "created": 1793261450.784275,
+ "duration": 0.03821849822998047,
+ "exitcode": 1,
+ "root": "/work/pytest",
+ "environment": {},
+ "summary": {
+  "passed": 4,
+  "failed": 1,
+  "skipped": 1,
+  "total": 6,
+  "collected": 6
+ },
+ "collectors": [
+  {
+   "nodeid": "",
+   "outcome": "passed",
+   "result": [
+    {
+     "nodeid": ".",
+     "type": "Dir"
+    }
+   ]
+  },
+  {
+   "nodeid": "test_orders.py::TestShipping",
+   "outcome": "passed",
+   "result": [
+    {
+     "nodeid": "test_orders.py::TestShipping::test_free_over_50",
+     "type": "Function",
+     "lineno": 13
+    },
+    {
+     "nodeid": "test_orders.py::TestShipping::test_rates[CN]",
+     "type": "Function",
+     "lineno": 16
+    },
+    {
+     "nodeid": "test_orders.py::TestShipping::test_rates[US]",
+     "type": "Function",
+     "lineno": 16
+    }
+   ]
+  },
+  {
+   "nodeid": "test_orders.py",
+   "outcome": "passed",
+   "result": [
+    {
+     "nodeid": "test_orders.py::test_total",
+     "type": "Function",
+     "lineno": 2
+    },
+    {
+     "nodeid": "test_orders.py::test_tax",
+     "type": "Function",
+     "lineno": 5
+    },
+    {
+     "nodeid": "test_orders.py::test_refund",
+     "type": "Function",
+     "lineno": 8
+    },
+    {
+     "nodeid": "test_orders.py::TestShipping",
+     "type": "Class"
+    }
+   ]
+  },
+  {
+   "nodeid": ".",
+   "outcome": "passed",
+   "result": [
+    {
+     "nodeid": "test_orders.py",
+     "type": "Module"
+    }
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "nodeid": "test_orders.py::test_total",
+   "lineno": 2,
+   "outcome": "passed",
+   "keywords": [
+    "test_total",
+    "test_orders.py",
+    "pytest",
+    ""
+   ],
+   "setup": {
+    "duration": 0.000160556985065341,
+    "outcome": "passed"
+   },
+   "call": {
+    "duration": 0.00011940114200115204,
+    "outcome": "passed"
+   },
+   "teardown": {
+    "duration": 9.573507122695446e-05,
+    "outcome": "passed"
+   }
+  },
+  {
+   "nodeid": "test_orders.py::test_tax",
+   "lineno": 5,
+   "outcome": "failed",
+   "keywords": [
+    "test_tax",
+    "test_orders.py",
+    "pytest",
+    ""
+   ],
+   "setup": {
+    "duration": 8.793896995484829e-05,
+    "outcome": "passed"
+   },
+   "call": {
+    "duration": 0.00037197000347077847,
+    "outcome": "failed",
+    "crash": {
+     "path": "/work/pytest/test_orders.py",
+     "lineno": 7,
+     "message": "assert 0.7 == 0.8\n +  where 0.7 = round((10 * 0.07), 2)"
+    },
+    "traceback": [
+     {
+      "path": "test_orders.py",
+      "lineno": 7,
+      "message": "AssertionError"
+     }
+    ],
+    "longrepr": "def test_tax():\n>       assert round(10 * 0.07, 2) == 0.8\nE       assert 0.7 == 0.8\nE        +  where 0.7 = round((10 * 0.07), 2)\n\ntest_orders.py:7: AssertionError"
+   },
+   "teardown": {
+    "duration": 0.00013760896399617195,
+    "outcome": "passed"
+   }
+  },
+  {
+   "nodeid": "test_orders.py::test_refund",
+   "lineno": 8,
+   "outcome": "skipped",
+   "keywords": [
+    "test_refund",
+    "skip",
+    "pytestmark",
+    "test_orders.py",
+    "pytest",
+    ""
+   ],
+   "setup": {
+    "duration": 0.00012010405771434307,
+    "outcome": "skipped",
+    "longrepr": "('/work/pytest/test_orders.py', 9, 'Skipped: not built yet')"
+   },
+   "teardown": {
+    "duration": 9.928597137331963e-05,
+    "outcome": "passed"
+   }
+  },
+  {
+   "nodeid": "test_orders.py::TestShipping::test_free_over_50",
+   "lineno": 13,
+   "outcome": "passed",
+   "keywords": [
+    "test_free_over_50",
+    "TestShipping",
+    "test_orders.py",
+    "pytest",
+    ""
+   ],
+   "setup": {
+    "duration": 8.688215166330338e-05,
+    "outcome": "passed"
+   },
+   "call": {
+    "duration": 0.00010404293425381184,
+    "outcome": "passed"
+   },
+   "teardown": {
+    "duration": 8.109398186206818e-05,
+    "outcome": "passed"
+   }
+  },
+  {
+   "nodeid": "test_orders.py::TestShipping::test_rates[CN]",
+   "lineno": 16,
+   "outcome": "passed",
+   "keywords": [
+    "test_rates[CN]",
+    "parametrize",
+    "pytestmark",
+    "CN",
+    "TestShipping",
+    "test_orders.py",
+    "pytest",
+    ""
+   ],
+   "setup": {
+    "duration": 0.00024096411652863026,
+    "outcome": "passed"
+   },
+   "call": {
+    "duration": 9.81620978564024e-05,
+    "outcome": "passed"
+   },
+   "teardown": {
+    "duration": 9.458488784730434e-05,
+    "outcome": "passed"
+   }
+  },
+  {
+   "nodeid": "test_orders.py::TestShipping::test_rates[US]",
+   "lineno": 16,
+   "outcome": "passed",
+   "keywords": [
+    "test_rates[US]",
+    "parametrize",
+    "pytestmark",
+    "US",
+    "TestShipping",
+    "test_orders.py",
+    "pytest",
+    ""
+   ],
+   "setup": {
+    "duration": 0.00018495297990739346,
+    "outcome": "passed"
+   },
+   "call": {
+    "duration": 9.275181218981743e-05,
+    "outcome": "passed"
+   },
+   "teardown": {
+    "duration": 9.40319150686264e-05,
+    "outcome": "passed"
+   }
+  }
+ ]
+}

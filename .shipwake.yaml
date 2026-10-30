@@ -1,0 +1,10 @@
+# Shipwake records its own runs; see .github/workflows/ci.yml.
+name: Shipwake
+languages: [en, zh]
+
+# Approved 2026-10-29. Allocations and memory are stable run to run (under 1%), so they can block;
+# time on shared CI machines varies 1–17% and changes CPU model, so it only warns.
+metrics:
+  "*.allocs": { warn: "+5%", block: "+20%" }
+  "*.bytes": { warn: "+10%", block: "+30%" }
+  "*.time": { warn: "+30%" }

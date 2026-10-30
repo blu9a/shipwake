@@ -1,0 +1,160 @@
+[
+ {
+  "uri": "features/basket.feature",
+  "id": "shopping-basket",
+  "keyword": "Feature",
+  "name": "Shopping basket",
+  "description": "",
+  "line": 1,
+  "elements": [
+   {
+    "id": "shopping-basket;adding-an-item",
+    "keyword": "Scenario",
+    "name": "Adding an item",
+    "description": "",
+    "line": 5,
+    "type": "scenario",
+    "steps": [
+     {
+      "keyword": "Given ",
+      "name": "an empty basket",
+      "line": 3,
+      "match": {
+       "location": "basket_test.go:39"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 74169
+      }
+     },
+     {
+      "keyword": "When ",
+      "name": "I add \"tea\"",
+      "line": 6,
+      "match": {
+       "location": "basket_test.go:40"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 27698
+      }
+     },
+     {
+      "keyword": "Then ",
+      "name": "the basket has 1 item",
+      "line": 7,
+      "match": {
+       "location": "basket_test.go:42"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 37370
+      }
+     }
+    ]
+   },
+   {
+    "id": "shopping-basket;removing-an-item",
+    "keyword": "Scenario",
+    "name": "Removing an item",
+    "description": "",
+    "line": 9,
+    "type": "scenario",
+    "steps": [
+     {
+      "keyword": "Given ",
+      "name": "an empty basket",
+      "line": 3,
+      "match": {
+       "location": "basket_test.go:39"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 17603
+      }
+     },
+     {
+      "keyword": "When ",
+      "name": "I add \"tea\"",
+      "line": 10,
+      "match": {
+       "location": "basket_test.go:40"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 44455
+      }
+     },
+     {
+      "keyword": "And ",
+      "name": "I remove \"tea\"",
+      "line": 11,
+      "match": {
+       "location": "basket_test.go:41"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 20205
+      }
+     },
+     {
+      "keyword": "Then ",
+      "name": "the basket has 0 items",
+      "line": 12,
+      "match": {
+       "location": "basket_test.go:42"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 15588
+      }
+     }
+    ]
+   },
+   {
+    "id": "shopping-basket;a-discount-that-is-not-built-yet",
+    "keyword": "Scenario",
+    "name": "A discount that is not built yet",
+    "description": "",
+    "line": 14,
+    "type": "scenario",
+    "steps": [
+     {
+      "keyword": "Given ",
+      "name": "an empty basket",
+      "line": 3,
+      "match": {
+       "location": "basket_test.go:39"
+      },
+      "result": {
+       "status": "passed",
+       "duration": 22205
+      }
+     },
+     {
+      "keyword": "When ",
+      "name": "I apply the code \"SPRING\"",
+      "line": 15,
+      "match": {
+       "location": "features/basket.feature:15"
+      },
+      "result": {
+       "status": "pending"
+      }
+     },
+     {
+      "keyword": "Then ",
+      "name": "the total is reduced",
+      "line": 16,
+      "match": {
+       "location": "features/basket.feature:16"
+      },
+      "result": {
+       "status": "undefined"
+      }
+     }
+    ]
+   }
+  ]
+ }
+]

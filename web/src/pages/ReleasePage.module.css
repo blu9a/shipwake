@@ -1,0 +1,125 @@
+.title {
+  font-size: 22px;
+  margin: 0 0 18px;
+}
+.sec {
+  margin: 0 0 26px;
+}
+.sec h2 {
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+.secHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.secHead h2 {
+  margin: 0;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.version {
+  width: 140px;
+}
+.commit {
+  padding: 12px 14px;
+  border: 1px solid var(--card-line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 4px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.check:first-child {
+  border-top: 0;
+}
+.notes {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.assemble {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.textBtn {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+}
+.primary {
+  font-weight: 600;
+  color: var(--on-accent);
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+  padding: 10px 20px;
+}
+.primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.cmd {
+  margin-top: 14px;
+  border: 1px solid var(--card-line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+.cmdHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--fill) 55%, var(--bg));
+  border-bottom: 1px solid var(--line);
+}
+.cmdHead button {
+  color: var(--accent);
+  font-weight: 600;
+}
+.cmd pre {
+  margin: 0;
+  padding: 12px 14px;
+  font:
+    12.5px / 1.5 ui-monospace,
+    Menlo,
+    monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.error {
+  color: var(--t-del);
+  font-size: 13px;
+}
+.tagged {
+  margin: 0;
+}

@@ -1,0 +1,54 @@
+{
+  "id": "",
+  "kind": "test",
+  "name": "",
+  "commit": "",
+  "start": "2026-10-29T08:10:50Z",
+  "duration": 0,
+  "format": "",
+  "tests": [
+    {
+      "feature": "test_orders.py",
+      "name": "test_total",
+      "status": "passed",
+      "duration": 0.11940114200115204,
+      "attempts": 1
+    },
+    {
+      "feature": "test_orders.py",
+      "name": "test_tax",
+      "status": "failed",
+      "duration": 0.37197000347077847,
+      "attempts": 1,
+      "error": "assert 0.7 == 0.8\n +  where 0.7 = round((10 * 0.07), 2)"
+    },
+    {
+      "feature": "test_orders.py",
+      "name": "test_refund",
+      "status": "skipped",
+      "duration": 0.12010405771434307,
+      "attempts": 1
+    },
+    {
+      "feature": "test_orders.py",
+      "name": "TestShipping::test_free_over_50",
+      "status": "passed",
+      "duration": 0.10404293425381184,
+      "attempts": 1
+    },
+    {
+      "feature": "test_orders.py",
+      "name": "TestShipping::test_rates[CN]",
+      "status": "passed",
+      "duration": 0.0981620978564024,
+      "attempts": 1
+    },
+    {
+      "feature": "test_orders.py",
+      "name": "TestShipping::test_rates[US]",
+      "status": "passed",
+      "duration": 0.09275181218981743,
+      "attempts": 1
+    }
+  ]
+}

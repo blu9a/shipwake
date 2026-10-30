@@ -1,0 +1,20 @@
+# pytest with the pytest-json-report plugin: pytest --json-report --json-report-file=report.json
+format: pytest-json
+about: pytest with pytest-json-report (--json-report)
+input: json
+start: created
+tests:
+  each: tests[]
+  feature: nodeid | before(::)
+  name: nodeid | after(::)
+  status: outcome
+  duration: call.duration || setup.duration
+  duration_unit: s
+  error: call.crash.message || call.longrepr || setup.longrepr
+totals:
+  total: summary.total
+  passed: summary.passed
+  failed: summary.failed + summary.error
+  skipped: summary.skipped + summary.xfailed
+sample: testdata/pytest-json.pytest.json
+expected: testdata/pytest-json.pytest.expected.json

@@ -1,0 +1,11 @@
+# Build output
+/site/
+/bin/
+/shipwake-results/
+internal/site/dist/*
+!internal/site/dist/.gitkeep
+web/node_modules/
+web/dist/
+node_modules/
+web/test-results/
+web/playwright-report/

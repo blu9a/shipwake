@@ -1,0 +1,12 @@
+name: Bug
+description: Something doesn't work as described
+labels: [bug]
+body:
+  - type: textarea
+    attributes: { label: What happened, description: "What you did, what you expected, what happened instead." }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: How to reproduce it, description: "Commands, a small repository or report file, screenshots." }
+  - type: input
+    attributes: { label: Version, description: "shipwake version, and where it ran (OS, CI)." }
+    validations: { required: true }

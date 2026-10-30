@@ -1,0 +1,337 @@
+.title {
+  font-size: 20px;
+  font-weight: 650;
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+.body {
+  white-space: pre-wrap;
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.parents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 0 2px 12px;
+  margin: 24px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+.bar b {
+  font-size: 16px;
+}
+.sum {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font:
+    600 13px ui-monospace,
+    Menlo,
+    monospace;
+}
+.path {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.scenarios {
+  margin-bottom: 8px;
+}
+.steps {
+  padding: 2px 14px 14px 42px;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+.new {
+  background: var(--d-add);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.old {
+  background: var(--d-del);
+  border-radius: 4px;
+  padding: 0 4px;
+  text-decoration: line-through;
+  color: var(--ink-2);
+}
+
+.blocks {
+  display: inline-flex;
+  gap: 2px;
+}
+.blocks i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.blocks i.g {
+  background: var(--b-add);
+}
+.blocks i.r {
+  background: var(--b-del);
+}
+
+.diffWrap {
+  overflow-x: auto;
+  border-top: 1px solid var(--line);
+}
+.diff {
+  border-collapse: collapse;
+  width: 100%;
+  font:
+    12.5px / 20px ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+.diff td {
+  vertical-align: top;
+}
+.ln {
+  width: var(--ln, 3ch);
+  min-width: var(--ln, 3ch);
+  padding: 0 6px 0 10px;
+  text-align: right;
+  color: var(--ink-2);
+  user-select: none;
+  white-space: nowrap;
+}
+.cd {
+  padding: 0 16px 0 6px;
+  white-space: pre;
+}
+.cd b {
+  font-weight: 400;
+  display: inline-block;
+  width: 14px;
+  color: var(--ink-2);
+  user-select: none;
+}
+.add .cd {
+  background: var(--d-add);
+}
+.add .ln {
+  background: var(--d-add-n);
+  color: var(--ink);
+}
+.del .cd {
+  background: var(--d-del);
+}
+.del .ln {
+  background: var(--d-del-n);
+  color: var(--ink);
+}
+.hunk td {
+  background: var(--d-hunk);
+  color: var(--ink-2);
+}
+.hunk .ln {
+  background: var(--d-hunk-n);
+  text-align: center;
+}
+.note {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--ink-2);
+  border-top: 1px solid var(--line);
+}
+
+/* files: a tree beside the diffs, resizable; one pane at a time on narrow pages */
+.treeBtn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: -4px;
+  border-radius: 8px;
+  color: var(--ink-2);
+}
+.treeBtn:hover {
+  background: var(--fill);
+  color: var(--ink);
+}
+.paneSwitch {
+  display: none;
+  margin: 0 0 14px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: var(--tw, 300px) 12px minmax(0, 1fr);
+  column-gap: 8px;
+  align-items: start;
+}
+.dragging {
+  cursor: col-resize;
+  user-select: none;
+}
+.tree {
+  position: sticky;
+  top: calc(var(--bar-space) + 8px);
+  max-height: calc(100vh - var(--bar-space) - 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.divider {
+  position: relative;
+  align-self: stretch;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--line);
+  transition: background 0.15s;
+}
+.divider:hover::before,
+.divider:focus-visible::before,
+.dragging .divider::before {
+  left: 4px;
+  width: 3px;
+  background: var(--accent);
+}
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink-2);
+  background: var(--card);
+}
+.filter:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.filter input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.treeList {
+  overflow: auto;
+  padding-bottom: 16px;
+  font-size: 13.5px;
+}
+.tr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 8px;
+  border-radius: 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+.tr:hover,
+.tr.on {
+  background: var(--fill);
+}
+.tr.on {
+  font-weight: 600;
+}
+.nm {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chev {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 14px;
+  color: var(--ink-2);
+  transition: transform 0.15s;
+}
+.chevShut {
+  transform: rotate(-90deg);
+}
+.kids {
+  margin-left: 13px;
+  padding-left: 6px;
+  border-left: 1px solid var(--line);
+}
+.dirIc {
+  flex: none;
+  color: var(--ink-2);
+  opacity: 0.55;
+}
+.fileIc {
+  flex: none;
+  color: var(--t-mod);
+}
+.stA {
+  color: var(--t-add);
+}
+.stD {
+  color: var(--t-del);
+}
+.stR {
+  color: var(--ink-2);
+}
+.files {
+  min-width: 0;
+}
+.layout.treeOff {
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 0;
+}
+.layout.treeOff > .tree,
+.layout.treeOff > .divider {
+  display: none;
+}
+.file {
+  scroll-margin-top: calc(var(--bar-space) + 8px);
+  /* the browser skips drawing diffs far off screen; large commits stay smooth */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 52px;
+}
+
+@container (max-width: 900px) {
+  .treeBtn,
+  .divider {
+    display: none;
+  }
+  .paneSwitch {
+    display: flex;
+  }
+  .layout,
+  .layout.treeOff {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+  .layout[data-pane="changes"] > .tree {
+    display: none;
+  }
+  .layout[data-pane="files"] > .tree {
+    display: flex;
+    position: static;
+    max-height: none;
+  }
+  .layout[data-pane="files"] > .files {
+    display: none;
+  }
+}

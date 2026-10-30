@@ -1,0 +1,143 @@
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 2px 0 14px;
+}
+.head h1 {
+  margin: 0;
+  font-size: 20px;
+}
+.chart {
+  border: 1px solid var(--card-line);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  padding: 14px 16px 8px;
+}
+.chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.grid {
+  stroke: var(--line);
+}
+.axl {
+  font-size: 11px;
+  fill: var(--ink-2);
+  font-family: ui-monospace, Menlo, monospace;
+}
+.band {
+  fill: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.ln {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.pt {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 2;
+  cursor: pointer;
+}
+.pt.warn {
+  stroke: var(--b-warn);
+  fill: var(--b-warn);
+}
+.pt.block {
+  stroke: var(--b-del);
+  fill: var(--b-del);
+}
+.pt.cur {
+  stroke-width: 3;
+}
+.th {
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5;
+}
+.thl {
+  font-size: 11px;
+  font-weight: 600;
+}
+.warn .th {
+  stroke: var(--b-warn);
+}
+.warn .thl {
+  fill: var(--t-warn);
+}
+.block .th {
+  stroke: var(--b-del);
+}
+.block .thl {
+  fill: var(--t-del);
+}
+.rel line {
+  stroke: var(--ink-2);
+  stroke-dasharray: 2 3;
+}
+.rel text {
+  font-size: 11px;
+  fill: var(--ink-2);
+}
+.sec {
+  margin: 24px 0 10px;
+}
+.sec h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* A measured requirement: what was agreed, then its story. */
+.requirement {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--card-line);
+  border-radius: 14px;
+  background: var(--card);
+}
+.about {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.story {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+.story li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ink-2);
+}
+.dot.approved,
+.dot.added {
+  background: var(--accent);
+}
+.dot.met {
+  background: var(--b-add);
+}
+.dot.missed {
+  background: var(--b-del);
+}
+.dot.proposed {
+  background: transparent;
+  border: 1.5px dashed var(--ink-2);
+}

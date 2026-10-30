@@ -1,0 +1,54 @@
+{
+  "id": "",
+  "kind": "test",
+  "name": "",
+  "commit": "",
+  "start": "2026-10-29T08:10:01.974Z",
+  "duration": 0,
+  "format": "",
+  "tests": [
+    {
+      "feature": "math",
+      "name": "adds",
+      "status": "passed",
+      "duration": 1.4786129999999957,
+      "attempts": 1
+    },
+    {
+      "feature": "math",
+      "name": "divides by zero",
+      "status": "failed",
+      "duration": 9.37056999999993,
+      "attempts": 1,
+      "error": "AssertionError: expected Infinity to be +0 // Object.is equality\n    at /work/vitest/math.test.js:4:45\n    at file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (\u003canonymous\u003e)\n    at runWithTimeout (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at runSuite (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///work/vitest/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "feature": "math",
+      "name": "rounds money",
+      "status": "skipped",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "math › nested",
+      "name": "multiplies",
+      "status": "passed",
+      "duration": 0.24082699999996748,
+      "attempts": 1
+    },
+    {
+      "feature": "text.test.js",
+      "name": "trims",
+      "status": "passed",
+      "duration": 1.5926899999999478,
+      "attempts": 1
+    },
+    {
+      "feature": "text.test.js",
+      "name": "translates",
+      "status": "skipped",
+      "duration": 0,
+      "attempts": 1
+    }
+  ]
+}

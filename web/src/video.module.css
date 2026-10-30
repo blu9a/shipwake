@@ -1,0 +1,57 @@
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin-top: 8px;
+  font-size: 12.5px;
+}
+.label {
+  color: var(--ink-2);
+}
+.pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.controls button {
+  padding: 3px 10px;
+  font-size: 12.5px;
+}
+/* on the dark viewer */
+.dark .label {
+  color: rgb(255 255 255 / 70%);
+}
+.dark .pair > div {
+  background: rgb(255 255 255 / 12%);
+}
+.dark button {
+  color: rgb(255 255 255 / 75%);
+}
+.dark button[aria-pressed="true"] {
+  background: rgb(255 255 255 / 90%);
+  color: #111;
+}
+
+/* Subtitles drawn by the page: always the same place, clear of the video's controls. */
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 56px;
+  display: flex;
+  justify-content: center;
+  padding: 0 12px;
+  pointer-events: none;
+}
+.caption span {
+  max-width: 90%;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgb(0 0 0 / 78%);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.35;
+  text-align: center;
+  white-space: pre-line;
+}

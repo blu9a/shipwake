@@ -1,0 +1,487 @@
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 2px 0 14px;
+}
+.head h1 {
+  margin: 0;
+  font-size: 22px;
+}
+.when {
+  margin-left: auto;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* details at full width, the verdicts in a row under them */
+  gap: 18px;
+  align-items: start;
+  padding: 16px 18px;
+  border: 1px solid var(--card-line);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  margin-bottom: 28px;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 10px;
+}
+.stat {
+  /* Fit by the label/count, then grow equally up to the cap; remaining room stays on the right. */
+  flex: 1 1 0;
+  min-width: min-content;
+  max-width: 11rem;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--card-inset);
+}
+.k {
+  display: flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.k i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.f .k i {
+  background: var(--b-del);
+}
+.p .k i {
+  background: var(--b-add);
+}
+.v {
+  white-space: nowrap;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.2;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.f.has .v {
+  color: var(--t-del);
+}
+.sec {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
+}
+.sec h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.comparison {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+  max-width: 100%;
+  margin-left: auto;
+}
+@container (max-width: 620px) {
+  .comparison {
+    flex-basis: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+  .comparison > span {
+    flex: 1 1 10rem;
+  }
+}
+
+.detail {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 4px 14px 14px 42px;
+  display: grid;
+  gap: 12px;
+}
+/* one gap between the parts of a test; the meta line keeps no margin of its own here */
+.detail > :global(.meta) {
+  margin: 0;
+}
+.err {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--d-del);
+  font:
+    12.5px / 1.5 ui-monospace,
+    Menlo,
+    monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.groupName {
+  min-width: 0;
+}
+.watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 14px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.watch svg {
+  fill: currentColor;
+}
+.watch:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.video::cue {
+  font-size: 15px;
+}
+.screen {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+}
+.video {
+  box-sizing: border-box;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 420px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #000;
+}
+.steps {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+.steps .bad {
+  color: var(--t-del);
+}
+
+.worse {
+  color: var(--t-del);
+}
+.better {
+  color: var(--t-add);
+}
+.spark {
+  width: 96px;
+  height: 24px;
+  flex: none;
+}
+.spark polyline {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.spark circle {
+  fill: var(--accent);
+}
+.w .k i {
+  background: var(--b-warn);
+}
+.spark circle.warn {
+  fill: var(--b-warn);
+}
+.spark circle.block {
+  fill: var(--b-del);
+}
+.passage {
+  display: grid;
+  gap: 8px;
+}
+.pline {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 10px;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.prole {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  padding-top: 2px;
+}
+.pline.bad .prole {
+  color: var(--t-del);
+}
+.proof {
+  margin-top: 4px;
+  font-size: 13.5px;
+}
+.proof mark {
+  background: color-mix(in srgb, var(--b-add) 24%, transparent);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: 600;
+}
+.was {
+  margin-left: 8px;
+  font-size: 12.5px;
+  color: var(--t-mod);
+}
+
+/* The run on a time axis (from the draft): a row of bars per target. */
+.gantt {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 16px 8px;
+  margin-bottom: 28px;
+}
+.gGroup {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 0;
+}
+.gGroup + .gGroup {
+  border-top: 1px dashed var(--line);
+}
+.solo .gGroup {
+  grid-template-columns: minmax(0, 1fr);
+}
+.gLabel {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  padding-top: 1px;
+}
+.gLane {
+  position: relative;
+  height: 7px;
+  margin: 0 0 2px;
+}
+.gBar {
+  position: absolute;
+  top: 0;
+  height: 7px;
+  min-width: 3px;
+  padding: 0;
+  border-radius: 2px;
+  background: var(--b-add);
+  opacity: 0.85;
+}
+.gBar.failed {
+  background: var(--b-del);
+  opacity: 1;
+}
+.gBar:hover,
+.gBar:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+.gAxis {
+  position: relative;
+  height: 22px;
+  margin-left: 122px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+}
+.solo .gAxis {
+  margin-left: 0;
+}
+.gAxis span {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.gAxis span:first-child {
+  transform: none;
+}
+.gAxis span:last-child:not(:first-child) {
+  transform: translateX(-100%);
+}
+@media (max-width: 620px) {
+  .gGroup {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .gAxis {
+    margin-left: 0;
+  }
+}
+
+.badges span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.badges {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* "Steps and files": the steps as a tree, with the files they hold. */
+.more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  list-style: none;
+  cursor: pointer;
+  width: max-content;
+  color: var(--accent);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.more > summary::-webkit-details-marker {
+  display: none;
+}
+.more > summary > svg {
+  flex: none;
+  transform: rotate(-90deg);
+}
+.more[open] > summary > svg {
+  transform: none;
+}
+.attached {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--ink-2);
+}
+.tree {
+  margin-top: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.srow {
+  --row-start: calc(var(--lv, 0) * 28px);
+  --row-end: 0px;
+}
+summary.srow {
+  list-style: none;
+  cursor: pointer;
+}
+summary.srow::-webkit-details-marker {
+  display: none;
+}
+summary.srow:hover {
+  background: color-mix(in srgb, var(--fill) 55%, transparent);
+}
+.n {
+  width: 18px;
+  flex: none;
+  text-align: right;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.name {
+  flex: 1;
+  min-width: 0;
+}
+.du {
+  width: 64px;
+  flex: none;
+  text-align: right;
+  font:
+    12.5px ui-monospace,
+    Menlo,
+    monospace;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.aIc {
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+}
+.mime {
+  color: var(--ink-2);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.acts {
+  width: 64px;
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.plain {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--ink-2);
+}
+.plain:hover {
+  color: var(--ink);
+}
+/* under the name: past the icon (18), the number (18) and their gaps (10 each) */
+.abody {
+  padding: 4px 0 12px calc(var(--lv, 0) * 28px + 56px);
+}
+.abody img,
+.abody video {
+  box-sizing: border-box;
+  display: block;
+  max-width: 100%;
+  max-height: 520px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--fill);
+}
+@media (max-width: 700px) {
+  .mime {
+    display: none;
+  }
+}
+
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+  background: rgb(0 0 0 / 82%);
+}
+.viewer img,
+.viewer video {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+}
+.vClose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+
+/* a test picked on the timeline, for a moment */
+.hit > summary {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}

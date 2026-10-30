@@ -1,0 +1,248 @@
+/* Design tokens. Light and dark; dark follows the system unless <html data-mode> is set. */
+
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-sheet: 28px;
+  --radius-pill: 999px;
+  --text-caption: 12px;
+  --text-footnote: 13px;
+  --text-subhead: 14px;
+  --text-body: 16px;
+  --text-title3: 20px;
+  --text-title2: 22px;
+  --text-title1: 28px;
+  --layout-medium: 600px;
+  --layout-expanded: 1024px;
+  --layout-sidebar: 260px;
+  --layout-column: 720px;
+  --layout-column-wide: 880px;
+  --layout-sheet: 460px;
+  --bg: #ffffff;
+  --fill: #f1f1f4;
+  --fill-2: #e6e6eb;
+  --side: #f7f7f9;
+  --raised: #ffffff;
+  --field: #f1f1f4;
+  --ink: #111113;
+  --ink-2: #6e6e73;
+  --line: #e8e8ec;
+  --ok: #2b7a4b;
+  --warn: #9a5b00;
+  --warn-soft: #fff1da;
+  --danger: #e5484d;
+  --on-accent: #ffffff;
+  --accent: var(--accent-light);
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--bg));
+  color-scheme: light;
+}
+
+/* Theme colors, chosen by the person: <html data-accent="teal"> */
+:root,
+[data-accent="indigo"] {
+  --accent-light: #4f5bd5;
+  --accent-dark: #8f98f2;
+}
+[data-accent="blue"] {
+  --accent-light: #0a6cf0;
+  --accent-dark: #4da3ff;
+}
+[data-accent="teal"] {
+  --accent-light: #0e8478;
+  --accent-dark: #4cc9b8;
+}
+[data-accent="green"] {
+  --accent-light: #2b8440;
+  --accent-dark: #6ccb7a;
+}
+[data-accent="orange"] {
+  --accent-light: #d0600c;
+  --accent-dark: #ff9f4a;
+}
+[data-accent="pink"] {
+  --accent-light: #cc3b78;
+  --accent-dark: #ff7ab0;
+}
+[data-accent="graphite"] {
+  --accent-light: #3a3a3c;
+  --accent-dark: #d1d1d6;
+}
+
+/* Dark mode follows the system unless <html data-mode="light|dark"> is set. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    --bg: #0a0a0a;
+    --fill: #1c1c1f;
+    --fill-2: #2a2a2e;
+    --side: #0e0e10;
+    --raised: #1a1a1d;
+    --field: #2a2a2e;
+    --ink: #f5f5f7;
+    --ink-2: #8e8e93;
+    --line: #232326;
+    --ok: #7bcb98;
+    --warn: #f0b55e;
+    --warn-soft: #3a2d16;
+    --danger: #ff6369;
+    --on-accent: #000000;
+    --accent: var(--accent-dark);
+    --accent-soft: color-mix(in srgb, var(--accent) 26%, var(--bg));
+    color-scheme: dark;
+  }
+}
+:root[data-mode="dark"] {
+  --bg: #0a0a0a;
+  --fill: #1c1c1f;
+  --fill-2: #2a2a2e;
+  --side: #0e0e10;
+  --raised: #1a1a1d;
+  --field: #2a2a2e;
+  --ink: #f5f5f7;
+  --ink-2: #8e8e93;
+  --line: #232326;
+  --ok: #7bcb98;
+  --warn: #f0b55e;
+  --warn-soft: #3a2d16;
+  --danger: #ff6369;
+  --on-accent: #000000;
+  --accent: var(--accent-dark);
+  --accent-soft: color-mix(in srgb, var(--accent) 26%, var(--bg));
+  color-scheme: dark;
+}
+
+/* Cards and the top bar, measured from the glass references: a nearly opaque tint over a very
+   wide, neutral blur, so what passes underneath shows only as soft light or shade, never as shapes.
+   No highlights or gradients; in dark mode just a faint cool hairline. */
+:root {
+  --card: var(--raised);
+  --card-line: var(--line);
+  --card-shadow: none;
+  --card-head: color-mix(in srgb, var(--fill) 45%, var(--bg));
+  --card-inset: color-mix(in srgb, var(--fill) 60%, var(--bg));
+  --bar-bg: rgba(255, 255, 255, 0.68);
+  --bar-line: transparent;
+  --bar-shadow: 0 8px 32px rgba(17, 17, 19, 0.07), 0 1px 2px rgba(17, 17, 19, 0.03);
+  --bar-blur: blur(40px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    --card: rgba(255, 255, 255, 0.035);
+    --card-line: rgba(255, 255, 255, 0.07);
+    --card-shadow: none;
+    --card-head: rgba(255, 255, 255, 0.025);
+    --card-inset: rgba(255, 255, 255, 0.045);
+    --bar-bg: rgba(11, 11, 11, 0.8);
+    --bar-line: rgba(150, 160, 185, 0.09);
+    --bar-shadow: none;
+  }
+}
+:root[data-mode="dark"] {
+  --card: rgba(255, 255, 255, 0.035);
+  --card-line: rgba(255, 255, 255, 0.07);
+  --card-shadow: none;
+  --card-head: rgba(255, 255, 255, 0.025);
+  --card-inset: rgba(255, 255, 255, 0.045);
+  --bar-bg: rgba(11, 11, 11, 0.8);
+  --bar-line: rgba(150, 160, 185, 0.09);
+  --bar-shadow: none;
+}
+
+/* Results and diffs */
+:root {
+  --d-add: #e6ffec;
+  --d-add-n: #ccffd8;
+  --d-del: #ffebe9;
+  --d-del-n: #ffd7d5;
+  --d-hunk: #ddf4ff;
+  --d-hunk-n: #b6e3ff;
+  --b-add: #2da44e;
+  --b-del: #cf222e;
+  --b-warn: #e0a100;
+  --t-add: #1a7f37;
+  --t-del: #cf222e;
+  --t-warn: #a87700;
+  --t-mod: #9a6700;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    --d-add: rgba(46, 160, 67, 0.15);
+    --d-add-n: rgba(63, 185, 80, 0.3);
+    --d-del: rgba(248, 81, 73, 0.1);
+    --d-del-n: rgba(248, 81, 73, 0.3);
+    --d-hunk: rgba(56, 139, 253, 0.1);
+    --d-hunk-n: rgba(56, 139, 253, 0.4);
+    --b-add: #3fb950;
+    --b-del: #f85149;
+    --t-add: #3fb950;
+    --t-del: #f85149;
+    --t-warn: #e3b341;
+    --t-mod: #d29922;
+  }
+}
+:root[data-mode="dark"] {
+  --d-add: rgba(46, 160, 67, 0.15);
+  --d-add-n: rgba(63, 185, 80, 0.3);
+  --d-del: rgba(248, 81, 73, 0.1);
+  --d-del-n: rgba(248, 81, 73, 0.3);
+  --d-hunk: rgba(56, 139, 253, 0.1);
+  --d-hunk-n: rgba(56, 139, 253, 0.4);
+  --b-add: #3fb950;
+  --b-del: #f85149;
+  --t-add: #3fb950;
+  --t-del: #f85149;
+  --t-warn: #e3b341;
+  --t-mod: #d29922;
+}
+
+/* Code tokens, colored at build time (internal/highlight) */
+:root {
+  --tk-k: #cf222e;
+  --tk-t: #953800;
+  --tk-v: #0550ae;
+  --tk-s: #0a3069;
+  --tk-n: #0550ae;
+  --tk-c: #6e7781;
+  --tk-p: #cf222e;
+  --tk-f: #8250df;
+  --tk-b: #0550ae;
+  --tk-g: #116329;
+  --tk-a: #0550ae;
+  --tk-d: #8250df;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    --tk-k: #ff7b72;
+    --tk-t: #ffa657;
+    --tk-v: #79c0ff;
+    --tk-s: #a5d6ff;
+    --tk-n: #79c0ff;
+    --tk-c: #8b949e;
+    --tk-p: #ff7b72;
+    --tk-f: #d2a8ff;
+    --tk-b: #79c0ff;
+    --tk-g: #7ee787;
+    --tk-a: #79c0ff;
+    --tk-d: #d2a8ff;
+  }
+}
+:root[data-mode="dark"] {
+  --tk-k: #ff7b72;
+  --tk-t: #ffa657;
+  --tk-v: #79c0ff;
+  --tk-s: #a5d6ff;
+  --tk-n: #79c0ff;
+  --tk-c: #8b949e;
+  --tk-p: #ff7b72;
+  --tk-f: #d2a8ff;
+  --tk-b: #79c0ff;
+  --tk-g: #7ee787;
+  --tk-a: #79c0ff;
+  --tk-d: #d2a8ff;
+}
