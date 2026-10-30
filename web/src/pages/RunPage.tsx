@@ -8,7 +8,7 @@ import { comparison, effectiveFor, hasRelease, series, trendInRow, upTo } from '
 import type { Attachment, Evidence, Metric, Project, Run, Step, Test } from '../model.gen';
 import { useSettings, useT } from '../settings';
 import { Icon, ScrollName, Segmented, StatusIcon, Tally, ui } from '../ui';
-import { Caption, useApplySettings, useSubtitles, VideoControls } from '../video';
+import { Caption, Still, useApplySettings, useNoBlanks, useSubtitles, VideoControls } from '../video';
 import { Cases } from './Cases';
 import s from './RunPage.module.css';
 import { featureClips } from './WatchPage';
@@ -204,6 +204,7 @@ function Recording({ p, run, x, video }: { p: Project; run: Run; x: Test; video:
   const ref = useRef<HTMLVideoElement>(null);
   useApplySettings(ref);
   const subs = useSubtitles(p, x, video);
+  const still = useNoBlanks(ref, fileUrl(p.id, run.id, video.path));
   return (
     <div>
       <div className={s.screen}>
@@ -211,6 +212,7 @@ function Recording({ p, run, x, video }: { p: Project; run: Run; x: Test; video:
         <video ref={ref} className={s.video} controls preload="metadata" src={fileUrl(p.id, run.id, video.path)}>
           {subs.url && <track key={subs.url} kind="subtitles" srcLang={subs.lang} label={subs.lang} src={subs.url} />}
         </video>
+        <Still src={still} />
         <Caption video={ref} />
       </div>
       <VideoControls />

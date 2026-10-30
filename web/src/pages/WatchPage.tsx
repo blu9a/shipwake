@@ -6,7 +6,7 @@ import { targetName, tr } from '../format';
 import type { Run } from '../model.gen';
 import { useSettings, useT } from '../settings';
 import { Icon, StatusIcon } from '../ui';
-import { Caption, useApplySettings, useSubtitles, VideoControls } from '../video';
+import { Caption, Still, useApplySettings, useNoBlanks, useSubtitles, VideoControls } from '../video';
 import s from './WatchPage.module.css';
 
 /** The clips the feature's video is made of: one target's passing recordings, in the order they ran. */
@@ -34,6 +34,7 @@ export function WatchPage() {
   useApplySettings(ref);
   const clip = clips[at];
   const subs = useSubtitles(p, clip?.x, clip?.video);
+  const still = useNoBlanks(ref, clip ? fileUrl(project, run.id, clip.path) : '');
   // The scenario's name shows over the video for a moment whenever a clip starts.
   useEffect(() => {
     if (!card) return;
@@ -41,7 +42,9 @@ export function WatchPage() {
     return () => clearTimeout(tm);
   }, [card]);
   const close = () => router.history.back();
+  const next = useRef(0);
   const go = (i: number) => {
+    clearTimeout(next.current);
     setAt(i);
     setProgress(0);
     setCard(true);
@@ -64,10 +67,14 @@ export function WatchPage() {
                 muted
                 playsInline
                 onTimeUpdate={(e) => setProgress(e.currentTarget.duration ? e.currentTarget.currentTime / e.currentTarget.duration : 0)}
-                onEnded={() => at + 1 < clips.length && go(at + 1)}
+                // the result stays on screen a moment before the next scenario
+                onEnded={() => {
+                  if (at + 1 < clips.length) next.current = window.setTimeout(() => go(at + 1), 1200);
+                }}
               >
                 {subs.url && <track key={subs.url} kind="subtitles" srcLang={subs.lang} label={subs.lang} src={subs.url} />}
               </video>
+              <Still src={still} />
               <Caption video={ref} />
               <div className={`${s.card} ${card ? s.show : ''}`}>
                 {at + 1} / {clips.length} · {tr(p, clip.x.name, lang)}
