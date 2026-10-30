@@ -19,3 +19,11 @@ Feature: Approving requirements
     When I open the proposal
     Then that line is marked with the reason
     And approving it is not possible
+
+  @proposed
+  Scenario: Each branch shows its own requirements
+    Given scenarios proposed on a branch that is not merged
+    When I open the timeline of the trunk
+    Then nothing is shown as proposed
+    And the branch's timeline shows the proposal
+    And it can be approved only while that branch is checked out
