@@ -1,0 +1,1435 @@
+{
+  "schemaVersion": 1,
+  "id": "20261030T213354-ea99770d",
+  "kind": "test",
+  "name": "Acceptance",
+  "commit": "27ff4921943bac5442c522dca549fbb0e605f3ae",
+  "branch": "main",
+  "start": "2026-10-30T21:33:54.021Z",
+  "duration": 31635.446,
+  "format": "json",
+  "context": {
+    "runner": "github-ubuntu"
+  },
+  "tests": [
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "Approving commits to the workspace",
+      "status": "passed",
+      "start": "2026-10-30T21:33:54.405Z",
+      "duration": 2474,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed for a project in local mode",
+          "status": "passed",
+          "start": "2026-10-30T21:33:54.76Z",
+          "duration": 339
+        },
+        {
+          "name": "When I approve them in Shipwake",
+          "status": "passed",
+          "start": "2026-10-30T21:33:55.102Z",
+          "duration": 1106
+        },
+        {
+          "name": "Then the approval is a commit in the project's workspace that names me",
+          "status": "passed",
+          "start": "2026-10-30T21:33:56.21Z",
+          "duration": 16
+        },
+        {
+          "name": "And the repository has no new commits",
+          "status": "passed",
+          "start": "2026-10-30T21:33:56.227Z",
+          "duration": 10
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "video.webm",
+          "size": 98445,
+          "start": "2026-10-30T21:33:54.66Z"
+        }
+      ]
+    },
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "Opening a repository by its path",
+      "status": "passed",
+      "start": "2026-10-30T21:33:54.409Z",
+      "duration": 2848,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a repository on my machine that Shipwake has never seen",
+          "status": "passed",
+          "start": "2026-10-30T21:33:54.752Z",
+          "duration": 91
+        },
+        {
+          "name": "When I open it in Shipwake by its path",
+          "status": "passed",
+          "start": "2026-10-30T21:33:54.849Z",
+          "duration": 805
+        },
+        {
+          "name": "Then its timeline is shown",
+          "status": "passed",
+          "start": "2026-10-30T21:33:55.655Z",
+          "duration": 918,
+          "attachments": [
+            {
+              "name": "decisive: its timeline is shown",
+              "type": "image/png",
+              "path": "1.png",
+              "size": 39557
+            }
+          ]
+        },
+        {
+          "name": "And its files, branches, tags and Git settings are as they were",
+          "status": "passed",
+          "start": "2026-10-30T21:33:56.574Z",
+          "duration": 12
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "1-video.webm",
+          "size": 72012,
+          "start": "2026-10-30T21:33:54.653Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "its timeline is shown",
+          "expected": [
+            "main",
+            "fix: shares add up to the total"
+          ],
+          "observed": "main Default branch 0 merges latest release v0.1.0 New release fix: shares add up to the total 330ac41 Jan 4, 00:00 v0.1.0 Jan 3 · 0 merges FEATURES Split a bill between friends chore(release): v0.1.0 2ffeafe Jan 3, 00:00 feat: split a bill between friends a617283 Jan 2, 00:00"
+        }
+      ]
+    },
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "Runs are kept in the workspace",
+      "status": "passed",
+      "start": "2026-10-30T21:33:57.122Z",
+      "duration": 1695,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a project in local mode",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.182Z",
+          "duration": 105
+        },
+        {
+          "name": "When I record a run of its tests, with a recording",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.289Z",
+          "duration": 51
+        },
+        {
+          "name": "Then the run and its recording are kept in the project's workspace",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.341Z",
+          "duration": 6
+        },
+        {
+          "name": "And the repository has no new branch",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.347Z",
+          "duration": 5
+        },
+        {
+          "name": "And the run is shown on the repository commit it tested",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.353Z",
+          "duration": 613,
+          "attachments": [
+            {
+              "name": "decisive: the run is shown on the repository commit it tested",
+              "type": "image/png",
+              "path": "2.png",
+              "size": 26212
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "2-video.webm",
+          "size": 28372,
+          "start": "2026-10-30T21:33:57.129Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the run is shown on the repository commit it tested",
+          "expected": [
+            "Acceptance",
+            "a617283"
+          ],
+          "observed": "Acceptance 1 a617283 Oct 30, 21:33"
+        }
+      ]
+    },
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "Requirements follow the repository's branch",
+      "status": "passed",
+      "start": "2026-10-30T21:33:57.484Z",
+      "duration": 3272,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a project in local mode with scenarios proposed for the branch feature/tip",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.576Z",
+          "duration": 160
+        },
+        {
+          "name": "When the repository has feature/tip checked out",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.738Z",
+          "duration": 80
+        },
+        {
+          "name": "Then the timeline of feature/tip shows the proposal, and it can be approved",
+          "status": "passed",
+          "start": "2026-10-30T21:33:57.819Z",
+          "duration": 1274,
+          "attachments": [
+            {
+              "name": "decisive: the timeline of feature/tip shows the proposal, and it can be approved",
+              "type": "image/png",
+              "path": "3.png",
+              "size": 61794
+            }
+          ]
+        },
+        {
+          "name": "And the trunk's timeline shows nothing proposed",
+          "status": "passed",
+          "start": "2026-10-30T21:33:59.094Z",
+          "duration": 813
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "3-video.webm",
+          "size": 115975,
+          "start": "2026-10-30T21:33:57.494Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the timeline of feature/tip shows the proposal, and it can be approved",
+          "expected": [
+            "Splitting a bill",
+            "Approve"
+          ],
+          "observed": "Proposed Splitting a bill 1 scenario Proposed Oct 30, 21:33 Approve Save changes"
+        }
+      ]
+    },
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "Opening every project at once",
+      "status": "passed",
+      "start": "2026-10-30T21:33:58.826Z",
+      "duration": 2265,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given two projects in local mode and one repository set up the usual way",
+          "status": "passed",
+          "start": "2026-10-30T21:33:58.882Z",
+          "duration": 416
+        },
+        {
+          "name": "When I start Shipwake without naming a repository",
+          "status": "passed",
+          "start": "2026-10-30T21:33:59.299Z",
+          "duration": 500
+        },
+        {
+          "name": "Then all three projects are shown",
+          "status": "passed",
+          "start": "2026-10-30T21:33:59.8Z",
+          "duration": 404,
+          "attachments": [
+            {
+              "name": "decisive: all three projects are shown",
+              "type": "image/png",
+              "path": "4.png",
+              "size": 26596
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "4-video.webm",
+          "size": 41774,
+          "start": "2026-10-30T21:33:58.833Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "all three projects are shown",
+          "expected": [
+            "bills",
+            "notes",
+            "Shop"
+          ],
+          "observed": "bills notes Shop Open a repository"
+        }
+      ]
+    },
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "Adopting the requirements into the repository",
+      "status": "passed",
+      "start": "2026-10-30T21:34:01.101Z",
+      "duration": 1136,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a project in local mode with approved scenarios and recorded runs",
+          "status": "passed",
+          "start": "2026-10-30T21:34:01.139Z",
+          "duration": 985
+        },
+        {
+          "name": "When I adopt it into the repository",
+          "status": "passed",
+          "start": "2026-10-30T21:34:02.125Z",
+          "duration": 62
+        },
+        {
+          "name": "Then the repository has one new commit, made as me, with the requirements and settings",
+          "status": "passed",
+          "start": "2026-10-30T21:34:02.189Z",
+          "duration": 25
+        },
+        {
+          "name": "And its message lists what was approved in local mode, and by whom",
+          "status": "passed",
+          "start": "2026-10-30T21:34:02.215Z",
+          "duration": 5
+        },
+        {
+          "name": "And the workspace is kept as it was",
+          "status": "passed",
+          "start": "2026-10-30T21:34:02.221Z",
+          "duration": 12
+        }
+      ]
+    },
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "Giving an agent what it needs",
+      "status": "passed",
+      "start": "2026-10-30T21:34:00.768Z",
+      "duration": 2457,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a project in local mode",
+          "status": "passed",
+          "start": "2026-10-30T21:34:00.85Z",
+          "duration": 274
+        },
+        {
+          "name": "When I open the agent prompt",
+          "status": "passed",
+          "start": "2026-10-30T21:34:01.125Z",
+          "duration": 711
+        },
+        {
+          "name": "Then it names the skill, the repository, its workspace and the checked-out branch",
+          "status": "passed",
+          "start": "2026-10-30T21:34:01.837Z",
+          "duration": 86,
+          "attachments": [
+            {
+              "name": "decisive: it names the skill, the repository, its workspace and the checked-out branch",
+              "type": "image/png",
+              "path": "5.png",
+              "size": 66263
+            }
+          ]
+        },
+        {
+          "name": "And I can copy it with one click",
+          "status": "passed",
+          "start": "2026-10-30T21:34:01.924Z",
+          "duration": 430,
+          "attachments": [
+            {
+              "name": "decisive: I can copy it with one click",
+              "type": "image/png",
+              "path": "6.png",
+              "size": 66992
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "5-video.webm",
+          "size": 91580,
+          "start": "2026-10-30T21:34:00.788Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "it names the skill, the repository, its workspace and the checked-out branch",
+          "expected": [
+            "/tmp/shipwake-acceptance-8dVuQW/home/skill/SKILL.md",
+            "/tmp/shipwake-acceptance-8dVuQW/bills",
+            "/tmp/shipwake-acceptance-8dVuQW/home/bills",
+            "branch main"
+          ],
+          "observed": "Use Shipwake for the repository /tmp/shipwake-acceptance-8dVuQW/bills, branch main. First read the Shipwake skill: /tmp/shipwake-acceptance-8dVuQW/home/skill/SKILL.md The project is in local mode: its .shipwake.yaml, features, metrics, converters and results are in the workspace /tmp/shipwake-acceptance-8dVuQW/home/bills, a Git repository of its own, on the branch of the same name. Write and commit Shipwake's files there, never in /tmp/shipwake-acceptance-8dVuQW/bills. Test code stays in /tmp/shipwake-acceptance-8dVuQW/bills, as usual."
+        },
+        {
+          "step": "I can copy it with one click",
+          "expected": [
+            "Copied"
+          ],
+          "observed": "Copied"
+        }
+      ]
+    },
+    {
+      "feature": "Using Shipwake without touching a repository",
+      "name": "An approval in local mode shows on the timeline",
+      "status": "passed",
+      "start": "2026-10-30T21:34:02.248Z",
+      "duration": 2354,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed for a project in local mode",
+          "status": "passed",
+          "start": "2026-10-30T21:34:02.308Z",
+          "duration": 174
+        },
+        {
+          "name": "When I approve them in Shipwake",
+          "status": "passed",
+          "start": "2026-10-30T21:34:02.483Z",
+          "duration": 1155
+        },
+        {
+          "name": "Then the timeline shows the approval, marked as kept in the workspace",
+          "status": "passed",
+          "start": "2026-10-30T21:34:03.639Z",
+          "duration": 77,
+          "attachments": [
+            {
+              "name": "decisive: the timeline shows the approval, marked as kept in the workspace",
+              "type": "image/png",
+              "path": "7.png",
+              "size": 40080
+            }
+          ]
+        },
+        {
+          "name": "And it sits above the repository commit that was checked out when I approved",
+          "status": "passed",
+          "start": "2026-10-30T21:34:03.716Z",
+          "duration": 23
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "6-video.webm",
+          "size": 93277,
+          "start": "2026-10-30T21:34:02.259Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the timeline shows the approval, marked as kept in the workspace",
+          "expected": [
+            "spec: approve 1 scenario of \"Splitting a bill\"",
+            "In the workspace"
+          ],
+          "observed": "spec: approve 1 scenario of \"Splitting a bill\" In the workspace 8806393 Approved by Pat Example Oct 30, 21:34"
+        }
+      ]
+    },
+    {
+      "feature": "Approving requirements",
+      "name": "Proposals wait at the top of the timeline",
+      "status": "passed",
+      "start": "2026-10-30T21:34:03.239Z",
+      "duration": 1865,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed for a feature",
+          "status": "passed",
+          "start": "2026-10-30T21:34:03.292Z",
+          "duration": 31
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T21:34:03.324Z",
+          "duration": 464
+        },
+        {
+          "name": "Then the proposal is shown above everything else",
+          "status": "passed",
+          "start": "2026-10-30T21:34:03.789Z",
+          "duration": 110,
+          "attachments": [
+            {
+              "name": "decisive: the proposal is shown above everything else",
+              "type": "image/png",
+              "path": "8.png",
+              "size": 38277
+            }
+          ]
+        },
+        {
+          "name": "And it can be opened to read its scenarios",
+          "status": "passed",
+          "start": "2026-10-30T21:34:03.9Z",
+          "duration": 350,
+          "attachments": [
+            {
+              "name": "decisive: it can be opened to read its scenarios",
+              "type": "image/png",
+              "path": "9.png",
+              "size": 53889
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "7-video.webm",
+          "size": 76237,
+          "start": "2026-10-30T21:34:03.245Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the proposal is shown above everything else",
+          "expected": [
+            "Splitting a bill"
+          ],
+          "observed": "Proposed Splitting a bill 1 scenario Proposed Jan 3, 00:00"
+        },
+        {
+          "step": "it can be opened to read its scenarios",
+          "expected": [
+            "Scenario: Exact totals"
+          ],
+          "observed": ""
+        }
+      ]
+    },
+    {
+      "feature": "Approving requirements",
+      "name": "Approving records who approved",
+      "status": "passed",
+      "start": "2026-10-30T21:34:04.616Z",
+      "duration": 2430,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed for a feature",
+          "status": "passed",
+          "start": "2026-10-30T21:34:04.673Z",
+          "duration": 29
+        },
+        {
+          "name": "When I approve them in Shipwake",
+          "status": "passed",
+          "start": "2026-10-30T21:34:04.702Z",
+          "duration": 1120
+        },
+        {
+          "name": "Then they are no longer proposed",
+          "status": "passed",
+          "start": "2026-10-30T21:34:05.823Z",
+          "duration": 342
+        },
+        {
+          "name": "And the commit that approved them names me as the approver",
+          "status": "passed",
+          "start": "2026-10-30T21:34:06.166Z",
+          "duration": 12
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "8-video.webm",
+          "size": 89399,
+          "start": "2026-10-30T21:34:04.622Z"
+        }
+      ]
+    },
+    {
+      "feature": "Approving requirements",
+      "name": "A metric Shipwake can't read can't be approved",
+      "status": "passed",
+      "start": "2026-10-30T21:34:05.112Z",
+      "duration": 1992,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a proposed metric with a line Shipwake doesn't understand",
+          "status": "passed",
+          "start": "2026-10-30T21:34:05.177Z",
+          "duration": 36
+        },
+        {
+          "name": "When I open the proposal",
+          "status": "passed",
+          "start": "2026-10-30T21:34:05.214Z",
+          "duration": 819
+        },
+        {
+          "name": "Then that line is marked with the reason",
+          "status": "passed",
+          "start": "2026-10-30T21:34:06.034Z",
+          "duration": 82,
+          "attachments": [
+            {
+              "name": "decisive: that line is marked with the reason",
+              "type": "image/png",
+              "path": "10.png",
+              "size": 54313
+            }
+          ]
+        },
+        {
+          "name": "And approving it is not possible",
+          "status": "passed",
+          "start": "2026-10-30T21:34:06.117Z",
+          "duration": 86,
+          "attachments": [
+            {
+              "name": "decisive: approving it is not possible",
+              "type": "image/png",
+              "path": "11.png",
+              "size": 55826
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "9-video.webm",
+          "size": 101261,
+          "start": "2026-10-30T21:34:05.12Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "that line is marked with the reason",
+          "expected": [
+            "Line 3:"
+          ],
+          "observed": "Line 3: not a setting Shipwake knows; settings come after the description, one per line"
+        },
+        {
+          "step": "approving it is not possible",
+          "expected": [
+            "Approve"
+          ],
+          "observed": "Approve"
+        }
+      ]
+    },
+    {
+      "feature": "Watching what a scenario did",
+      "name": "A recording starts where the page shows something",
+      "status": "passed",
+      "start": "2026-10-30T21:34:07.127Z",
+      "duration": 2548,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a scenario recorded while its page was still blank for the first second",
+          "status": "passed",
+          "start": "2026-10-30T21:34:07.213Z",
+          "duration": 82
+        },
+        {
+          "name": "When I open the scenario's recording",
+          "status": "passed",
+          "start": "2026-10-30T21:34:07.296Z",
+          "duration": 1457
+        },
+        {
+          "name": "Then it shows the page from the start, not a blank screen",
+          "status": "passed",
+          "start": "2026-10-30T21:34:08.754Z",
+          "duration": 40
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "10-video.webm",
+          "size": 90364,
+          "start": "2026-10-30T21:34:07.138Z"
+        }
+      ]
+    },
+    {
+      "feature": "Approving requirements",
+      "name": "Each branch shows its own requirements",
+      "status": "passed",
+      "start": "2026-10-30T21:34:07.055Z",
+      "duration": 3680,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed on a branch that is not merged",
+          "status": "passed",
+          "start": "2026-10-30T21:34:07.176Z",
+          "duration": 57
+        },
+        {
+          "name": "When I open the timeline of the trunk",
+          "status": "passed",
+          "start": "2026-10-30T21:34:07.234Z",
+          "duration": 487
+        },
+        {
+          "name": "Then nothing is shown as proposed",
+          "status": "passed",
+          "start": "2026-10-30T21:34:07.722Z",
+          "duration": 7
+        },
+        {
+          "name": "And the branch's timeline shows the proposal",
+          "status": "passed",
+          "start": "2026-10-30T21:34:07.73Z",
+          "duration": 907,
+          "attachments": [
+            {
+              "name": "decisive: the branch's timeline shows the proposal",
+              "type": "image/png",
+              "path": "12.png",
+              "size": 40047
+            }
+          ]
+        },
+        {
+          "name": "And it can be approved only while that branch is checked out",
+          "status": "passed",
+          "start": "2026-10-30T21:34:08.638Z",
+          "duration": 1236,
+          "attachments": [
+            {
+              "name": "decisive: it can be approved only while that branch is checked out",
+              "type": "image/png",
+              "path": "13.png",
+              "size": 51943
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "11-video.webm",
+          "size": 156137,
+          "start": "2026-10-30T21:34:07.082Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the branch's timeline shows the proposal",
+          "expected": [
+            "Splitting a bill"
+          ],
+          "observed": "Proposed Splitting a bill 1 scenario Proposed Jan 3, 00:00"
+        },
+        {
+          "step": "it can be approved only while that branch is checked out",
+          "expected": [
+            "Check out spec/exact-totals"
+          ],
+          "observed": "Check out spec/exact-totals to approve or change this proposal."
+        }
+      ]
+    },
+    {
+      "feature": "Watching what a scenario did",
+      "name": "A feature's video ends each scenario on its result",
+      "status": "passed",
+      "start": "2026-10-30T21:34:10.748Z",
+      "duration": 4280,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a feature with two recorded scenarios",
+          "status": "passed",
+          "start": "2026-10-30T21:34:10.798Z",
+          "duration": 65
+        },
+        {
+          "name": "When I watch the feature",
+          "status": "passed",
+          "start": "2026-10-30T21:34:10.865Z",
+          "duration": 1425
+        },
+        {
+          "name": "Then the end of the first scenario stays on screen a moment before the second begins",
+          "status": "passed",
+          "start": "2026-10-30T21:34:12.291Z",
+          "duration": 1860
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "12-video.webm",
+          "size": 291951,
+          "start": "2026-10-30T21:34:10.754Z"
+        }
+      ]
+    },
+    {
+      "feature": "Releasing",
+      "name": "The changelog is drafted from the changes",
+      "status": "passed",
+      "start": "2026-10-30T21:34:15.038Z",
+      "duration": 1886,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given commits since the last release: a feature, a fix and a test",
+          "status": "passed",
+          "start": "2026-10-30T21:34:15.103Z",
+          "duration": 95
+        },
+        {
+          "name": "When I prepare a new release and assemble the draft",
+          "status": "passed",
+          "start": "2026-10-30T21:34:15.199Z",
+          "duration": 755
+        },
+        {
+          "name": "Then the notes list the feature and the fix",
+          "status": "passed",
+          "start": "2026-10-30T21:34:15.955Z",
+          "duration": 81,
+          "attachments": [
+            {
+              "name": "decisive: the notes list the feature and the fix",
+              "type": "image/png",
+              "path": "14.png",
+              "size": 47343
+            }
+          ]
+        },
+        {
+          "name": "And they don't list the test",
+          "status": "passed",
+          "start": "2026-10-30T21:34:16.037Z",
+          "duration": 8
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "13-video.webm",
+          "size": 94599,
+          "start": "2026-10-30T21:34:15.046Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the notes list the feature and the fix",
+          "expected": [
+            "add a tip before splitting",
+            "shares add up to the total"
+          ],
+          "observed": ""
+        }
+      ]
+    },
+    {
+      "feature": "Watching what a scenario did",
+      "name": "A blank moment holds the last picture",
+      "status": "passed",
+      "start": "2026-10-30T21:34:09.685Z",
+      "duration": 8315,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a scenario recorded while its page went blank for a second in the middle",
+          "status": "passed",
+          "start": "2026-10-30T21:34:09.769Z",
+          "duration": 71
+        },
+        {
+          "name": "When I play the recording through that second",
+          "status": "passed",
+          "start": "2026-10-30T21:34:09.841Z",
+          "duration": 1449
+        },
+        {
+          "name": "Then the page's last picture stays on screen until the page is back",
+          "status": "passed",
+          "start": "2026-10-30T21:34:11.291Z",
+          "duration": 5852
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "14-video.webm",
+          "size": 204604,
+          "start": "2026-10-30T21:34:09.703Z"
+        }
+      ]
+    },
+    {
+      "feature": "Releasing",
+      "name": "Approving a release records it",
+      "status": "passed",
+      "start": "2026-10-30T21:34:16.932Z",
+      "duration": 1849,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given checks that pass on the newest commit",
+          "status": "passed",
+          "start": "2026-10-30T21:34:16.986Z",
+          "duration": 61
+        },
+        {
+          "name": "When I approve a release with its notes",
+          "status": "passed",
+          "start": "2026-10-30T21:34:17.048Z",
+          "duration": 845
+        },
+        {
+          "name": "Then the changelog has a section for the new version",
+          "status": "passed",
+          "start": "2026-10-30T21:34:17.894Z",
+          "duration": 7
+        },
+        {
+          "name": "And the version is tagged with me as the approver",
+          "status": "passed",
+          "start": "2026-10-30T21:34:17.902Z",
+          "duration": 6
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "15-video.webm",
+          "size": 100612,
+          "start": "2026-10-30T21:34:16.94Z"
+        }
+      ]
+    },
+    {
+      "feature": "Getting started",
+      "name": "Setting up in local mode from the terminal",
+      "status": "passed",
+      "start": "2026-10-30T21:34:18.793Z",
+      "duration": 166,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a repository on my machine that Shipwake has never seen",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.816Z",
+          "duration": 67
+        },
+        {
+          "name": "When I run \"shipwake init --local --write\" in it",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.887Z",
+          "duration": 47
+        },
+        {
+          "name": "Then it is in local mode, its settings written and committed in its workspace",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.935Z",
+          "duration": 12
+        },
+        {
+          "name": "And the repository is as it was",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.948Z",
+          "duration": 11
+        }
+      ]
+    },
+    {
+      "feature": "Getting started",
+      "name": "Setting up a project already in local mode",
+      "status": "passed",
+      "start": "2026-10-30T21:34:18.968Z",
+      "duration": 155,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a project in local mode",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.989Z",
+          "duration": 90
+        },
+        {
+          "name": "When I run \"shipwake init --write\" in its repository",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.08Z",
+          "duration": 30
+        },
+        {
+          "name": "Then its settings are written in its workspace, not in the repository",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.111Z",
+          "duration": 10
+        }
+      ]
+    },
+    {
+      "feature": "Releasing",
+      "name": "Nothing to release",
+      "status": "passed",
+      "start": "2026-10-30T21:34:18.017Z",
+      "duration": 1481,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given every change is already released",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.103Z",
+          "duration": 46
+        },
+        {
+          "name": "When I open the new release page",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.15Z",
+          "duration": 118
+        },
+        {
+          "name": "Then it says there is nothing new since the last release",
+          "status": "passed",
+          "start": "2026-10-30T21:34:18.269Z",
+          "duration": 378,
+          "attachments": [
+            {
+              "name": "decisive: it says there is nothing new since the last release",
+              "type": "image/png",
+              "path": "15.png",
+              "size": 15525
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "16-video.webm",
+          "size": 18913,
+          "start": "2026-10-30T21:34:18.034Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "it says there is nothing new since the last release",
+          "expected": [
+            "Nothing new since v0.1.0."
+          ],
+          "observed": "Nothing new since v0.1.0."
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "A run sits with the commit it tested",
+      "status": "passed",
+      "start": "2026-10-30T21:34:19.132Z",
+      "duration": 1621,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a project whose newest commit came after an older one",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.185Z",
+          "duration": 32
+        },
+        {
+          "name": "And a test run on the older commit, recorded after the newest commit",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.218Z",
+          "duration": 40
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.259Z",
+          "duration": 444
+        },
+        {
+          "name": "Then the run appears directly above the older commit",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.704Z",
+          "duration": 112,
+          "attachments": [
+            {
+              "name": "decisive: the run appears directly above the older commit",
+              "type": "image/png",
+              "path": "16.png",
+              "size": 31595
+            }
+          ]
+        },
+        {
+          "name": "And it names the commit it tested",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.817Z",
+          "duration": 80,
+          "attachments": [
+            {
+              "name": "decisive: it names the commit it tested",
+              "type": "image/png",
+              "path": "17.png",
+              "size": 31629
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "17-video.webm",
+          "size": 30752,
+          "start": "2026-10-30T21:34:19.138Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the run appears directly above the older commit",
+          "expected": [
+            "Acceptance",
+            "feat: split a bill between friends"
+          ],
+          "observed": "Acceptance 1 a617283 Oct 30, 21:34 feat: split a bill between friends a617283 Jan 2, 00:00"
+        },
+        {
+          "step": "it names the commit it tested",
+          "expected": [
+            "a617283"
+          ],
+          "observed": "a617283"
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "A release shows what it records",
+      "status": "passed",
+      "start": "2026-10-30T21:34:20.764Z",
+      "duration": 1480,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a release whose changelog lists a new feature and a fix",
+          "status": "passed",
+          "start": "2026-10-30T21:34:20.819Z",
+          "duration": 38
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T21:34:20.857Z",
+          "duration": 434
+        },
+        {
+          "name": "Then the release shows the feature and the fix as its changelog says",
+          "status": "passed",
+          "start": "2026-10-30T21:34:21.292Z",
+          "duration": 95,
+          "attachments": [
+            {
+              "name": "decisive: the release shows the feature and the fix as its changelog says",
+              "type": "image/png",
+              "path": "18.png",
+              "size": 40694
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "18-video.webm",
+          "size": 42708,
+          "start": "2026-10-30T21:34:20.77Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "the release shows the feature and the fix as its changelog says",
+          "expected": [
+            "Split a bill between friends",
+            "totals: Shares add up to the total (#12)"
+          ],
+          "observed": "v0.1.0 Jan 3 · 0 merges FEATURES Split a bill between friends FIXES totals: Shares add up to the total (#12)"
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "A failing test is visible on its commit",
+      "status": "passed",
+      "start": "2026-10-30T21:34:19.51Z",
+      "duration": 2941,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a test run with one failing test on a commit",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.567Z",
+          "duration": 55
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T21:34:19.623Z",
+          "duration": 458
+        },
+        {
+          "name": "Then that commit's run shows one failure",
+          "status": "passed",
+          "start": "2026-10-30T21:34:20.082Z",
+          "duration": 82,
+          "attachments": [
+            {
+              "name": "decisive: that commit's run shows one failure",
+              "type": "image/png",
+              "path": "19.png",
+              "size": 27005
+            }
+          ]
+        },
+        {
+          "name": "And opening the run shows the failing test with its error",
+          "status": "passed",
+          "start": "2026-10-30T21:34:20.165Z",
+          "duration": 1416,
+          "attachments": [
+            {
+              "name": "decisive: opening the run shows the failing test with its error",
+              "type": "image/png",
+              "path": "20.png",
+              "size": 41065
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "19-video.webm",
+          "size": 76149,
+          "start": "2026-10-30T21:34:19.516Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "that commit's run shows one failure",
+          "expected": [
+            "1"
+          ],
+          "observed": "1"
+        },
+        {
+          "step": "opening the run shows the failing test with its error",
+          "expected": [
+            "expected 33.34 to be 33.33"
+          ],
+          "observed": "expected 33.34 to be 33.33"
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "A result step without evidence is marked",
+      "status": "passed",
+      "start": "2026-10-30T21:34:22.251Z",
+      "duration": 2851,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a run in which some scenarios recorded what their result steps saw",
+          "status": "passed",
+          "start": "2026-10-30T21:34:22.306Z",
+          "duration": 0
+        },
+        {
+          "name": "And one scenario whose result step recorded nothing",
+          "status": "passed",
+          "start": "2026-10-30T21:34:22.307Z",
+          "duration": 58
+        },
+        {
+          "name": "When I open that scenario in the run",
+          "status": "passed",
+          "start": "2026-10-30T21:34:22.366Z",
+          "duration": 1416
+        },
+        {
+          "name": "Then its result says no evidence was recorded",
+          "status": "passed",
+          "start": "2026-10-30T21:34:23.783Z",
+          "duration": 86,
+          "attachments": [
+            {
+              "name": "decisive: its result says no evidence was recorded",
+              "type": "image/png",
+              "path": "21.png",
+              "size": 38699
+            }
+          ]
+        },
+        {
+          "name": "And the scenarios with evidence show what was observed",
+          "status": "passed",
+          "start": "2026-10-30T21:34:23.87Z",
+          "duration": 366,
+          "attachments": [
+            {
+              "name": "decisive: the scenarios with evidence show what was observed",
+              "type": "image/png",
+              "path": "22.png",
+              "size": 46036
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "20-video.webm",
+          "size": 116192,
+          "start": "2026-10-30T21:34:22.257Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "its result says no evidence was recorded",
+          "expected": [
+            "No evidence recorded"
+          ],
+          "observed": "No evidence recorded"
+        },
+        {
+          "step": "the scenarios with evidence show what was observed",
+          "expected": [
+            "30.00"
+          ],
+          "observed": "Observed “Each person pays 30.00”"
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "Copying a scenario's name",
+      "status": "passed",
+      "start": "2026-10-30T21:34:22.46Z",
+      "duration": 3037,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a run with a scenario of a feature",
+          "status": "passed",
+          "start": "2026-10-30T21:34:22.55Z",
+          "duration": 60
+        },
+        {
+          "name": "When I copy the scenario's name from the run",
+          "status": "passed",
+          "start": "2026-10-30T21:34:22.611Z",
+          "duration": 1904
+        },
+        {
+          "name": "Then I have the feature's and the scenario's names together, ready to paste",
+          "status": "passed",
+          "start": "2026-10-30T21:34:24.516Z",
+          "duration": 99,
+          "attachments": [
+            {
+              "name": "decisive: I have the feature's and the scenario's names together, ready to paste",
+              "type": "image/png",
+              "path": "23.png",
+              "size": 36186
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "21-video.webm",
+          "size": 90292,
+          "start": "2026-10-30T21:34:22.468Z"
+        }
+      ],
+      "evidence": [
+        {
+          "step": "I have the feature's and the scenario's names together, ready to paste",
+          "expected": [
+            "Even split"
+          ],
+          "observed": "Even split"
+        }
+      ]
+    }
+  ]
+}
