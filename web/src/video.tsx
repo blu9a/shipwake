@@ -200,27 +200,24 @@ const isBlank = (data: Uint8ClampedArray) => {
 
 const once = (el: EventTarget, event: string) => new Promise<void>((ok) => el.addEventListener(event, () => ok(), { once: true }));
 
-/** Finds the blank stretches of a recording by sampling a hidden copy of it, about ten times a second. */
-async function findBlanks(src: string, signal: AbortSignal): Promise<Blank[]> {
+/** Finds the blank stretches of a recording by sampling a hidden copy of it, about ten times a second, and
+ *  says how it read it: its length and samples. */
+async function findBlanks(src: string, signal: AbortSignal): Promise<{ blanks: Blank[]; scan: string }> {
   const v = document.createElement('video');
   v.muted = true;
   v.preload = 'auto';
   v.src = src;
   await once(v, 'loadeddata');
-  let duration = v.duration;
-  if (!Number.isFinite(duration)) {
-    // Recordings written as they're made may not state their length. Seeking far past the end stops
-    // at the last frame: where it stops is the length, whether or not the browser then states it.
-    v.currentTime = 1e7;
-    await once(v, 'seeked');
-    duration = Number.isFinite(v.duration) ? v.duration : v.currentTime;
-  }
-  const step = Math.max(0.1, duration / 400);
+  // Recordings written as they're made may not state their length: then the scan walks on until a step
+  // can't go further. (Jumping to the end first to learn it leaves the last frame on screen, which a slow
+  // machine can still show at the next step.)
+  let duration = Number.isFinite(v.duration) ? v.duration : Number.POSITIVE_INFINITY;
+  const step = Number.isFinite(duration) ? Math.max(0.1, duration / 400) : 0.1;
   const small = document.createElement('canvas');
   small.width = 48;
   small.height = 27;
   const ctx = small.getContext('2d', { willReadFrequently: true });
-  if (!ctx || !Number.isFinite(duration) || duration <= 0) return [];
+  if (!ctx || duration <= 0) return { blanks: [], scan: 'unreadable' };
   const picture = () => {
     const c = document.createElement('canvas');
     c.width = v.videoWidth;
@@ -231,12 +228,19 @@ async function findBlanks(src: string, signal: AbortSignal): Promise<Blank[]> {
   const seek = async (t: number) => {
     v.currentTime = t;
     await once(v, 'seeked');
+    if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) await once(v, 'loadeddata'); // the frame itself
   };
   const out: Blank[] = [];
   let good: number | undefined; // the last sample that showed something
   let open: Blank | undefined;
-  for (let t = 0; t < duration && !signal.aborted; t += step) {
+  let samples = 0;
+  for (let t = 0; t < duration && t < 3600 && !signal.aborted; t += step) {
     await seek(t);
+    if (!Number.isFinite(duration) && v.currentTime < t - 0.001) {
+      duration = v.currentTime; // the last frame: the recording ends here
+      break;
+    }
+    samples++;
     ctx.drawImage(v, 0, 0, small.width, small.height);
     const blank = isBlank(ctx.getImageData(0, 0, small.width, small.height).data);
     if (blank && !open) {
@@ -256,10 +260,14 @@ async function findBlanks(src: string, signal: AbortSignal): Promise<Blank[]> {
       }
     }
   }
-  if (open) out.push(open);
+  if (!Number.isFinite(duration)) duration = v.currentTime;
+  if (open) {
+    open.end = duration;
+    out.push(open);
+  }
   v.removeAttribute('src');
   v.load();
-  return out;
+  return { blanks: out, scan: `${duration.toFixed(2)} s, ${samples} samples` };
 }
 
 /** Keeps a recording from showing blank screens: it starts where the page first shows something, and a
@@ -274,10 +282,13 @@ export function useNoBlanks(ref: RefObject<HTMLVideoElement | null>, src: string
     setStill(undefined);
     if (!src) return;
     findBlanks(src, ctl.signal)
-      .then((b) => {
+      .then(({ blanks: b, scan }) => {
         if (ctl.signal.aborted) return;
         // the scan's result, for anyone checking the player: blank stretches as start-end seconds
-        if (ref.current) ref.current.dataset.blanks = b.map((x) => `${x.start.toFixed(1)}-${x.end.toFixed(1)}`).join(' ');
+        if (ref.current) {
+          ref.current.dataset.blanks = b.map((x) => `${x.start.toFixed(1)}-${x.end.toFixed(1)}`).join(' ');
+          ref.current.dataset.scan = scan; // for anyone checking the player
+        }
         setBlanks(b);
       })
       .catch(() => {}); // unreadable: shown as recorded

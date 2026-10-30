@@ -55,7 +55,9 @@ When("I open the scenario's recording", async ({ page, served, world }) => {
 
 Then('it shows the page from the start, not a blank screen', async ({ world }) => {
   // once the player has found the blank start, it stands, still paused, where the page first shows something
-  await expect(world.video).toHaveAttribute('data-blanks', /^0\.0-1\.\d/, { timeout: 30000 });
+  await expect(world.video).toHaveAttribute('data-scan', /samples/, { timeout: 30000 });
+  const scan = await world.video.evaluate((v) => `${v.dataset.scan}; blank: ${v.dataset.blanks || 'none'}`);
+  expect(scan, 'the scan should find the blank first second').toMatch(/blank: 0\.0-1\.\d/);
   await expect.poll(() => at(world.video), { timeout: 5000 }).toBeGreaterThan(0.9);
   expect(await world.video.evaluate((v) => v.paused)).toBe(true);
 });
