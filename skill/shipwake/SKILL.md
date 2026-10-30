@@ -25,7 +25,8 @@ Default to local mode: nothing is written into their repository.
    commits a starter `.shipwake.yaml` there, and shows the test tools it found and the command for each. Tell
    them where the workspace is.
 3. **A first run.** Running the tests runs their code: ask first. Run the command `init` showed for their test
-   tool, then `shipwake add` as it showed. When no tool was found, find how the project runs its tests and
+   tool, writing its report to a temporary folder rather than into the repository, then `shipwake add` with that
+   file. When no tool was found, find how the project runs its tests and
    record JUnit XML, or write a converter (below).
 4. **Scenarios for what the product already does.** Read the README, the docs and the main code paths, then
    propose three to five scenarios for the most important behavior, in the person's words (see "Propose
