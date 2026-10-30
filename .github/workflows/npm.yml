@@ -22,5 +22,6 @@ jobs:
           npm run build
       - name: Publish
         working-directory: packages/playwright
-        run: npm publish --provenance --access public $([ "${{ github.event.release.prerelease }}" = true ] && echo --tag next)
+        # a version with a suffix (0.2.0-rc.1) goes out as "next"; others as the version everyone installs
+        run: npm publish --provenance --access public $(case "$GITHUB_REF_NAME" in *-*) echo --tag next;; esac)
         env: { NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}" }
