@@ -70,9 +70,15 @@ jobs:
         run: |
           if [ ${{ matrix.suite.file }} = acceptance ]; then pnpm exec bddgen -c acceptance.config.mjs; fi
           pnpm exec playwright test -c ${{ matrix.suite.config }} --reporter=list,../packages/playwright/src/reporter.ts
+      # the report, and the recordings it points to, in their places relative to each other
       - uses: actions/upload-artifact@v7
         if: always()
-        with: { name: "${{ matrix.suite.file }}", path: "${{ matrix.suite.file }}/", if-no-files-found: ignore }
+        with:
+          name: ${{ matrix.suite.file }}
+          if-no-files-found: ignore
+          path: |
+            ${{ matrix.suite.file }}/
+            web/test-results/
 
   benchmarks:
     runs-on: ubuntu-latest
@@ -111,8 +117,8 @@ jobs:
           # a suite that stopped before writing its report has nothing to record; Check still fails
           record() { f=$1; shift; if [ -e "$f" ]; then bin/shipwake add --file "$f" "$@" --context runner=github-ubuntu $PUSH; fi; }
           record runs/go-test/go-test.json -f go-test -n "Go tests"
-          record runs/browser/run.json -f json
-          record runs/acceptance/run.json -f json
+          record runs/browser/browser/run.json -f json
+          record runs/acceptance/acceptance/run.json -f json
           record runs/bench/bench.txt -f go-bench -n "Benchmarks"
       - name: Check
         run: |
