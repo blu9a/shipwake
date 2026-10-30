@@ -117,7 +117,8 @@ Trends fill in as CI records each change. To have them now, record your recent r
 - **Nothing to operate.** `shipwake build -o site` writes a static folder; publish it anywhere, for example on
   GitHub Pages from CI. `shipwake check` gates merges and releases (exit 1 when something blocks).
 - **Upgrading.** Update the binary, or the version of the GitHub Action you use. `shipwake doctor` checks a setup.
-  Until 1.0, formats may still change; each release's notes list breaking changes first.
+  Recorded results stay readable by every later version; what else may change before 1.0 is in
+  [Compatibility](docs/compatibility.md).
 
 ## Docs
 
@@ -127,6 +128,7 @@ Trends fill in as CI records each change. To have them now, record your recent r
 - [Configuration](docs/config.md): names, languages, thresholds, translations, the changelog
 - [CI](docs/ci.md): GitHub Actions, GitLab, others; publishing the site
 - [Releases](docs/releases.md): the changelog, notes in tags, approval
+- [Compatibility](docs/compatibility.md): what upgrades keep working, recorded results above all
 - [Playwright reporter](packages/playwright/README.md): steps, screenshots, recordings and what was observed
 - [Agent skill](skill/shipwake/SKILL.md): setting Shipwake up, writing converters, drafting release notes
 
@@ -180,7 +182,7 @@ Apache-2.0.
 
 ## 后续维护
 
-没有需要运维的服务：`shipwake build -o site` 生成静态网站，发布到任何地方；`shipwake check` 用来把关合并和发布。升级时更新二进制或 GitHub Action 的版本；`shipwake doctor` 检查配置。1.0 之前格式仍可能变化，每个版本的说明会把破坏性变更列在最前面。
+没有需要运维的服务：`shipwake build -o site` 生成静态网站，发布到任何地方；`shipwake check` 用来把关合并和发布。升级时更新二进制或 GitHub Action 的版本；`shipwake doctor` 检查配置。记录下来的结果，之后的每个版本都能读取；1.0 之前还有哪些可能变化，见 [兼容性](docs/compatibility.md)。
 
 参与贡献：见 [CONTRIBUTING.md](CONTRIBUTING.md)。许可证：Apache-2.0。
 

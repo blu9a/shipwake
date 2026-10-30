@@ -546,6 +546,9 @@
     },
     "Run": {
       "properties": {
+        "schemaVersion": {
+          "type": "integer"
+        },
         "id": {
           "type": "string"
         },

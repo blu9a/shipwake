@@ -15,6 +15,9 @@ func readOwn(r io.Reader) (model.Run, error) {
 	if err := json.NewDecoder(r).Decode(&run); err != nil {
 		return run, err
 	}
+	if err := run.CheckSchema(); err != nil {
+		return run, err
+	}
 	for i := range run.Metrics {
 		if run.Metrics[i].Direction == "" {
 			run.Metrics[i].Direction = "lower"
