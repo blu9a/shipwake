@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/blu9a/shipwake/internal/highlight"
 )
 
 // fixture is a real repository at a pinned commit, from tools/fixtures.sh. Without it the benchmark
@@ -29,8 +31,26 @@ func BenchmarkBuildRealRepository(b *testing.B) {
 	ctx := context.Background()
 	repo := fixture(b, "charmbracelet-log")
 	for b.Loop() {
+		highlight.Forget() // the first build of a process
 		if err := Run(ctx, Options{Projects: []Project{{Dir: repo}}, Out: b.TempDir()}); err != nil {
 			b.Fatal(err)
 		}
+	}
+}
+
+// BenchmarkRebuildRealRepository is the same build again in the same process: what serve does after
+// every change.
+func BenchmarkRebuildRealRepository(b *testing.B) {
+	ctx := context.Background()
+	repo := fixture(b, "charmbracelet-log")
+	build := func() {
+		if err := Run(ctx, Options{Projects: []Project{{Dir: repo}}, Out: b.TempDir()}); err != nil {
+			b.Fatal(err)
+		}
+	}
+	highlight.Forget()
+	build()
+	for b.Loop() {
+		build()
 	}
 }
