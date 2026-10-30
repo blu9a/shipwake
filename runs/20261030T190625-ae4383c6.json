@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "id": "20261030T190625-ae4383c6",
+  "kind": "benchmark",
+  "name": "Benchmarks",
+  "commit": "98d3ff1120cd92880d367aa75796419b9d09876d",
+  "branch": "main",
+  "start": "2026-10-30T19:06:25.446247893Z",
+  "duration": 0,
+  "format": "go-bench",
+  "context": {
+    "cpu": "AMD EPYC 7763 64-Core Processor                ",
+    "goarch": "amd64",
+    "goos": "linux",
+    "runner": "github-ubuntu"
+  },
+  "metrics": [
+    {
+      "id": "BuildRealRepository.time",
+      "suite": "BuildRealRepository",
+      "name": "Time per operation",
+      "unit": "ns",
+      "direction": "lower",
+      "values": [
+        8441460994,
+        7604280297,
+        7598073226,
+        7727875609,
+        7611106249
+      ]
+    },
+    {
+      "id": "BuildRealRepository.bytes",
+      "suite": "BuildRealRepository",
+      "name": "Memory per operation",
+      "unit": "B",
+      "direction": "lower",
+      "values": [
+        2207930240,
+        2229038760,
+        2215319968,
+        2225700152,
+        2193879576
+      ]
+    },
+    {
+      "id": "BuildRealRepository.allocs",
+      "suite": "BuildRealRepository",
+      "name": "Allocations per operation",
+      "unit": "allocs",
+      "direction": "lower",
+      "values": [
+        30084470,
+        30409060,
+        30200693,
+        30344369,
+        29910339
+      ]
+    },
+    {
+      "id": "RebuildRealRepository.time",
+      "suite": "RebuildRealRepository",
+      "name": "Time per operation",
+      "unit": "ns",
+      "direction": "lower",
+      "values": [
+        2328385823,
+        2349940071,
+        2306281483,
+        2350656909,
+        2334676111
+      ]
+    },
+    {
+      "id": "RebuildRealRepository.bytes",
+      "suite": "RebuildRealRepository",
+      "name": "Memory per operation",
+      "unit": "B",
+      "direction": "lower",
+      "values": [
+        75764440,
+        75858896,
+        75508784,
+        75614120,
+        75856136
+      ]
+    },
+    {
+      "id": "RebuildRealRepository.allocs",
+      "suite": "RebuildRealRepository",
+      "name": "Allocations per operation",
+      "unit": "allocs",
+      "direction": "lower",
+      "values": [
+        189718,
+        189760,
+        189743,
+        189680,
+        189713
+      ]
+    },
+    {
+      "id": "HistoryLoad.time",
+      "suite": "HistoryLoad",
+      "name": "Time per operation",
+      "unit": "ns",
+      "direction": "lower",
+      "values": [
+        398858770,
+        375034341,
+        379870849,
+        402393226,
+        383557037
+      ]
+    },
+    {
+      "id": "HistoryLoad.bytes",
+      "suite": "HistoryLoad",
+      "name": "Memory per operation",
+      "unit": "B",
+      "direction": "lower",
+      "values": [
+        9385282,
+        9347517,
+        9350237,
+        9348034,
+        9347304
+      ]
+    },
+    {
+      "id": "HistoryLoad.allocs",
+      "suite": "HistoryLoad",
+      "name": "Allocations per operation",
+      "unit": "allocs",
+      "direction": "lower",
+      "values": [
+        43488,
+        43440,
+        43447,
+        43441,
+        43438
+      ]
+    },
+    {
+      "id": "JudgeApply.time",
+      "suite": "JudgeApply",
+      "name": "Time per operation",
+      "unit": "ns",
+      "direction": "lower",
+      "values": [
+        7459085,
+        7425619,
+        7523949,
+        7402961,
+        7410962
+      ]
+    },
+    {
+      "id": "JudgeApply.bytes",
+      "suite": "JudgeApply",
+      "name": "Memory per operation",
+      "unit": "B",
+      "direction": "lower",
+      "values": [
+        1859933,
+        1861018,
+        1859304,
+        1860852,
+        1861772
+      ]
+    },
+    {
+      "id": "JudgeApply.allocs",
+      "suite": "JudgeApply",
+      "name": "Allocations per operation",
+      "unit": "allocs",
+      "direction": "lower",
+      "values": [
+        41355,
+        41355,
+        41355,
+        41355,
+        41355
+      ]
+    }
+  ]
+}
