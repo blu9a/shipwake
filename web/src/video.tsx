@@ -177,3 +177,148 @@ export function useSubtitles(p: Project, x: Test | undefined, recording?: Attach
   );
   return { url, lang };
 }
+
+// Blank stretches: a test's recording starts when its browser page opens, often long before the page shows
+// anything (the test is still setting up), and goes blank whenever the page loads again. A blank screen
+// looks frozen or broken; the page it was about to show, or the one it just showed, doesn't.
+
+/** A stretch where the recording shows a single color, and the picture to show instead. */
+interface Blank {
+  start: number;
+  end: number;
+  still?: string; // the last picture before it; none before the page first shows something
+}
+
+/** Whether a small sample of a frame is one color: hardly any pixel differs from the commonest. */
+const isBlank = (data: Uint8ClampedArray) => {
+  const counts = new Map<number, number>();
+  const key = (i: number) => ((data[i] ?? 0) >> 4) * 256 + ((data[i + 1] ?? 0) >> 4) * 16 + ((data[i + 2] ?? 0) >> 4);
+  for (let i = 0; i < data.length; i += 4) counts.set(key(i), (counts.get(key(i)) ?? 0) + 1);
+  const most = Math.max(...counts.values());
+  return most >= (data.length / 4) * 0.997;
+};
+
+const once = (el: EventTarget, event: string) => new Promise<void>((ok) => el.addEventListener(event, () => ok(), { once: true }));
+
+/** Finds the blank stretches of a recording by sampling a hidden copy of it, about ten times a second. */
+async function findBlanks(src: string, signal: AbortSignal): Promise<Blank[]> {
+  const v = document.createElement('video');
+  v.muted = true;
+  v.preload = 'auto';
+  v.src = src;
+  await once(v, 'loadeddata');
+  if (!Number.isFinite(v.duration)) {
+    // recordings written as they're made may not state their length until read to the end
+    v.currentTime = 1e7;
+    await once(v, 'seeked');
+  }
+  const duration = v.duration;
+  const step = Math.max(0.1, duration / 400);
+  const small = document.createElement('canvas');
+  small.width = 48;
+  small.height = 27;
+  const ctx = small.getContext('2d', { willReadFrequently: true });
+  if (!ctx || !Number.isFinite(duration)) return [];
+  const picture = () => {
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    c.getContext('2d')?.drawImage(v, 0, 0);
+    return c.toDataURL('image/jpeg', 0.9);
+  };
+  const seek = async (t: number) => {
+    v.currentTime = t;
+    await once(v, 'seeked');
+  };
+  const out: Blank[] = [];
+  let good: number | undefined; // the last sample that showed something
+  let open: Blank | undefined;
+  for (let t = 0; t < duration && !signal.aborted; t += step) {
+    await seek(t);
+    ctx.drawImage(v, 0, 0, small.width, small.height);
+    const blank = isBlank(ctx.getImageData(0, 0, small.width, small.height).data);
+    if (blank && !open) {
+      open = { start: t, end: duration };
+      if (good !== undefined) {
+        await seek(good); // the picture it holds: the last one before it
+        open.still = picture();
+        await seek(t);
+      }
+    }
+    if (!blank) {
+      good = t;
+      if (open) {
+        open.end = t;
+        out.push(open);
+        open = undefined;
+      }
+    }
+  }
+  if (open) out.push(open);
+  v.removeAttribute('src');
+  v.load();
+  return out;
+}
+
+/** Keeps a recording from showing blank screens: it starts where the page first shows something, and a
+ *  blank stretch later on shows the last picture instead, held until the page is back. Subtitles stay in
+ *  step, since the recording itself plays on underneath. The picture to show now, if any. */
+export function useNoBlanks(ref: RefObject<HTMLVideoElement | null>, src: string) {
+  const [blanks, setBlanks] = useState<Blank[]>([]);
+  const [still, setStill] = useState<string>();
+  useEffect(() => {
+    const ctl = new AbortController();
+    setBlanks([]);
+    setStill(undefined);
+    if (!src) return;
+    findBlanks(src, ctl.signal)
+      .then((b) => !ctl.signal.aborted && setBlanks(b))
+      .catch(() => {}); // unreadable: shown as recorded
+    return () => ctl.abort();
+  }, [src]);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || blanks.length === 0) return;
+    let frame = 0;
+    const check = () => {
+      const t = v.currentTime;
+      const b = blanks.find((x) => t >= x.start - 0.05 && t < x.end);
+      if (b && !b.still && !(v.duration <= b.end)) {
+        // (a length not known yet doesn't rule it out)
+        v.currentTime = b.end; // before the page showed anything: start where it does
+        return;
+      }
+      setStill(b?.still);
+    };
+    const tick = () => {
+      check();
+      frame = requestAnimationFrame(tick);
+    };
+    const events = ['seeked', 'loadedmetadata', 'loadeddata', 'timeupdate'];
+    for (const e of events) v.addEventListener(e, check);
+    const play = () => {
+      cancelAnimationFrame(frame);
+      tick();
+    };
+    const stop = () => cancelAnimationFrame(frame);
+    v.addEventListener('play', play);
+    v.addEventListener('pause', stop);
+    v.addEventListener('ended', stop);
+    check();
+    if (!v.paused) play();
+    return () => {
+      stop();
+      for (const e of events) v.removeEventListener(e, check);
+      v.removeEventListener('play', play);
+      v.removeEventListener('pause', stop);
+      v.removeEventListener('ended', stop);
+    };
+  }, [ref, blanks]);
+  return still;
+}
+
+/** The picture held over a blank stretch, in the video's place. */
+export function Still({ src }: { src?: string }) {
+  if (!src) return null;
+  return <img className={s.still} src={src} alt="" aria-hidden="true" data-still="" />;
+}

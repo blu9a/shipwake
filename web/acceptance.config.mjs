@@ -7,7 +7,7 @@ const testDir = defineBddConfig({
   featuresRoot: '../features',
   features: '../features/*.feature',
   steps: 'acceptance/*.mjs',
-  tags: 'not @proposed',
+  tags: process.env.SHIPWAKE_TAGS ?? 'not @proposed', // SHIPWAKE_TAGS=@proposed tries proposals' tests
   outputDir: '.features-gen',
 });
 

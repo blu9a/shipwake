@@ -6,6 +6,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { test as base, createBdd } from 'playwright-bdd';
+import { showPointer, slowClicks } from '../../packages/playwright/src/index.ts';
 
 
 // Who approves: the repository's own Git identity, as on a person's machine.
@@ -214,12 +215,17 @@ export const test = base.extend({
     await use(s);
     await s.stop();
   },
+  // Recorded as a demo of the feature: a pointer that reaches what it clicks, and the result left on
+  // screen a moment before the recording ends.
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
       localStorage.setItem('lang', 'en');
       localStorage.setItem('mode', 'light');
     });
+    await showPointer(page);
+    slowClicks(page, 250);
     await use(page);
+    if (page.url().startsWith('http')) await page.waitForTimeout(800);
   },
   // What a scenario remembers between its steps: commits by role, names it chose.
   world: async ({}, use) => {
