@@ -45,7 +45,7 @@ export function OpenPage() {
           value={path}
           spellCheck={false}
           autoComplete="off"
-          placeholder="/home/me/code/app"
+          placeholder="~/code/app"
           onChange={(e) => setPath(e.target.value)}
         />
       </label>

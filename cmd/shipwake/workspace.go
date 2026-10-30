@@ -664,7 +664,7 @@ func (w *workspace) open(path string) (any, error) {
 		}
 	}
 	if !filepath.IsAbs(path) {
-		return nil, fmt.Errorf("give the repository's full path, such as /home/me/code/app")
+		return nil, fmt.Errorf("give the repository's full path, such as ~/code/app")
 	}
 	p, err := open(w.ctx, path)
 	if err != nil {
