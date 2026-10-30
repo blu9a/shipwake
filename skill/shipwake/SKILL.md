@@ -100,6 +100,29 @@ only what they approve.
   remove `@proposed` yourself, and don't implement a scenario until it is approved. To change an approved
   scenario, propose the change; don't edit it silently.
 
+## Write a scenario's test
+
+Shipwake checks what it can on its own. Where you can do more, do it: the person judges the product from what
+your tests record, so the recording should show it plainly.
+
+- **Every result step proves itself.** A `Then` step asserts on the element that shows the result (the total,
+  not the page) and marks it, with `@shipwake/playwright`:
+  `await decisive(total, testInfo, 'the shares add up to 100.00', ['100.00'])`. That draws a box around it in the
+  recording, attaches a screenshot and records the text actually seen, shown as "Observed" under the
+  scenario's result. Use the step's text without its keyword as the name. A result checked outside the page (a
+  file, a commit) has no box: assert it directly.
+- **Recordings are made to be watched.** Call `showPointer(page)` and `slowClicks(page)`, go through the product
+  the way a person would (click, don't navigate to inner addresses), and leave the result on screen a moment
+  before the test ends.
+- **Steps read like a person describing the product,** one behavior per scenario. Find elements by role and
+  visible text, never by styling classes; wait for what the person would wait for, never a fixed time.
+- **Check your work as far as you can:**
+  - If you can run the tests, run them with the reporter and look at the run in `shipwake serve`.
+  - If you can see images, open the decisive screenshots and a few frames of each recording, and confirm the box
+    is on what its step names and the screen shows what the scenario says.
+  - What you couldn't check, say so plainly. Never imply you checked it.
+- An approved scenario's test is never weakened, skipped or deleted to get a pass.
+
 ## Propose a metric
 
 Where outputs vary (agent features, ranking, performance), a requirement is a number. Write it as a `.metric`
