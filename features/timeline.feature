@@ -19,3 +19,11 @@ Feature: Seeing what every change did
     Given a release whose changelog lists a new feature and a fix
     When I open the project's timeline
     Then the release shows the feature and the fix as its changelog says
+
+  @proposed
+  Scenario: A result step without evidence is marked
+    Given a run in which some scenarios recorded what their result steps saw
+    And one scenario whose result step recorded nothing
+    When I open that scenario in the run
+    Then its result says no evidence was recorded
+    And the scenarios with evidence show what was observed
