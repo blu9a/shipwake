@@ -1,6 +1,13 @@
 # @shipwake/playwright
 
-Playwright reporter and recording helpers for [Shipwake](../../README.md).
+Playwright reporter and recording helpers for [Shipwake](https://github.com/blu9a/shipwake).
+
+Shipwake reads Playwright's own JSON reporter already. This package adds what that report doesn't have:
+subtitles in step with each recording, Gherkin Background steps where they belong, and the helpers below.
+
+```sh
+npm i -D @shipwake/playwright
+```
 
 ```ts
 // playwright.config.ts

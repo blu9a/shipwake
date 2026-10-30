@@ -5,11 +5,37 @@
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./reporter": "./src/reporter.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./reporter": {
+      "types": "./dist/reporter.d.ts",
+      "default": "./dist/reporter.js"
+    }
   },
-  "files": ["src"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p ."
+  },
   "peerDependencies": {
     "@playwright/test": ">=1.51"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blu9a/shipwake.git",
+    "directory": "packages/playwright"
+  },
+  "homepage": "https://github.com/blu9a/shipwake/tree/main/packages/playwright",
+  "publishConfig": {
+    "access": "public"
   }
 }

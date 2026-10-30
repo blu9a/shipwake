@@ -36,9 +36,9 @@ shipwake add -f <format> --file <path> -n "<name>" [--context key=value]... [--p
 For any other tool, a [converter](converters.md) in your repository describes its report in a few
 lines of YAML: no code, checked against a real report, and against the tool's own counts.
 
-For Playwright, the [`@shipwake/playwright`](../packages/playwright/README.md) reporter records more than
-the JSON reporter: every Gherkin step including Background, screenshots and videos as files, and the
-evidence each scenario's result was decided on.
+For Playwright, start with its own JSON reporter (`-f playwright`): scenarios, steps, errors, screenshots and
+videos. The [`@shipwake/playwright`](../packages/playwright/README.md) reporter adds subtitles in step with
+each recording, Gherkin Background steps in their place, and helpers that mark what a result step checked.
 
 ## Shipwake's own format
 
