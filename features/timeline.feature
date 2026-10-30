@@ -20,7 +20,6 @@ Feature: Seeing what every change did
     When I open the project's timeline
     Then the release shows the feature and the fix as its changelog says
 
-  @proposed
   Scenario: A result step without evidence is marked
     Given a run in which some scenarios recorded what their result steps saw
     And one scenario whose result step recorded nothing
