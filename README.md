@@ -6,6 +6,8 @@
 [![Release](https://img.shields.io/github/v/release/blu9a/shipwake?include_prereleases&sort=semver)](https://github.com/blu9a/shipwake/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
+https://github.com/user-attachments/assets/d543f4bd-65d3-4287-9df7-51632bd230be
+
 **[See it live: Shipwake's own site](https://blu9a.github.io/shipwake/)**, built with Shipwake from this
 repository's history and CI runs.
 
@@ -173,6 +175,8 @@ Apache-2.0.
 有了智能体，代码的产出速度已经远远超过任何人能审阅的速度。逐个阅读 diff 已经跟不上，对一人公司来说更是如此。而质量本来就不在代码本身，而在产品为使用它的人做了什么。Shipwake（航迹）把质量控制放回到这里：你们约定好的功能、它们的行为，以及它们做得有多好。
 
 > 状态：早期。已经端到端可用；格式和命令仍可能变化。
+
+https://github.com/user-attachments/assets/b93ea56a-dda3-49ba-b66e-f073cebf5c12
 
 ## 你会得到什么
 
