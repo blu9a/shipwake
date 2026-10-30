@@ -37,7 +37,7 @@ For any other tool, a [converter](converters.md) in your repository describes it
 lines of YAML: no code, checked against a real report, and against the tool's own counts.
 
 For Playwright, start with its own JSON reporter (`-f playwright`): scenarios, steps, errors, screenshots and
-videos. The [`@shipwake/playwright`](../packages/playwright/README.md) reporter adds subtitles in step with
+videos. The [`shipwake-playwright`](../packages/playwright/README.md) reporter adds subtitles in step with
 each recording, Gherkin Background steps in their place, and helpers that mark what a result step checked.
 
 ## Shipwake's own format

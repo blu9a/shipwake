@@ -138,7 +138,7 @@ Shipwake checks what it can on its own. Where you can do more, do it: the person
 your tests record, so the recording should show it plainly.
 
 - **Every result step proves itself.** A `Then` step asserts on the element that shows the result (the total,
-  not the page) and marks it, with `@shipwake/playwright`:
+  not the page) and marks it, with `shipwake-playwright`:
   `await decisive(total, testInfo, 'the shares add up to 100.00', ['100.00'])`. That draws a box around it in the
   recording, attaches a screenshot and records the text actually seen, shown as "Observed" under the
   scenario's result. Use the step's text without its keyword as the name. A result checked outside the page (a
