@@ -13,6 +13,31 @@ decide a verdict.
 Commands: `shipwake init | add | build | serve | check | doctor | formats | schema`. Run
 `shipwake <command> --help` for flags. Docs: `docs/` in the Shipwake repository.
 
+## Get started
+
+When the person asks you to set up Shipwake (the README's one prompt), guide them through these steps, one at a
+time. Before each step, say in a sentence or two what it does and what it changes, and wait for them to agree.
+Default to local mode: nothing is written into their repository.
+
+1. **Shipwake installed.** Run `shipwake version`. If it's missing, show the install command for their system
+   from the README (a release binary) and run it only once they agree.
+2. **Local mode.** In the repository, run `shipwake init --local --write`. It makes the project's workspace,
+   commits a starter `.shipwake.yaml` there, and shows the test tools it found and the command for each. Tell
+   them where the workspace is.
+3. **A first run.** Running the tests runs their code: ask first. Run the command `init` showed for their test
+   tool, then `shipwake add` as it showed. When no tool was found, find how the project runs its tests and
+   record JUnit XML, or write a converter (below).
+4. **Scenarios for what the product already does.** Read the README, the docs and the main code paths, then
+   propose three to five scenarios for the most important behavior, in the person's words (see "Propose
+   scenarios"). Write them in the workspace's `features/`, tagged `@proposed`, and commit them there.
+5. **The dashboard.** Start `shipwake serve` in the background and give them the address. Show them, in order:
+   the timeline, the run you recorded, and the proposals at the top, where they read, change and approve them.
+   Never approve for them.
+6. **What next.** Recording runs after each change (`shipwake add`), more scenarios, metrics for anything
+   measured; `shipwake adopt` when they want the files in the repository; CI once it's adopted.
+
+If a step fails, say what failed and what you'll try, and ask before trying it. Stop when they say so.
+
 ## Local mode
 
 If the person's prompt names a workspace, the project is in local mode: Shipwake writes nothing into the
@@ -99,6 +124,12 @@ only what they approve.
 - The person changes and approves proposals in Shipwake (`shipwake serve`, at the top of the timeline). Never
   remove `@proposed` yourself, and don't implement a scenario until it is approved. To change an approved
   scenario, propose the change; don't edit it silently.
+
+## When the project is rebuilt
+
+The approved scenarios, the metrics with their limits and the recorded runs describe the product apart from its
+code. When rebuilding it (a new stack, a rewrite), start from them: implement against the approved scenarios,
+compare recordings, and hold the rebuild to the recorded benchmarks and evaluations.
 
 ## Write a scenario's test
 

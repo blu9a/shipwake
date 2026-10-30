@@ -65,15 +65,22 @@ app is built into the binary, so `go install` alone isn't enough.
 
 ## Start
 
-**Ask your agent.** Give it the [Shipwake skill](skill/shipwake/SKILL.md) and ask it to set up Shipwake in your
-repository. Integration is the agent's job: it finds your test runners, records their results (writing a small
-converter when a format isn't supported yet), and proposes scenarios for what your product already does, for you
-to approve.
+**One prompt.** Paste this to your coding agent, in your repository:
+
+```text
+Set up Shipwake for this repository. Read https://raw.githubusercontent.com/blu9a/shipwake/main/skill/shipwake/SKILL.md
+and follow its "Get started" steps: use local mode, explain each step, and ask me before you change anything.
+```
+
+The agent installs Shipwake if needed, puts the repository in [local mode](docs/local-mode.md) (nothing is
+written into it), records your tests, proposes scenarios for what your product already does, and opens the
+dashboard so you can approve them. It goes one step at a time and waits for you.
 
 Or by hand:
 
 ```sh
-shipwake init        # what it finds in your repository, and the commands for CI (changes nothing)
+shipwake init        # what it finds in your repository, and the commands for CI (changes nothing;
+                     #   --local --write sets it up in local mode)
 go test -json ./... > go-test.json
 shipwake add -f go-test --file go-test.json -n "Go tests"
 shipwake serve       # http://127.0.0.1:7070
@@ -106,6 +113,14 @@ To remove it, delete that branch, the CI steps and the config. Nothing else depe
 
 **To try it without changing the repository at all,** use [local mode](docs/local-mode.md): `shipwake serve`, then
 open the repository by its path. Its requirements, settings and runs stay in a workspace on your machine.
+
+### What stays behind
+
+Everything Shipwake keeps is plain files in Git: the scenarios (`.feature`), the metrics and their limits
+(`.metric`), and the recorded runs with their recordings. Together they describe what the product does and how
+well it does it, apart from the code. That is what a rebuild starts from, whether a new stack, a rewrite by
+agents or a fork: the approved scenarios are its specification and its acceptance tests, the recordings show how
+it should behave, and the recorded benchmarks and evaluations are the bar it has to meet.
 
 ### Your first day
 
@@ -183,9 +198,11 @@ Apache-2.0.
 
 **安装：** 从 [Releases](https://github.com/blu9a/shipwake/releases) 下载适合你系统的二进制文件（Linux、macOS、Windows，amd64 或 arm64；命令见英文部分）；网页应用内置在二进制文件中，所以单靠 `go install` 不够，自行构建见 [CONTRIBUTING.md](CONTRIBUTING.md)；在 CI 中由 GitHub Action 安装。在线示例：[Shipwake 自己的网站](https://blu9a.github.io/shipwake/)。
 
-**交给你的智能体。** 把 [Shipwake 技能](skill/shipwake/SKILL.md)交给它，让它在你的仓库里接入 Shipwake。接入是智能体的工作：找到你的测试工具，记录它们的结果（格式还不支持时写一个小转换器），并为产品现有的行为提出场景，供你批准。也可以按英文部分的命令手动开始。
+**一句提示就能开始。** 在你的仓库里，把英文部分 “One prompt” 中的提示粘贴给你的编程智能体。它会在需要时安装 Shipwake，把仓库置于[本地模式](docs/local-mode.md)（不向仓库写入任何东西），记录你的测试，为产品现有的行为提出场景，并打开仪表盘让你批准。它一步一步来，每一步都等你确认。也可以按英文部分的命令手动开始。
 
 **它会改动仓库里的什么：** 记录第一次运行时，一个与代码不共享历史的 `shipwake-results` 分支；可选的 `.shipwake.yaml`；CI 里每个测试命令后的一步；采用场景和指标时的 `.feature`、`.metric` 文件；从 Shipwake 发布时的 `CHANGELOG.md`、一个 `chore(release)` 提交和标签。你的代码、构建和测试都不会被改动。Shipwake 从不主动推送；要在 CI 中保留运行结果，用 `--push` 或 GitHub Action 的 `push: true`。移除它只需删除那个分支、CI 步骤和配置。想完全不改动仓库地试用，用[本地模式](docs/local-mode.md)：运行 `shipwake serve`，再按路径打开仓库；它的需求、配置和运行记录都留在你机器上的工作区里。
+
+**留下的东西：** Shipwake 保存的一切都是 Git 里的普通文件：场景（`.feature`）、指标及其界限（`.metric`），以及带录像的运行记录。它们不依赖代码，描述了产品做什么、做得怎样。重建项目（换技术栈、让智能体重写、或者分叉）就从这里开始：已批准的场景是规格和验收测试，录像展示它应有的行为，记录下来的基准测试和评测则是重建必须达到的标准。
 
 **第一天：** 第一次构建就能看到全部历史（提交、合并、发布、分支、每个提交的改动）。智能体可以为产品现有的行为提出场景，批准之后每次变更都会以它们为准。结果从第一次记录开始积累；想马上看到趋势，可以在最近的几个版本上各运行一次并记录（见英文部分的 “Your first day”）。
 
