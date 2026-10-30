@@ -101,14 +101,17 @@ func initCmd() *cobra.Command {
 					trunk = "master"
 				}
 				cfg := fmt.Sprintf(starterConfig, filepath.Base(top), trunk)
+				ws := gitx.Repo{Dir: proj.Spec}
+				if proj.Spec != "" {
+					// on the repository's branch first: the settings belong to it
+					if err := local.Follow(ctx, repo, ws, build.DefaultTrunk(ctx, repo)); err != nil {
+						return err
+					}
+				}
 				if err := os.WriteFile(cfgPath, []byte(cfg), 0o644); err != nil {
 					return err
 				}
 				if proj.Spec != "" {
-					ws := gitx.Repo{Dir: proj.Spec}
-					if err := local.Follow(ctx, repo, ws, build.DefaultTrunk(ctx, repo)); err != nil {
-						return err
-					}
 					if _, err := ws.Git(ctx, "add", ".shipwake.yaml"); err != nil {
 						return err
 					}
