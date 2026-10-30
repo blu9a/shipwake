@@ -3,23 +3,12 @@ import { join } from 'node:path';
 import { expect } from '@playwright/test';
 import { Given, Then, When } from './project.mjs';
 
-const page = (color, text) =>
-  `<body style="margin:0;background:${color};font:48px sans-serif;display:grid;place-items:center;height:100vh"><h1>${text}</h1></body>`;
-
-/** Records a browser page through these moments ([html, seconds]; null html is a blank page) and keeps the
- *  file next to the scenario's report, as a test runner would. Its name in the report. */
-async function recording(browser, repo, name, moments) {
-  const dir = join(repo.dir, '..', 'report', `${name}-video`);
-  const context = await browser.newContext({ recordVideo: { dir, size: { width: 640, height: 360 } }, viewport: { width: 640, height: 360 } });
-  const p = await context.newPage();
-  for (const [html, seconds] of moments) {
-    await p.setContent(html ?? '');
-    await p.waitForTimeout(seconds * 1000);
-  }
-  const path = await p.video().path();
-  await context.close();
+/** A recording as a test runner keeps it, next to the scenario's report. The recordings are fixed files
+ *  (web/acceptance/fixtures), made with known stretches: recording them during the run depended on the
+ *  machine's speed, and a busy one dropped the blank second they're about. */
+function recording(repo, name) {
   mkdirSync(join(repo.dir, '..', 'report'), { recursive: true });
-  copyFileSync(path, join(repo.dir, '..', 'report', `${name}.webm`));
+  copyFileSync(join(import.meta.dirname, 'fixtures', `${name}.webm`), join(repo.dir, '..', 'report', `${name}.webm`));
   return `${name}.webm`;
 }
 
@@ -43,9 +32,9 @@ async function openRecording(page, served, name) {
 
 const at = (video) => video.evaluate((v) => v.currentTime);
 
-Given('a scenario recorded while its page was still blank for the first second', async ({ browser, repo }) => {
+Given('a scenario recorded while its page was still blank for the first second', async ({ repo }) => {
   const tested = repo.commit('feat: split a bill between friends');
-  const video = await recording(browser, repo, 'late', [[null, 1.2], [page('#4f5bd5', 'Bills'), 1.5]]);
+  const video = recording(repo, 'late'); // 1.2 s white, then 1.5 s of picture
   repo.record(tested, 'Acceptance', [scenario('Late page', video)]);
 });
 
@@ -62,9 +51,9 @@ Then('it shows the page from the start, not a blank screen', async ({ world }) =
   expect(await world.video.evaluate((v) => v.paused)).toBe(true);
 });
 
-Given('a scenario recorded while its page went blank for a second in the middle', async ({ browser, repo }) => {
+Given('a scenario recorded while its page went blank for a second in the middle', async ({ repo }) => {
   const tested = repo.commit('feat: split a bill between friends');
-  const video = await recording(browser, repo, 'reload', [[page('#4f5bd5', 'Bills'), 1.5], [null, 1.2], [page('#2a9d5c', 'Shares'), 1.5]]);
+  const video = recording(repo, 'reload'); // 1.5 s of picture, 1.2 s white, 1.5 s of another picture
   repo.record(tested, 'Acceptance', [scenario('Reloading', video)]);
 });
 
@@ -88,10 +77,10 @@ Then("the page's last picture stays on screen until the page is back", async ({ 
   await expect(still).toBeHidden();
 });
 
-Given('a feature with two recorded scenarios', async ({ browser, repo }) => {
+Given('a feature with two recorded scenarios', async ({ repo }) => {
   const tested = repo.commit('feat: split a bill between friends');
-  const first = await recording(browser, repo, 'first', [[page('#4f5bd5', 'First'), 1]]);
-  const second = await recording(browser, repo, 'second', [[page('#2a9d5c', 'Second'), 1]]);
+  const first = recording(repo, 'first');
+  const second = recording(repo, 'second');
   repo.record(tested, 'Acceptance', [scenario('First scenario', first), scenario('Second scenario', second)]);
 });
 
