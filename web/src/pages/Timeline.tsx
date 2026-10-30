@@ -5,7 +5,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { Fragment, type ReactNode, startTransition, use, useState } from 'react';
 import { forget, loadMetricStories, loadProject, loadSession, loadStories, type MetricStory, type StoryFeature } from '../data';
 import { commitLabel, day, targetName, tr, when } from '../format';
-import type { Branch, Commit, Project, Row, RunSummary, Tag } from '../model.gen';
+import type { Branch, Commit, Kept, Project, Row, RunSummary, Tag } from '../model.gen';
 import { inHistory, type Placed } from '../order';
 import { useSettings, useT } from '../settings';
 import { Icon, kindIcon, Tally } from '../ui';
@@ -109,6 +109,7 @@ function WorkspaceTimeline({ project }: { project: string }) {
         show: (place: Place) => <RowItem p={p} r={r} line={place === 'line'} />,
       })),
       ...runEntries(p, trunk),
+      ...keptEntries(p, trunk),
       ...p.tags
         .filter((tag) => trunk.has(tag.sha))
         .map((tag) => ({
@@ -167,6 +168,7 @@ function BranchTimeline({ project, shown }: { project: string; shown: Branch }) 
       show: (place: Place) => <CommitItem p={p} c={p.commits[sha]} line={place === 'line'} />,
     })),
     ...runEntries(p, new Set(b.ahead)),
+    ...keptEntries(p, new Set(b.ahead)),
   ]);
   return (
     <>
@@ -222,6 +224,38 @@ function runEntries(p: Project, shas: Set<string>): Entry[] {
           place === 'fold' ? <RunLine p={p} r={r} part={part} /> : <RunItem p={p} r={r} part={part} line={place === 'line'} />,
       })),
     );
+}
+
+/** In local mode, the workspace's commits (proposals, edits, approvals) above the repository commits
+ *  that were checked out when they were made. */
+function keptEntries(p: Project, shas: Set<string>): Entry[] {
+  return (p.kept ?? [])
+    .filter((k) => shas.has(k.commit))
+    .map((k) => ({
+      commit: k.commit,
+      kind: 'kept' as const,
+      at: time(k.date),
+      key: `kept:${k.sha}`,
+      show: (place: Place) => <KeptItem k={k} line={place === 'line'} />,
+    }));
+}
+
+/** A commit in the workspace: not the repository's, so it has no page of its own here. */
+function KeptItem({ k, line }: { k: Kept; line: boolean }) {
+  const { lang } = useSettings();
+  const t = useT();
+  return (
+    <div className={`${s.item} ${s.kept}`}>
+      {line && <span className={s.dot} />}
+      <div className={s.title}>{k.subject}</div>
+      <div className="meta">
+        <span className="chip">{t.keptInWorkspace}</span>
+        <code>{k.short}</code>
+        {k.by && <span>{t.approvedBy(k.by)}</span>}
+        <span>{when(k.date, lang)}</span>
+      </div>
+    </div>
+  );
 }
 
 const runParts = (r: RunSummary): ('tests' | 'metrics')[] => {

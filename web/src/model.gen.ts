@@ -56,6 +56,7 @@ export interface Project {
     [k: string]: Kind;
   };
   truncated?: boolean;
+  kept?: Kept[];
 }
 /**
  * This interface was referenced by `Shipwake`'s JSON-Schema
@@ -172,6 +173,18 @@ export interface Rule {
 export interface Kind {
   icon?: string;
   names?: Names;
+}
+/**
+ * This interface was referenced by `Shipwake`'s JSON-Schema
+ * via the `definition` "Kept".
+ */
+export interface Kept {
+  sha: string;
+  short: string;
+  subject: string;
+  by?: string;
+  date: string;
+  commit: string;
 }
 /**
  * This interface was referenced by `Shipwake`'s JSON-Schema

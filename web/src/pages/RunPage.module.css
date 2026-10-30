@@ -485,3 +485,28 @@ summary.srow:hover {
 .hit > summary {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
+
+/* copying a scenario's name: quiet until the row is pointed at or the button is focused */
+.copyName {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  color: var(--ink-2);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+:global(.row) > summary:hover .copyName,
+.copyName:focus-visible {
+  opacity: 1;
+}
+.copyName:hover {
+  background: var(--fill);
+  color: var(--ink);
+}
+@media (hover: none) {
+  .copyName {
+    opacity: 1;
+  }
+}

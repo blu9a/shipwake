@@ -460,6 +460,18 @@ func (w *workspace) writeChangelogs(repo gitx.Repo, files map[string]string, ver
 }
 
 func (w *workspace) commit(repo gitx.Repo, path, msg string) (any, error) {
+	// In local mode the repository's commit at this moment places it on the timeline.
+	for _, p := range w.projects {
+		if p.local && p.spec.Dir == repo.Dir {
+			if head, err := p.code.Resolve(w.ctx, "HEAD"); err == nil {
+				msg = strings.TrimRight(msg, "\n")
+				if !strings.Contains(msg, "\n\n") {
+					msg += "\n"
+				}
+				msg += "\nRepository-commit: " + head
+			}
+		}
+	}
 	if _, err := repo.Git(w.ctx, "add", "--", path); err != nil {
 		return nil, err
 	}

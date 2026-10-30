@@ -220,6 +220,35 @@ function Recording({ p, run, x, video }: { p: Project; run: Run; x: Test; video:
   );
 }
 
+/** Copies a scenario's name with its feature's, as written in the .feature file, to paste when telling
+ *  someone about it. Inside the row's summary, so a click copies without opening the row. */
+function CopyName({ text }: { text: string }) {
+  const t = useT();
+  const [done, setDone] = useState(false);
+  const label = done ? t.copiedName : t.copyName;
+  return (
+    <button
+      type="button"
+      className={s.copyName}
+      aria-label={label}
+      title={label}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigator.clipboard
+          ?.writeText(text)
+          .then(() => {
+            setDone(true);
+            setTimeout(() => setDone(false), 1500);
+          })
+          .catch(() => {});
+      }}
+    >
+      <Icon name={done ? 'check' : 'copy'} size={14} />
+    </button>
+  );
+}
+
 function TestRow({ p, run, x, showTarget }: { p: Project; run: Run; x: Test; showTarget: boolean }) {
   const { lang } = useSettings();
   const t = useT();
@@ -231,6 +260,7 @@ function TestRow({ p, run, x, showTarget }: { p: Project; run: Run; x: Test; sho
       <summary>
         <StatusIcon status={x.status} />
         <span className="grow">{tr(p, x.name, lang)}</span>
+        <CopyName text={x.feature ? `${x.feature} › ${x.name}` : x.name} />
         {x.retried && <span className="chip warn">{t.passedOnRetry}</span>}
         {hasAttachments(x) && <AttachmentMark />}
         {showTarget && x.target && <span className="muted small">{targetName(p, x.target, lang)}</span>}

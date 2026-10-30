@@ -263,3 +263,29 @@ Then('the workspace is kept as it was', async ({ world }) => {
   expect(world.ws.git('for-each-ref', '--format=%(refname) %(objectname)')).toBe(world.kept);
   expect(world.ws.git('status', '--porcelain')).toBe('');
 });
+
+// An approval in local mode shows on the timeline
+
+/** A workspace commit on the timeline, by its subject. */
+const keptEntry = (page, subject) => page.locator('main div').filter({ has: page.getByText(subject, { exact: true }) }).filter({ hasText: 'In the workspace' }).last();
+
+Then('the timeline shows the approval, marked as kept in the workspace', async ({ page, $testInfo, $step, world }) => {
+  const f = { page, $testInfo, $step };
+  world.approval = world.ws.git('log', '-1', '--format=%s');
+  const entry = keptEntry(page, world.approval);
+  await expect(entry).toBeVisible();
+  await expect(entry).toContainText(`Approved by ${me.name}`);
+  await prove(f, entry, [world.approval, 'In the workspace']);
+});
+
+Then('it sits above the repository commit that was checked out when I approved', async ({ page, repo, world }) => {
+  const head = repo.git('rev-parse', 'HEAD');
+  expect(world.ws.git('log', '-1', '--format=%(trailers:key=Repository-commit,valueonly)')).toBe(head);
+  // top to bottom: the approval, then the commit it was made on, with only other workspace commits between
+  const text = await page.locator('main').innerText();
+  const at = text.indexOf(world.approval);
+  const commit = text.indexOf(repo.git('log', '-1', '--format=%s'));
+  expect(at).toBeGreaterThan(-1);
+  expect(commit).toBeGreaterThan(at);
+  expect(text.slice(at, commit)).not.toMatch(/\bAcceptance\b/);
+});

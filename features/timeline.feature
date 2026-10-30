@@ -26,3 +26,8 @@ Feature: Seeing what every change did
     When I open that scenario in the run
     Then its result says no evidence was recorded
     And the scenarios with evidence show what was observed
+
+  Scenario: Copying a scenario's name
+    Given a run with a scenario of a feature
+    When I copy the scenario's name from the run
+    Then I have the feature's and the scenario's names together, ready to paste

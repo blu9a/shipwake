@@ -207,18 +207,20 @@ async function findBlanks(src: string, signal: AbortSignal): Promise<Blank[]> {
   v.preload = 'auto';
   v.src = src;
   await once(v, 'loadeddata');
-  if (!Number.isFinite(v.duration)) {
-    // recordings written as they're made may not state their length until read to the end
+  let duration = v.duration;
+  if (!Number.isFinite(duration)) {
+    // Recordings written as they're made may not state their length. Seeking far past the end stops
+    // at the last frame: where it stops is the length, whether or not the browser then states it.
     v.currentTime = 1e7;
     await once(v, 'seeked');
+    duration = Number.isFinite(v.duration) ? v.duration : v.currentTime;
   }
-  const duration = v.duration;
   const step = Math.max(0.1, duration / 400);
   const small = document.createElement('canvas');
   small.width = 48;
   small.height = 27;
   const ctx = small.getContext('2d', { willReadFrequently: true });
-  if (!ctx || !Number.isFinite(duration)) return [];
+  if (!ctx || !Number.isFinite(duration) || duration <= 0) return [];
   const picture = () => {
     const c = document.createElement('canvas');
     c.width = v.videoWidth;
@@ -272,10 +274,15 @@ export function useNoBlanks(ref: RefObject<HTMLVideoElement | null>, src: string
     setStill(undefined);
     if (!src) return;
     findBlanks(src, ctl.signal)
-      .then((b) => !ctl.signal.aborted && setBlanks(b))
+      .then((b) => {
+        if (ctl.signal.aborted) return;
+        // the scan's result, for anyone checking the player: blank stretches as start-end seconds
+        if (ref.current) ref.current.dataset.blanks = b.map((x) => `${x.start.toFixed(1)}-${x.end.toFixed(1)}`).join(' ');
+        setBlanks(b);
+      })
       .catch(() => {}); // unreadable: shown as recorded
     return () => ctl.abort();
-  }, [src]);
+  }, [ref, src]);
   useEffect(() => {
     const v = ref.current;
     if (!v || blanks.length === 0) return;

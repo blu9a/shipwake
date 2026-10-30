@@ -45,3 +45,9 @@ Feature: Using Shipwake without touching a repository
     Then the repository has one new commit, made as me, with the requirements and settings
     And its message lists what was approved in local mode, and by whom
     And the workspace is kept as it was
+
+  Scenario: An approval in local mode shows on the timeline
+    Given scenarios proposed for a project in local mode
+    When I approve them in Shipwake
+    Then the timeline shows the approval, marked as kept in the workspace
+    And it sits above the repository commit that was checked out when I approved
