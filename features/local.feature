@@ -46,7 +46,6 @@ Feature: Using Shipwake without touching a repository
     And its message lists what was approved in local mode, and by whom
     And the workspace is kept as it was
 
-  @proposed
   Scenario: An approval in local mode shows on the timeline
     Given scenarios proposed for a project in local mode
     When I approve them in Shipwake
