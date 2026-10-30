@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"os"
@@ -91,7 +92,11 @@ func buildCmd() *cobra.Command {
 		Example: "  shipwake build --out site\n" +
 			"  shipwake build ../app ../api=git:shipwake-results --out site",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return build.Run(cmd.Context(), build.Options{Projects: projectsFrom(args, results), Out: out, MaxRows: rows, Web: site.Web(), Log: logf(cmd)})
+			web, err := webApp()
+			if err != nil {
+				return err
+			}
+			return build.Run(cmd.Context(), build.Options{Projects: projectsFrom(args, results), Out: out, MaxRows: rows, Web: web, Log: logf(cmd)})
 		},
 	}
 	c.Flags().StringVarP(&out, "out", "o", "site", "output directory")
@@ -112,7 +117,11 @@ func serveCmd() *cobra.Command {
 				return err
 			}
 			defer os.RemoveAll(dir)
-			ws, err := newWorkspace(cmd.Context(), build.Options{Projects: projectsFrom(args, results), Out: dir, MaxRows: rows, Web: site.Web(), Log: logf(cmd)})
+			web, err := webApp()
+			if err != nil {
+				return err
+			}
+			ws, err := newWorkspace(cmd.Context(), build.Options{Projects: projectsFrom(args, results), Out: dir, MaxRows: rows, Web: web, Log: logf(cmd)})
 			if err != nil {
 				return err
 			}
@@ -454,7 +463,7 @@ func storiesCmd() *cobra.Command {
 				return err
 			}
 			defer l.Close()
-			features, err := story.Build(cmd.Context(), l.Repo, l.Runs)
+			features, err := story.Build(cmd.Context(), l.Repo, l.Trunk, l.Runs)
 			if err != nil {
 				return err
 			}
@@ -502,4 +511,14 @@ func storiesCmd() *cobra.Command {
 	c.Flags().StringVarP(&results, "results", "r", "", resultsHelp)
 	c.Flags().BoolVar(&asJSON, "json", false, "print as JSON")
 	return c
+}
+
+// webApp is the page a site is read with. A binary built without it, as go install builds one, would
+// write sites nobody can open: say so instead.
+func webApp() (fs.FS, error) {
+	web := site.Web()
+	if _, err := fs.Stat(web, "index.html"); err != nil {
+		return nil, fmt.Errorf("this shipwake was built without its web app; download a release binary from https://github.com/blu9a/shipwake/releases, or build it with make")
+	}
+	return web, nil
 }

@@ -18,6 +18,7 @@ You need Git, Go (the version in `go.mod`), and Node with pnpm (the versions in 
 make                 # the web app and the CLI: bin/shipwake
 make test            # Go tests
 make lint            # vet, formatting, types and the web app's lint
+make test-acceptance # the approved scenarios in features/, in a browser against bin/shipwake
 make test-responsive # browser checks on the production build (install Chromium once:
                      #   cd web && pnpm exec playwright install chromium)
 make test-history    # the timeline's order on this repository's own history and runs
@@ -54,6 +55,13 @@ Small fixes that change no behavior skip the first two steps.
 - Add `Release-note: <one line for people using Shipwake>` to a commit they would notice, or
   `Release-note: none`.
 - Pull requests are merged with a merge commit, so a branch's commits stay visible in its merge.
+
+## Releases
+
+A release is approved on Shipwake's own release page, like any project's: it writes `CHANGELOG.md` and an
+annotated tag with `Approved-by`. Pushing the tag drafts a GitHub release with binaries for Linux, macOS and
+Windows, each with `THIRD_PARTY_NOTICES.md` (`node tools/notices.mjs`). A maintainer checks the draft and
+publishes it; nothing is published on its own.
 
 ## Principles
 

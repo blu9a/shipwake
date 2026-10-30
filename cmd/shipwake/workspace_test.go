@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -207,5 +209,39 @@ func TestReleaseWithChangelog(t *testing.T) {
 	git("commit", "-q", "--allow-empty", "-m", "fix: later")
 	if _, err := w.release(repo, "v0.1.1", checked, notes, map[string]string{"en": notes}); err == nil {
 		t.Error("released a commit that isn't the newest")
+	}
+}
+
+func TestOnlyTheCheckedOutBranch(t *testing.T) {
+	ctx := context.Background()
+	repo := gitx.Repo{Dir: t.TempDir()}
+	for _, args := range [][]string{
+		{"init", "-q", "-b", "main"}, {"config", "user.name", "Ana"}, {"config", "user.email", "ana@example.com"},
+		{"commit", "-q", "--allow-empty", "-m", "start"}, {"branch", "spec/tip"},
+	} {
+		if _, err := repo.Git(ctx, args...); err != nil {
+			t.Fatal(err)
+		}
+	}
+	w := &workspace{ctx: ctx}
+	ask := func(branch string) error {
+		var req struct{ Path, Branch string }
+		r := httptest.NewRequest(http.MethodPost, "/api/p/approve", strings.NewReader(`{"path": "a.feature", "branch": "`+branch+`"}`))
+		return w.decode(r, repo, &req, &req.Branch)
+	}
+	if err := ask("main"); err != nil {
+		t.Errorf("checked out: %v", err)
+	}
+	if err := ask("spec/tip"); err == nil || !strings.Contains(err.Error(), "check out spec/tip") {
+		t.Errorf("another branch: %v", err)
+	}
+	if err := ask(""); err == nil {
+		t.Error("no branch named")
+	}
+	if _, err := repo.Git(ctx, "switch", "-q", "--detach"); err != nil {
+		t.Fatal(err)
+	}
+	if err := ask("main"); err == nil || !strings.Contains(err.Error(), "no branch is checked out") {
+		t.Errorf("detached: %v", err)
 	}
 }

@@ -28,6 +28,9 @@ var (
 	// A release's tag names a version: v1.2.3 or 1.2.3, a SemVer pre-release and build allowed. Tags
 	// with a package prefix (middleware/v1.2.0, @scope/pkg@1.2.3) release one package, not the project.
 	versionTagRe = regexp.MustCompile(`^v?\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$`)
+	// A tag naming only a major or minor version (v10, v10.7) follows the newest release of that line,
+	// as GitHub Actions and the projects that publish them do: it moves, so it's no release of its own.
+	movingTagRe = regexp.MustCompile(`^v?\d+(?:\.\d+)?$`)
 	// The types Conventional Commits defines, and spec for requirements. Any other prefix ("middleware:",
 	// "README:") names a component: the commit has no kind.
 	commitTypes = map[string]bool{"feat": true, "fix": true, "perf": true, "refactor": true, "docs": true, "test": true,
@@ -219,7 +222,7 @@ func tags(ctx context.Context, r gitx.Repo) ([]model.Tag, error) {
 		// A release is an annotated tag, or a lightweight one named as a version, as GitHub's release
 		// button and many projects make them. A lightweight tag has no message of its own.
 		annotated := f[1] == "tag"
-		if !annotated && !versionTagRe.MatchString(f[0]) {
+		if !annotated && !versionTagRe.MatchString(f[0]) || movingTagRe.MatchString(f[0]) {
 			continue
 		}
 		sha, err := r.Resolve(ctx, f[0])
@@ -290,7 +293,7 @@ func (h *History) branches(ctx context.Context, r gitx.Repo) ([]model.Branch, er
 		if err != nil || len(ahead) == 0 {
 			continue // merged, or unreadable
 		}
-		b := model.Branch{Name: name, Updated: ahead[0].Date}
+		b := model.Branch{Name: name, Ref: ref, Updated: ahead[0].Date}
 		for _, c := range ahead {
 			b.Ahead = append(b.Ahead, c.SHA)
 		}

@@ -111,6 +111,8 @@ type Tag struct {
 // Branch is a branch not yet merged into the trunk.
 type Branch struct {
 	Name    string    `json:"name"`
+	Key     string    `json:"key"` // its requirements' folder in the site: data/<project>/branches/<key>/
+	Ref     string    `json:"-"`   // for Git: refs/heads/… or refs/remotes/…
 	Updated time.Time `json:"updated"`
 	Ahead   []string  `json:"ahead"` // commits not on the trunk, newest first
 	Behind  int       `json:"behind"`

@@ -207,6 +207,8 @@ func TestRealWorldConventions(t *testing.T) {
 	git(origin, "tag", "latest")                               // not a version
 	git(origin, "tag", "middleware/v1.0.0")                    // one package's release
 	git(origin, "tag", "-a", "stable", "-m", "Stable", "HEAD") // annotated: a release, as before
+	git(origin, "tag", "-a", "v1", "-m", "v1.1.0", "HEAD~1")   // moves with the newest 1.x release
+	git(origin, "tag", "-a", "v1.1", "-m", "v1.1.0", "HEAD~1") // and with the newest 1.1.x
 	git(origin, "checkout", "-q", "-b", "feature/xff")
 	git(origin, "commit", "-q", "--allow-empty", "-m", "middleware: faster XFF")
 	git(origin, "checkout", "-q", "master")

@@ -57,12 +57,13 @@ type commit struct {
 	at                                       time.Time
 }
 
-// Build reads every commit that changed a .feature file, oldest first, then the runs.
-func Build(ctx context.Context, r gitx.Repo, runs []*model.Run) ([]*Feature, error) {
+// Build reads every commit in rev's history that changed a .feature file, oldest first, then the runs.
+// Each branch has its own requirements: rev is the trunk, or a branch.
+func Build(ctx context.Context, r gitx.Repo, rev string, runs []*model.Run) ([]*Feature, error) {
 	const sep = "\x1f"
 	out, err := r.Git(ctx, "log", "--reverse", "--format=%H"+sep+"%P"+sep+"%an"+sep+"%cI"+sep+"%s"+sep+
 		"%(trailers:key=Approved-by,valueonly,separator=%x2C)"+"\x1e",
-		"--", "*.feature")
+		rev, "--", "*.feature")
 	if err != nil {
 		return nil, err
 	}

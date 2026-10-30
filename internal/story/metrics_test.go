@@ -45,7 +45,7 @@ func TestMetricStory(t *testing.T) {
 		return &model.Run{ID: id, Commit: approved, Start: time.Now().Add(at), Metrics: []model.Metric{{ID: "totals.exact", Values: []float64{0.9},
 			Previous: &model.Comparison{Status: status}}}}
 	}
-	ms, err := BuildMetrics(ctx, repo, []*model.Run{run("r2", "ok", 2*time.Hour), run("r1", "block", time.Hour), run("r3", "ok", 3*time.Hour)})
+	ms, err := BuildMetrics(ctx, repo, "HEAD", []*model.Run{run("r2", "ok", 2*time.Hour), run("r1", "block", time.Hour), run("r3", "ok", 3*time.Hour)})
 	if err != nil {
 		t.Fatal(err)
 	}

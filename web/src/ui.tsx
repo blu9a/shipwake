@@ -1,5 +1,6 @@
 // Small shared pieces: icons, a popover menu, segmented controls, result counts.
 import { type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useT } from './settings';
 import s from './ui.module.css';
 
 /** One-line names: ellipsis at rest, the complete text scrolls on hover or focus. */
@@ -300,27 +301,30 @@ export function Segmented<T extends string>({
 }
 
 /** Counts as coloured bars and numbers: failed (or blocking), warnings, passed. Zero counts are left out. */
-export function Tally({ failed = 0, warn = 0, passed = 0 }: { failed?: number; warn?: number; passed?: number }) {
+export function Tally({
+  failed = 0,
+  warn = 0,
+  passed = 0,
+  measured = false,
+}: {
+  failed?: number;
+  warn?: number;
+  passed?: number;
+  measured?: boolean; // counts of measurements: blocking, warning, within limits
+}) {
+  const t = useT();
+  const count = (n: number, cls: string | undefined, label: string) =>
+    n > 0 && (
+      <span className={`${s.cnt} ${cls}`} role="img" aria-label={label} title={label}>
+        <i />
+        {n}
+      </span>
+    );
   return (
     <span className={s.tally}>
-      {failed > 0 && (
-        <span className={`${s.cnt} ${s.f}`}>
-          <i />
-          {failed}
-        </span>
-      )}
-      {warn > 0 && (
-        <span className={`${s.cnt} ${s.w}`}>
-          <i />
-          {warn}
-        </span>
-      )}
-      {passed > 0 && (
-        <span className={`${s.cnt} ${s.p}`}>
-          <i />
-          {passed}
-        </span>
-      )}
+      {count(failed, s.f, measured ? t.counts.block(failed) : t.counts.failed(failed))}
+      {count(warn, s.w, t.counts.warn(warn))}
+      {count(passed, s.p, measured ? t.counts.ok(passed) : t.counts.passed(passed))}
     </span>
   );
 }

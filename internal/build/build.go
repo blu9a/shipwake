@@ -3,6 +3,8 @@
 //
 //	data/site.json
 //	data/<project>/index.json            trunk rows, releases, branches, run summaries, commit headers
+//	data/<project>/stories.json          the trunk's requirements: features, and metric-stories.json
+//	data/<project>/branches/<key>/…      a branch's requirements still waiting for approval
 //	data/<project>/commits/<sha>.json    files and scenario changes
 //	data/<project>/diffs/<sha>.json      patches, per file
 //	data/<project>/runs/<id>.json        test results and measurements
@@ -11,6 +13,8 @@ package build
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -90,6 +94,7 @@ type Loaded struct {
 	Runs  []*model.Run
 	Files map[string]string // run ID → directory with its attachments
 	Repo  gitx.Repo
+	Trunk string // the trunk for Git: its local branch, or origin's
 	clean []func()
 }
 
@@ -157,7 +162,7 @@ func Load(ctx context.Context, p Project, maxRows int, log func(string, ...any))
 	if idx.Text, err = loadText(top, cfg.Text); err != nil {
 		return nil, err
 	}
-	l := &Loaded{Index: idx, Files: map[string]string{}, Repo: repo}
+	l := &Loaded{Index: idx, Files: map[string]string{}, Repo: repo, Trunk: h.Trunk}
 
 	// Where the runs are: an explicit location, the config's, or the default results branch.
 	spec := p.Results
@@ -342,21 +347,18 @@ func project(ctx context.Context, p Project, o Options, used map[string]bool) (m
 	used[id] = true
 	idx.ID = id
 	dir := filepath.Join(o.Out, "data", id)
-	// Each feature's requirements loop, for the feature pages.
-	stories, err := story.Build(ctx, l.Repo, l.Runs)
-	if err != nil {
-		return model.ProjectRef{}, fmt.Errorf("stories: %w", err)
-	}
-	if err := writeJSON(filepath.Join(dir, "stories.json"), stories); err != nil {
+	// Each feature's requirements loop, for the feature pages, and the measured requirements:
+	// metrics proposed, approved, then met or missed by runs (judged above). The trunk's are the
+	// project's; each branch has its own, for its timeline.
+	if err := writeStories(ctx, l, l.Trunk, dir, false); err != nil {
 		return model.ProjectRef{}, err
 	}
-	// Measured requirements: metrics proposed, approved, then met or missed by runs (judged above).
-	metrics, err := story.BuildMetrics(ctx, l.Repo, l.Runs)
-	if err != nil {
-		return model.ProjectRef{}, fmt.Errorf("metric stories: %w", err)
-	}
-	if err := writeJSON(filepath.Join(dir, "metric-stories.json"), metrics); err != nil {
-		return model.ProjectRef{}, err
+	for i := range idx.Branches {
+		b := &idx.Branches[i]
+		b.Key = branchKey(b.Name)
+		if err := writeStories(ctx, l, b.Ref, filepath.Join(dir, "branches", b.Key), true); err != nil {
+			return model.ProjectRef{}, fmt.Errorf("branch %s: %w", b.Name, err)
+		}
 	}
 	for _, r := range l.Runs {
 		if err := writeJSON(filepath.Join(dir, "runs", r.ID+".json"), r); err != nil {
@@ -527,3 +529,33 @@ func copyFS(src fs.FS, dst string) error {
 }
 
 func exists(p string) bool { _, err := os.Stat(p); return err == nil }
+
+// writeStories writes the requirements as of rev. For a branch, only what still waits for approval:
+// the rest is the trunk's story, told on the feature pages.
+func writeStories(ctx context.Context, l *Loaded, rev, dir string, pending bool) error {
+	stories, err := story.Build(ctx, l.Repo, rev, l.Runs)
+	if err != nil {
+		return fmt.Errorf("stories: %w", err)
+	}
+	metrics, err := story.BuildMetrics(ctx, l.Repo, rev, l.Runs)
+	if err != nil {
+		return fmt.Errorf("metric stories: %w", err)
+	}
+	if pending {
+		stories = slices.DeleteFunc(stories, func(f *story.Feature) bool {
+			return !slices.ContainsFunc(f.Scenarios, func(s *story.Scenario) bool { return s.State == "proposed" })
+		})
+		metrics = slices.DeleteFunc(metrics, func(m *story.Metric) bool { return m.State != "proposed" })
+	}
+	if err := writeJSON(filepath.Join(dir, "stories.json"), nonNil(stories)); err != nil {
+		return err
+	}
+	return writeJSON(filepath.Join(dir, "metric-stories.json"), nonNil(metrics))
+}
+
+// branchKey is a branch's folder name: readable, safe in a path and a URL, and distinct for
+// distinct names ("spec/a" and "spec-a" differ by the hash).
+func branchKey(name string) string {
+	sum := sha256.Sum256([]byte(name))
+	return strings.Trim(idRe.ReplaceAllString(strings.ToLower(name), "-"), "-") + "-" + hex.EncodeToString(sum[:4])
+}

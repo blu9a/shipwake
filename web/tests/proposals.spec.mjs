@@ -18,7 +18,7 @@ async function workspace(page, kind, withOther = false) {
   await page.route('**/api/**', async (route) => {
     const { pathname } = new URL(route.request().url());
     const action = pathname.split('/').at(-1);
-    if (action === 'session') return route.fulfill({ json: { edit: true, user: 'Fixture reviewer' } });
+    if (action === 'session') return route.fulfill({ json: { edit: true, user: 'Fixture reviewer', checkedOut: { fixture: 'main' } } });
     if (action === 'proposal' || action === 'metric') return route.fulfill({ json: { text: action === 'proposal' ? scenarioText : withOther ? metricText.replace('Exact totals', 'Unrelated requirement') : metricText } });
     if (action === 'check-metric') return route.fulfill({ json: { name: 'Exact totals', lines: metricLines } });
     if (action === 'approve' || action === 'approve-metric') {

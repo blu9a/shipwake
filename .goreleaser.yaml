@@ -1,16 +1,24 @@
 # Release binaries with the web app embedded. The archive names are what action.yml downloads.
 version: 2
+project_name: shipwake
 before:
   hooks:
     - make web
+    - node tools/notices.mjs
 builds:
   - main: ./cmd/shipwake
+    binary: shipwake # what action.yml unpacks
     env: [CGO_ENABLED=0]
     goos: [linux, darwin, windows]
     goarch: [amd64, arm64]
     ldflags: -s -w -X main.version={{ .Tag }}
 archives:
   - name_template: shipwake_{{ .Os }}_{{ .Arch }}
+    files:
+      - LICENSE
+      - README.md
+      - src: .cache/notices/THIRD_PARTY_NOTICES.md
+        strip_parent: true
     formats: [tar.gz]
     format_overrides:
       - goos: windows
@@ -21,3 +29,4 @@ changelog:
   disable: true # release notes come from the annotated tag
 release:
   mode: keep-existing
+  draft: true # published by hand, after checking it: nothing goes public on its own
