@@ -7,8 +7,10 @@
 package highlight
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode/utf16"
 
 	"github.com/alecthomas/chroma/v2"
@@ -24,7 +26,7 @@ func Lines(path, text string) []string {
 	if len(text) > MaxBytes || strings.IndexByte(text, 0) >= 0 {
 		return nil
 	}
-	lexer := lexers.Match(path)
+	lexer := lexerFor(path)
 	if lexer == nil {
 		return nil
 	}
@@ -64,6 +66,63 @@ func Lines(path, text string) []string {
 	}
 	return out
 }
+
+// Blob is Lines for the file whose Git object is oid. A history shows the same contents again and
+// again: a commit's new file is the next commit's old one, and serve builds the history anew after
+// every change. Each is colored once per process, until the cache holds MaxCached bytes of source.
+func Blob(oid, path, text string) []string {
+	key := oid + "\x00" + filepath.Base(path) // the name chooses the language
+	cache.Lock()
+	hl, ok := cache.lines[key]
+	cache.Unlock()
+	if ok {
+		return hl
+	}
+	hl = Lines(path, text)
+	cache.Lock()
+	if cache.bytes+len(text) > MaxCached {
+		cache.lines, cache.bytes = nil, 0
+	}
+	if cache.lines == nil {
+		cache.lines = map[string][]string{}
+	}
+	cache.lines[key] = hl
+	cache.bytes += len(text)
+	cache.Unlock()
+	return hl
+}
+
+// Forget empties the cache, to measure a first build.
+func Forget() {
+	cache.Lock()
+	cache.lines, cache.bytes = nil, 0
+	cache.Unlock()
+}
+
+// MaxCached bounds the source that Blob remembers; past it, the cache starts over.
+const MaxCached = 256 << 20
+
+var cache struct {
+	sync.Mutex
+	lines map[string][]string
+	bytes int
+}
+
+// lexerFor is the lexer for a file name. Matching tries every pattern of every lexer, so each name
+// is matched once.
+func lexerFor(path string) chroma.Lexer {
+	name := filepath.Base(path) // all Match looks at
+	if l, ok := byName.Load(name); ok {
+		return l.(found).Lexer
+	}
+	l := lexers.Match(name)
+	byName.Store(name, found{l})
+	return l
+}
+
+var byName sync.Map // file name → found
+
+type found struct{ chroma.Lexer } // nil when no lexer matches
 
 func utf16Len(s string) int {
 	n := 0

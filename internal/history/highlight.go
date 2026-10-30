@@ -42,8 +42,8 @@ func highlightDiffs(ctx context.Context, r gitx.Repo, base, sha string, files []
 		if len(d.Lines) == 0 {
 			continue
 		}
-		newer := highlight.Lines(f.Path, blobs[sha+":"+f.Path])
-		older := highlight.Lines(cmp(f.Old, f.Path), blobs[base+":"+cmp(f.Old, f.Path)])
+		newer := blobs[sha+":"+f.Path].lines(f.Path)
+		older := blobs[base+":"+cmp(f.Old, f.Path)].lines(cmp(f.Old, f.Path))
 		if newer == nil && older == nil {
 			continue
 		}
@@ -104,8 +104,19 @@ func hunkStart(h string) (o, n int) {
 	return o, n
 }
 
+// blob is a file's contents and its Git object.
+type blob struct{ oid, text string }
+
+// lines colors the blob, or is nil when there is none.
+func (b blob) lines(path string) []string {
+	if b.oid == "" {
+		return nil
+	}
+	return highlight.Blob(b.oid, path, b.text)
+}
+
 // catFiles reads blobs by "rev:path" in one git process. Missing ones are left out.
-func catFiles(ctx context.Context, r gitx.Repo, specs []string) (map[string]string, error) {
+func catFiles(ctx context.Context, r gitx.Repo, specs []string) (map[string]blob, error) {
 	cmd := exec.CommandContext(ctx, "git", "-C", r.Dir, "cat-file", "--batch")
 	cmd.Stdin = strings.NewReader(strings.Join(specs, "\n") + "\n")
 	var out bytes.Buffer
@@ -113,7 +124,7 @@ func catFiles(ctx context.Context, r gitx.Repo, specs []string) (map[string]stri
 	if err := cmd.Run(); err != nil {
 		return nil, fmt.Errorf("git cat-file: %w", err)
 	}
-	res := make(map[string]string, len(specs))
+	res := make(map[string]blob, len(specs))
 	rd := bufio.NewReader(&out)
 	for _, spec := range specs {
 		header, err := rd.ReadString('\n')
@@ -133,7 +144,7 @@ func catFiles(ctx context.Context, r gitx.Repo, specs []string) (map[string]stri
 			return res, nil
 		}
 		if size <= highlight.MaxBytes {
-			res[spec] = string(body[:size])
+			res[spec] = blob{f[0], string(body[:size])}
 		}
 	}
 	return res, nil
