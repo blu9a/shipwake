@@ -101,12 +101,18 @@ When('I watch the feature', async ({ page, served, world }) => {
 
 Then('the end of the first scenario stays on screen a moment before the second begins', async ({ world }) => {
   const video = world.page.locator('video');
+  // the page notes when the first scenario ended and when the next began: no polling delay in between
   await video.evaluate((v) => {
+    const w = window;
+    v.addEventListener('ended', () => {
+      w.endedAt ??= performance.now();
+    });
+    v.addEventListener('loadstart', () => {
+      if (w.endedAt !== undefined) w.nextAt ??= performance.now();
+    });
     v.playbackRate = 2;
   });
-  await expect.poll(() => video.evaluate((v) => v.ended), { timeout: 15000 }).toBe(true);
-  await world.page.waitForTimeout(600);
-  await expect(world.page.getByText('1 / 2 · First scenario')).toBeAttached();
-  expect(await video.evaluate((v) => v.ended)).toBe(true);
-  await expect(world.page.getByText('2 / 2 · Second scenario')).toBeAttached({ timeout: 5000 });
+  await expect(world.page.getByText('2 / 2 · Second scenario')).toBeAttached({ timeout: 15000 });
+  const held = await world.page.evaluate(() => window.nextAt - window.endedAt);
+  expect(held).toBeGreaterThanOrEqual(1000);
 });
