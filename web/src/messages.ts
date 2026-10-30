@@ -170,6 +170,7 @@ const en = {
   notComparable: 'Different runner: not compared',
   roles: { before: 'Before', action: 'Action', result: 'Result' } as Record<string, string>,
   observed: 'Observed',
+  noEvidence: 'No evidence recorded',
   passedOnRetry: 'passed on retry',
   counts: {
     failed: (n: number) => `${n} failed`,
@@ -366,6 +367,7 @@ const zh: Messages = {
   notComparable: '运行机器不同：不做比较',
   roles: { before: '前提', action: '操作', result: '结果' },
   observed: '实际看到',
+  noEvidence: '没有记录证据',
   passedOnRetry: '重试后通过',
   counts: {
     failed: (n) => `${n} 个失败`,
