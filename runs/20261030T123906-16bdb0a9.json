@@ -1,0 +1,368 @@
+{
+  "schemaVersion": 1,
+  "id": "20261030T123906-16bdb0a9",
+  "kind": "test",
+  "name": "Go tests",
+  "commit": "49c36c5afde079a6062c5d16ad583968a5ff5e6c",
+  "branch": "main",
+  "start": "2026-10-30T12:39:06.73508025Z",
+  "duration": 3164.029,
+  "format": "go-test",
+  "context": {
+    "runner": "github-ubuntu"
+  },
+  "tests": [
+    {
+      "feature": "github.com/blu9a/shipwake/cmd/shipwake",
+      "name": "TestProposalRoundTrip",
+      "status": "passed",
+      "start": "2026-10-30T12:39:06.770194143Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/changelog",
+      "name": "TestParse",
+      "status": "passed",
+      "start": "2026-10-30T12:39:06.872221156Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/changelog",
+      "name": "TestInsert",
+      "status": "passed",
+      "start": "2026-10-30T12:39:06.872245581Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/cmd/shipwake",
+      "name": "TestRelease",
+      "status": "passed",
+      "start": "2026-10-30T12:39:06.77730169Z",
+      "duration": 210,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/cmd/shipwake",
+      "name": "TestMetricProposal",
+      "status": "passed",
+      "start": "2026-10-30T12:39:06.983267281Z",
+      "duration": 210,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/cmd/shipwake",
+      "name": "TestReleaseWithChangelog",
+      "status": "passed",
+      "start": "2026-10-30T12:39:07.196678801Z",
+      "duration": 110,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/cmd/shipwake",
+      "name": "TestOnlyTheCheckedOutBranch",
+      "status": "passed",
+      "start": "2026-10-30T12:39:07.302496366Z",
+      "duration": 70,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/highlight",
+      "name": "TestLines",
+      "status": "passed",
+      "start": "2026-10-30T12:39:07.505932579Z",
+      "duration": 20,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/highlight",
+      "name": "TestBlob",
+      "status": "passed",
+      "start": "2026-10-30T12:39:07.527771695Z",
+      "duration": 10,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/highlight",
+      "name": "TestBlobUpTo",
+      "status": "passed",
+      "start": "2026-10-30T12:39:07.534105545Z",
+      "duration": 20,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestFormatBinaryStorage",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.231718404Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestApplyContextTiesAndRunnerBaselines",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.231826555Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestApplyBranchAndMissingSummaryBaselines",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.23198352Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestApply",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.232167871Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestLookup",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.232551581Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestDirectionRule",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.233250256Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestThreshold",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.233289643Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/judge",
+      "name": "TestParseThresholdErrors",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.233309101Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/history",
+      "name": "TestLoad",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.188695282Z",
+      "duration": 120,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/history",
+      "name": "TestLoadMergeOrderMatchesGit",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.308888015Z",
+      "duration": 270,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/history",
+      "name": "TestDetailScenarios",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.579319322Z",
+      "duration": 140,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/history",
+      "name": "TestMapLines",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.724157131Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/mapping",
+      "name": "TestXML",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.777160367Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/mapping",
+      "name": "TestTotalsMustAgree",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.77795007Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/mapping",
+      "name": "TestUnknownStatus",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.780357894Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/mapping",
+      "name": "TestPathsTemplatesFilters",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.780381018Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/mapping",
+      "name": "TestMetricsWithKeys",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.780408289Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/mapping",
+      "name": "TestStepsGiveStatus",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.780594027Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/mapping",
+      "name": "TestParseErrors",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.780618413Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/metricspec",
+      "name": "TestParse",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.784581182Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/metricspec",
+      "name": "TestParseChinese",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.784606881Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/metricspec",
+      "name": "TestParseErrors",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.784630726Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/history",
+      "name": "TestDetailHighlights",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.724187117Z",
+      "duration": 110,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/history",
+      "name": "TestRealWorldConventions",
+      "status": "passed",
+      "start": "2026-10-30T12:39:08.833715896Z",
+      "duration": 160,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/readers",
+      "name": "TestBuiltinFormats",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.251256017Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/readers",
+      "name": "TestJUnit",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.253341538Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/readers",
+      "name": "TestGoTest",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.253715689Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/readers",
+      "name": "TestPlaywright",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.253997207Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/readers",
+      "name": "TestGoBench",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.25446837Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/readers",
+      "name": "TestK6",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.254672944Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/readers",
+      "name": "TestOwn",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.255004896Z",
+      "duration": 0,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/story",
+      "name": "TestMetricStory",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.747439246Z",
+      "duration": 60,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/store",
+      "name": "TestBranchInCI",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.564881566Z",
+      "duration": 320,
+      "attempts": 1
+    },
+    {
+      "feature": "github.com/blu9a/shipwake/internal/store",
+      "name": "TestRunSchema",
+      "status": "passed",
+      "start": "2026-10-30T12:39:09.883602801Z",
+      "duration": 0,
+      "attempts": 1
+    }
+  ]
+}
