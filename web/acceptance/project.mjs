@@ -6,7 +6,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { test as base, createBdd } from 'playwright-bdd';
-import { showPointer, slowClicks } from '../../packages/playwright/src/index.ts';
+import { clearMarks, decisive, showPointer, slowClicks } from '../../packages/playwright/src/index.ts';
 
 
 // Who approves: the repository's own Git identity, as on a person's machine.
@@ -234,3 +234,11 @@ export const test = base.extend({
 });
 
 export const { Given, When, Then } = createBdd(test);
+
+/** Marks what a result step checked: a box around it in the recording, a screenshot, and the text seen,
+ *  shown under the scenario's result as what was observed. Only the latest step's box stays. */
+export async function prove({ page, $testInfo, $step }, target, expected = []) {
+  await clearMarks(page);
+  const step = $step.title.replace(/^(Given|When|Then|And|But)\s+/, '');
+  await decisive(target, $testInfo, step, expected);
+}

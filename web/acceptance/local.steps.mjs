@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { expect } from '@playwright/test';
-import { Given, me, shipwake, Then, When } from './project.mjs';
+import { Given, me, prove, shipwake, Then, When } from './project.mjs';
 
 const feature = (state) => `Feature: Splitting a bill
 
@@ -68,9 +68,11 @@ When('I open it in Shipwake by its path', async ({ page, served, repo }) => {
   await page.getByRole('button', { name: 'Open', exact: true }).click();
 });
 
-Then('its timeline is shown', async ({ page }) => {
+Then('its timeline is shown', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await expect(page.getByRole('heading', { name: 'main', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'fix: shares add up to the total' })).toBeVisible();
+  await prove(f, page.locator('main'), ['main', 'fix: shares add up to the total']);
 });
 
 Then('its files, branches, tags and Git settings are as they were', async ({ repo, world }) => {
@@ -123,11 +125,13 @@ Then('the repository has no new branch', async ({ repo, world }) => {
   expect(repo.git('branch', '--list')).toBe(world.branches);
 });
 
-Then('the run is shown on the repository commit it tested', async ({ page, served, world }) => {
+Then('the run is shown on the repository commit it tested', async ({ page, served, world, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await served.restart();
   await served.open(page);
   const run = page.getByRole('link', { name: 'Acceptance', exact: true }).locator('xpath=ancestor::div[.//code][1]');
   await expect(run.locator(`a[href$="/commit/${world.tested}"]`)).toHaveText(world.tested.slice(0, 7));
+  await prove(f, run, ['Acceptance', world.tested.slice(0, 7)]);
 });
 
 // Requirements follow the repository's branch
@@ -148,11 +152,13 @@ When('the repository has feature\\/tip checked out', async ({ repo, served }) =>
   await served.restart();
 });
 
-Then('the timeline of feature\\/tip shows the proposal, and it can be approved', async ({ page, served, world }) => {
+Then('the timeline of feature\\/tip shows the proposal, and it can be approved', async ({ page, served, world, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await served.open(page, '/branch/feature/tip');
   await expect(page.getByRole('heading', { name: 'feature/tip', exact: true })).toBeVisible();
   const p = proposal(page, 'Splitting a bill');
   await p.locator(':scope > summary').click();
+  await prove(f, p, ['Splitting a bill', 'Approve']);
   await p.getByRole('button', { name: 'Approve', exact: true }).click();
   await expect(p).toBeHidden();
   // committed on the workspace's branch of the same name
@@ -187,9 +193,11 @@ When('I start Shipwake without naming a repository', async ({ page, served }) =>
   await expect(page.getByRole('heading', { name: 'main', exact: true })).toBeVisible();
 });
 
-Then('all three projects are shown', async ({ page }) => {
+Then('all three projects are shown', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await page.getByRole('button', { name: 'Projects' }).click();
   for (const name of ['bills', 'notes', 'Shop']) await expect(page.getByRole('link', { name, exact: true })).toBeVisible();
+  await prove(f, page.getByRole('link', { name: 'Shop', exact: true }).locator('..'), ['bills', 'notes', 'Shop']);
 });
 
 // Giving an agent what it needs
@@ -200,7 +208,8 @@ When('I open the agent prompt', async ({ page, served }) => {
   await page.getByRole('button', { name: 'Prompt for an agent' }).click();
 });
 
-Then('it names the skill, the repository, its workspace and the checked-out branch', async ({ page, repo, home, world }) => {
+Then('it names the skill, the repository, its workspace and the checked-out branch', async ({ page, repo, home, world, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   const text = await page.locator('.prompt pre').innerText();
   const skill = join(home, 'skill', 'SKILL.md');
   expect(text).toContain(skill);
@@ -209,13 +218,16 @@ Then('it names the skill, the repository, its workspace and the checked-out bran
   expect(text).toContain(world.ws.dir);
   expect(text).toContain('branch main');
   world.prompt = text;
+  await prove(f, page.locator('.prompt pre'), [skill, repo.dir, world.ws.dir, 'branch main']);
 });
 
-Then('I can copy it with one click', async ({ page, context, world }) => {
+Then('I can copy it with one click', async ({ page, context, world, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.getByRole('button', { name: 'Copy', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Copied', exact: true })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(world.prompt);
+  await prove(f, page.getByRole('button', { name: 'Copied', exact: true }), ['Copied']);
 });
 
 // Adopting the requirements into the repository

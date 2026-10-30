@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { Given, me, Then, When } from './project.mjs';
+import { Given, me, prove, Then, When } from './project.mjs';
 
 const feature = `Feature: Splitting a bill
 
@@ -18,19 +18,23 @@ Given('scenarios proposed for a feature', async ({ repo }) => {
   repo.commit('spec: propose exact totals', { 'features/bill.feature': feature });
 });
 
-Then('the proposal is shown above everything else', async ({ page }) => {
+Then('the proposal is shown above everything else', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   const first = proposal(page, 'Splitting a bill');
   await expect(first).toBeVisible();
   const top = (await first.boundingBox()).y;
   for (const link of await page.locator('main a.lnk').all()) {
     expect((await link.boundingBox()).y).toBeGreaterThan(top);
   }
+  await prove(f, first, ['Splitting a bill']);
 });
 
-Then('it can be opened to read its scenarios', async ({ page }) => {
+Then('it can be opened to read its scenarios', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   const p = proposal(page, 'Splitting a bill');
   await p.locator(':scope > summary').click();
   await expect(p.getByRole('textbox')).toHaveValue(/Scenario: Exact totals[\s\S]*Then the shares add up to 100\.00/);
+  await prove(f, p.getByRole('textbox'), ['Scenario: Exact totals']);
 });
 
 When('I approve them in Shipwake', async ({ page, served }) => {
@@ -66,16 +70,21 @@ When('I open the proposal', async ({ page, served }) => {
   await proposal(page, 'Exact totals').locator(':scope > summary').click();
 });
 
-Then('that line is marked with the reason', async ({ page }) => {
+Then('that line is marked with the reason', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   const p = proposal(page, 'Exact totals');
   // numbered as the editor shows the text
   const text = await p.getByRole('textbox').inputValue();
   const n = text.split('\n').findIndex((l) => l.includes('when it feels wrong')) + 1;
   await expect(p.getByRole('status')).toHaveText(new RegExp(`^Line ${n}: \\S`));
+  await prove(f, p.getByRole('status'), [`Line ${n}:`]);
 });
 
-Then('approving it is not possible', async ({ page }) => {
-  await expect(proposal(page, 'Exact totals').getByRole('button', { name: 'Approve', exact: true })).toBeDisabled();
+Then('approving it is not possible', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
+  const approve = proposal(page, 'Exact totals').getByRole('button', { name: 'Approve', exact: true });
+  await expect(approve).toBeDisabled();
+  await prove(f, approve, ['Approve']);
 });
 
 Given('scenarios proposed on a branch that is not merged', async ({ repo }) => {
@@ -94,13 +103,16 @@ Then('nothing is shown as proposed', async ({ page }) => {
   await expect(proposal(page, 'Splitting a bill')).toHaveCount(0);
 });
 
-Then("the branch's timeline shows the proposal", async ({ page, served }) => {
+Then("the branch's timeline shows the proposal", async ({ page, served, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await served.open(page, '/branch/spec/exact-totals');
   await expect(page.getByRole('heading', { name: 'spec/exact-totals', exact: true })).toBeVisible();
   await expect(proposal(page, 'Splitting a bill')).toBeVisible();
+  await prove(f, proposal(page, 'Splitting a bill'), ['Splitting a bill']);
 });
 
-Then('it can be approved only while that branch is checked out', async ({ page, repo, served }) => {
+Then('it can be approved only while that branch is checked out', async ({ page, repo, served, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   const approve = () => proposal(page, 'Splitting a bill').getByRole('button', { name: 'Approve', exact: true });
   await proposal(page, 'Splitting a bill').locator(':scope > summary').click();
   await expect(approve()).toBeEnabled();
@@ -109,6 +121,8 @@ Then('it can be approved only while that branch is checked out', async ({ page, 
   await served.restart();
   await served.open(page, '/branch/spec/exact-totals');
   await proposal(page, 'Splitting a bill').locator(':scope > summary').click();
-  await expect(proposal(page, 'Splitting a bill')).toContainText('spec/exact-totals');
+  const note = proposal(page, 'Splitting a bill').getByText('Check out spec/exact-totals');
+  await expect(note).toBeVisible();
   await expect(approve()).toHaveCount(0);
+  await prove(f, note, ['Check out spec/exact-totals']);
 });

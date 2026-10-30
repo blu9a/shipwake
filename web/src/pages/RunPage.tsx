@@ -238,7 +238,13 @@ function TestRow({ p, run, x, showTarget }: { p: Project; run: Run; x: Test; sho
       </summary>
       <div className={s.detail}>
         {gherkin ? (
-          <Passage p={p} steps={x.steps ?? []} evidence={x.evidence ?? []} error={x.error} />
+          <Passage
+            p={p}
+            steps={x.steps ?? []}
+            evidence={x.evidence ?? []}
+            error={x.error}
+            expected={run.tests?.some((y) => y.evidence?.length)}
+          />
         ) : (
           x.error && <pre className={s.err}>{x.error}</pre>
         )}
@@ -495,8 +501,21 @@ function FullView({ children }: { children: ReactNode }) {
   );
 }
 
-/** A scenario as three short sentences: Given → before, When → action, Then → result; "And" joins the one above. */
-function Passage({ p, steps, evidence, error }: { p: Project; steps: Step[]; evidence: Evidence[]; error?: string }) {
+/** A scenario as three short sentences: Given → before, When → action, Then → result; "And" joins the one above.
+ *  When the run's tests record what their results saw (expected), a result that recorded nothing says so. */
+function Passage({
+  p,
+  steps,
+  evidence,
+  error,
+  expected,
+}: {
+  p: Project;
+  steps: Step[];
+  evidence: Evidence[];
+  error?: string;
+  expected?: boolean;
+}) {
   const { lang } = useSettings();
   const t = useT();
   const role: Record<string, string> = { Given: 'before', When: 'action', Then: 'result' };
@@ -528,6 +547,7 @@ function Passage({ p, steps, evidence, error }: { p: Project; steps: Step[]; evi
                   <span className="muted">{t.observed}</span> <Excerpt text={ev.observed} expected={ev.expected} />
                 </div>
               ))}
+              {g.role === 'result' && expected && proofs.length === 0 && <div className={`${s.proof} muted`}>{t.noEvidence}</div>}
             </div>
           </div>
         );
