@@ -42,8 +42,9 @@ func highlightDiffs(ctx context.Context, r gitx.Repo, base, sha string, files []
 		if len(d.Lines) == 0 {
 			continue
 		}
-		newer := blobs[sha+":"+f.Path].lines(f.Path)
-		older := blobs[base+":"+cmp(f.Old, f.Path)].lines(cmp(f.Old, f.Path))
+		lastOld, lastNew := shown(d.Lines)
+		newer := blobs[sha+":"+f.Path].lines(f.Path, lastNew)
+		older := blobs[base+":"+cmp(f.Old, f.Path)].lines(cmp(f.Old, f.Path), lastOld)
 		if newer == nil && older == nil {
 			continue
 		}
@@ -57,6 +58,29 @@ func cmp(a, b string) string {
 		return a
 	}
 	return b
+}
+
+// shown is the last line of each version a patch shows: how far each needs coloring.
+func shown(lines []string) (older, newer int) {
+	o, n := 0, 0
+	for _, l := range lines {
+		switch {
+		case strings.HasPrefix(l, "@@"):
+			o, n = hunkStart(l)
+		case strings.HasPrefix(l, "\\"):
+		case strings.HasPrefix(l, "+"):
+			newer = max(newer, n)
+			n++
+		case strings.HasPrefix(l, "-"):
+			older = max(older, o)
+			o++
+		default:
+			older, newer = max(older, o), max(newer, n)
+			o++
+			n++
+		}
+	}
+	return older, newer
 }
 
 // mapLines walks a patch as the page does, numbering old and new lines from each hunk header.
@@ -107,12 +131,12 @@ func hunkStart(h string) (o, n int) {
 // blob is a file's contents and its Git object.
 type blob struct{ oid, text string }
 
-// lines colors the blob, or is nil when there is none.
-func (b blob) lines(path string) []string {
-	if b.oid == "" {
+// lines colors the blob up to line upTo, or is nil when there is none.
+func (b blob) lines(path string, upTo int) []string {
+	if b.oid == "" || upTo == 0 {
 		return nil
 	}
-	return highlight.Blob(b.oid, path, b.text)
+	return highlight.Blob(b.oid, path, b.text, upTo)
 }
 
 // catFiles reads blobs by "rev:path" in one git process. Missing ones are left out.
