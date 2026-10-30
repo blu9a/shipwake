@@ -9,3 +9,4 @@ web/dist/
 node_modules/
 web/test-results/
 web/playwright-report/
+web/.features-gen/

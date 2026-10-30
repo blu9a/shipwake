@@ -1,5 +1,5 @@
 # Shipwake: Go core with the web app embedded.
-.PHONY: all web build test test-responsive test-history lint schema types site fixtures clean
+.PHONY: all web build test test-acceptance test-responsive test-history lint schema types site fixtures clean
 
 all: web build
 
@@ -14,6 +14,9 @@ test:           ## Go tests
 
 test-responsive: web ## browser layout and resize regression checks (install Chromium once first)
 	cd web && pnpm test:responsive
+
+test-acceptance: all ## the approved scenarios in features/, in a browser against bin/shipwake
+	cd web && pnpm test:acceptance
 
 test-history: all ## the timeline's order on this repository's own history and runs (needs full history)
 	bin/shipwake build -o .cache/self-site .
