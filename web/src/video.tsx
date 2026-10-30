@@ -207,18 +207,20 @@ async function findBlanks(src: string, signal: AbortSignal): Promise<Blank[]> {
   v.preload = 'auto';
   v.src = src;
   await once(v, 'loadeddata');
-  if (!Number.isFinite(v.duration)) {
-    // recordings written as they're made may not state their length until read to the end
+  let duration = v.duration;
+  if (!Number.isFinite(duration)) {
+    // Recordings written as they're made may not state their length. Seeking far past the end stops
+    // at the last frame: where it stops is the length, whether or not the browser then states it.
     v.currentTime = 1e7;
     await once(v, 'seeked');
+    duration = Number.isFinite(v.duration) ? v.duration : v.currentTime;
   }
-  const duration = v.duration;
   const step = Math.max(0.1, duration / 400);
   const small = document.createElement('canvas');
   small.width = 48;
   small.height = 27;
   const ctx = small.getContext('2d', { willReadFrequently: true });
-  if (!ctx || !Number.isFinite(duration)) return [];
+  if (!ctx || !Number.isFinite(duration) || duration <= 0) return [];
   const picture = () => {
     const c = document.createElement('canvas');
     c.width = v.videoWidth;
