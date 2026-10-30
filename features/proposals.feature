@@ -20,7 +20,6 @@ Feature: Approving requirements
     Then that line is marked with the reason
     And approving it is not possible
 
-  @proposed
   Scenario: Each branch shows its own requirements
     Given scenarios proposed on a branch that is not merged
     When I open the timeline of the trunk
