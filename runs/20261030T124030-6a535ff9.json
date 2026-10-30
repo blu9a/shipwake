@@ -1,0 +1,446 @@
+{
+  "schemaVersion": 1,
+  "id": "20261030T124030-6a535ff9",
+  "kind": "test",
+  "name": "Acceptance",
+  "commit": "49c36c5afde079a6062c5d16ad583968a5ff5e6c",
+  "branch": "main",
+  "start": "2026-10-30T12:40:30.842Z",
+  "duration": 10749.497,
+  "format": "json",
+  "context": {
+    "runner": "github-ubuntu"
+  },
+  "tests": [
+    {
+      "feature": "Approving requirements",
+      "name": "Proposals wait at the top of the timeline",
+      "status": "passed",
+      "start": "2026-10-30T12:40:31.832Z",
+      "duration": 2564,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed for a feature",
+          "status": "passed",
+          "start": "2026-10-30T12:40:32.435Z",
+          "duration": 92
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T12:40:32.532Z",
+          "duration": 1015
+        },
+        {
+          "name": "Then the proposal is shown above everything else",
+          "status": "passed",
+          "start": "2026-10-30T12:40:33.551Z",
+          "duration": 312
+        },
+        {
+          "name": "And it can be opened to read its scenarios",
+          "status": "passed",
+          "start": "2026-10-30T12:40:33.87Z",
+          "duration": 140
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "video.webm",
+          "size": 101961,
+          "start": "2026-10-30T12:40:32.212Z"
+        }
+      ]
+    },
+    {
+      "feature": "Approving requirements",
+      "name": "Approving records who approved",
+      "status": "passed",
+      "start": "2026-10-30T12:40:31.851Z",
+      "duration": 3318,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed for a feature",
+          "status": "passed",
+          "start": "2026-10-30T12:40:32.438Z",
+          "duration": 93
+        },
+        {
+          "name": "When I approve them in Shipwake",
+          "status": "passed",
+          "start": "2026-10-30T12:40:32.537Z",
+          "duration": 2277
+        },
+        {
+          "name": "Then they are no longer proposed",
+          "status": "passed",
+          "start": "2026-10-30T12:40:34.819Z",
+          "duration": 539
+        },
+        {
+          "name": "And the commit that approved them names me as the approver",
+          "status": "passed",
+          "start": "2026-10-30T12:40:35.363Z",
+          "duration": 27
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "1-video.webm",
+          "size": 122460,
+          "start": "2026-10-30T12:40:32.239Z"
+        }
+      ]
+    },
+    {
+      "feature": "Approving requirements",
+      "name": "A metric Shipwake can't read can't be approved",
+      "status": "passed",
+      "start": "2026-10-30T12:40:34.707Z",
+      "duration": 1398,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a proposed metric with a line Shipwake doesn't understand",
+          "status": "passed",
+          "start": "2026-10-30T12:40:34.869Z",
+          "duration": 55
+        },
+        {
+          "name": "When I open the proposal",
+          "status": "passed",
+          "start": "2026-10-30T12:40:34.925Z",
+          "duration": 814
+        },
+        {
+          "name": "Then that line is marked with the reason",
+          "status": "passed",
+          "start": "2026-10-30T12:40:35.74Z",
+          "duration": 124
+        },
+        {
+          "name": "And approving it is not possible",
+          "status": "passed",
+          "start": "2026-10-30T12:40:35.865Z",
+          "duration": 23
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "2-video.webm",
+          "size": 79741,
+          "start": "2026-10-30T12:40:34.746Z"
+        }
+      ]
+    },
+    {
+      "feature": "Releasing",
+      "name": "The changelog is drafted from the changes",
+      "status": "passed",
+      "start": "2026-10-30T12:40:36.154Z",
+      "duration": 1344,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given commits since the last release: a feature, a fix and a test",
+          "status": "passed",
+          "start": "2026-10-30T12:40:36.331Z",
+          "duration": 95
+        },
+        {
+          "name": "When I prepare a new release and assemble the draft",
+          "status": "passed",
+          "start": "2026-10-30T12:40:36.428Z",
+          "duration": 834
+        },
+        {
+          "name": "Then the notes list the feature and the fix",
+          "status": "passed",
+          "start": "2026-10-30T12:40:37.269Z",
+          "duration": 41
+        },
+        {
+          "name": "And they don't list the test",
+          "status": "passed",
+          "start": "2026-10-30T12:40:37.311Z",
+          "duration": 30
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "3-video.webm",
+          "size": 43985,
+          "start": "2026-10-30T12:40:36.245Z"
+        }
+      ]
+    },
+    {
+      "feature": "Approving requirements",
+      "name": "Each branch shows its own requirements",
+      "status": "passed",
+      "start": "2026-10-30T12:40:35.519Z",
+      "duration": 2683,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given scenarios proposed on a branch that is not merged",
+          "status": "passed",
+          "start": "2026-10-30T12:40:35.665Z",
+          "duration": 74
+        },
+        {
+          "name": "When I open the timeline of the trunk",
+          "status": "passed",
+          "start": "2026-10-30T12:40:35.741Z",
+          "duration": 810
+        },
+        {
+          "name": "Then nothing is shown as proposed",
+          "status": "passed",
+          "start": "2026-10-30T12:40:36.552Z",
+          "duration": 30
+        },
+        {
+          "name": "And the branch's timeline shows the proposal",
+          "status": "passed",
+          "start": "2026-10-30T12:40:36.583Z",
+          "duration": 371
+        },
+        {
+          "name": "And it can be approved only while that branch is checked out",
+          "status": "passed",
+          "start": "2026-10-30T12:40:36.956Z",
+          "duration": 1022
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "4-video.webm",
+          "size": 118467,
+          "start": "2026-10-30T12:40:35.549Z"
+        }
+      ]
+    },
+    {
+      "feature": "Releasing",
+      "name": "Approving a release records it",
+      "status": "passed",
+      "start": "2026-10-30T12:40:37.569Z",
+      "duration": 1540,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given checks that pass on the newest commit",
+          "status": "passed",
+          "start": "2026-10-30T12:40:37.688Z",
+          "duration": 74
+        },
+        {
+          "name": "When I approve a release with its notes",
+          "status": "passed",
+          "start": "2026-10-30T12:40:37.763Z",
+          "duration": 1216
+        },
+        {
+          "name": "Then the changelog has a section for the new version",
+          "status": "passed",
+          "start": "2026-10-30T12:40:38.98Z",
+          "duration": 10
+        },
+        {
+          "name": "And the version is tagged with me as the approver",
+          "status": "passed",
+          "start": "2026-10-30T12:40:38.991Z",
+          "duration": 7
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "5-video.webm",
+          "size": 78023,
+          "start": "2026-10-30T12:40:37.6Z"
+        }
+      ]
+    },
+    {
+      "feature": "Releasing",
+      "name": "Nothing to release",
+      "status": "passed",
+      "start": "2026-10-30T12:40:38.227Z",
+      "duration": 1119,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given every change is already released",
+          "status": "passed",
+          "start": "2026-10-30T12:40:38.334Z",
+          "duration": 53
+        },
+        {
+          "name": "When I open the new release page",
+          "status": "passed",
+          "start": "2026-10-30T12:40:38.389Z",
+          "duration": 399
+        },
+        {
+          "name": "Then it says there is nothing new since the last release",
+          "status": "passed",
+          "start": "2026-10-30T12:40:38.794Z",
+          "duration": 369
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "6-video.webm",
+          "size": 18333,
+          "start": "2026-10-30T12:40:38.244Z"
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "A run sits with the commit it tested",
+      "status": "passed",
+      "start": "2026-10-30T12:40:39.144Z",
+      "duration": 1164,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a project whose newest commit came after an older one",
+          "status": "passed",
+          "start": "2026-10-30T12:40:39.302Z",
+          "duration": 78
+        },
+        {
+          "name": "And a test run on the older commit, recorded after the newest commit",
+          "status": "passed",
+          "start": "2026-10-30T12:40:39.383Z",
+          "duration": 96
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T12:40:39.48Z",
+          "duration": 691
+        },
+        {
+          "name": "Then the run appears directly above the older commit",
+          "status": "passed",
+          "start": "2026-10-30T12:40:40.172Z",
+          "duration": 45
+        },
+        {
+          "name": "And it names the commit it tested",
+          "status": "passed",
+          "start": "2026-10-30T12:40:40.217Z",
+          "duration": 10
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "7-video.webm",
+          "size": 31300,
+          "start": "2026-10-30T12:40:39.172Z"
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "A failing test is visible on its commit",
+      "status": "passed",
+      "start": "2026-10-30T12:40:39.381Z",
+      "duration": 1665,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a test run with one failing test on a commit",
+          "status": "passed",
+          "start": "2026-10-30T12:40:39.592Z",
+          "duration": 142
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T12:40:39.736Z",
+          "duration": 702
+        },
+        {
+          "name": "Then that commit's run shows one failure",
+          "status": "passed",
+          "start": "2026-10-30T12:40:40.444Z",
+          "duration": 39
+        },
+        {
+          "name": "And opening the run shows the failing test with its error",
+          "status": "passed",
+          "start": "2026-10-30T12:40:40.485Z",
+          "duration": 457
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "8-video.webm",
+          "size": 64113,
+          "start": "2026-10-30T12:40:39.408Z"
+        }
+      ]
+    },
+    {
+      "feature": "Seeing what every change did",
+      "name": "A release shows what it records",
+      "status": "passed",
+      "start": "2026-10-30T12:40:40.331Z",
+      "duration": 978,
+      "attempts": 1,
+      "steps": [
+        {
+          "name": "Given a release whose changelog lists a new feature and a fix",
+          "status": "passed",
+          "start": "2026-10-30T12:40:40.452Z",
+          "duration": 67
+        },
+        {
+          "name": "When I open the project's timeline",
+          "status": "passed",
+          "start": "2026-10-30T12:40:40.52Z",
+          "duration": 675
+        },
+        {
+          "name": "Then the release shows the feature and the fix as its changelog says",
+          "status": "passed",
+          "start": "2026-10-30T12:40:41.196Z",
+          "duration": 28
+        }
+      ],
+      "attachments": [
+        {
+          "name": "video",
+          "type": "video/webm",
+          "path": "9-video.webm",
+          "size": 36214,
+          "start": "2026-10-30T12:40:40.346Z"
+        }
+      ]
+    }
+  ]
+}
