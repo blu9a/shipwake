@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { Given, me, Then, When } from './project.mjs';
+import { Given, me, prove, Then, When } from './project.mjs';
 
 const notes = (page) => page.getByRole('textbox').last();
 
@@ -17,9 +17,11 @@ When('I prepare a new release and assemble the draft', async ({ page, served }) 
   await page.getByRole('button', { name: /Assemble draft/ }).click();
 });
 
-Then('the notes list the feature and the fix', async ({ page }) => {
+Then('the notes list the feature and the fix', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await expect(notes(page)).toHaveValue(/add a tip before splitting/i);
   await expect(notes(page)).toHaveValue(/shares add up to the total/i);
+  await prove(f, notes(page), ['add a tip before splitting', 'shares add up to the total']);
 });
 
 Then("they don't list the test", async ({ page }) => {
@@ -60,6 +62,9 @@ When('I open the new release page', async ({ page, served }) => {
   await served.open(page, '/release');
 });
 
-Then('it says there is nothing new since the last release', async ({ page }) => {
-  await expect(page.getByText('Nothing new since v0.1.0.', { exact: true })).toBeVisible();
+Then('it says there is nothing new since the last release', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
+  const said = page.getByText('Nothing new since v0.1.0.', { exact: true });
+  await expect(said).toBeVisible();
+  await prove(f, said, ['Nothing new since v0.1.0.']);
 });

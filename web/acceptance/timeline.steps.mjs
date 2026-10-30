@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { Given, Then, When } from './project.mjs';
+import { Given, prove, Then, When } from './project.mjs';
 
 const passed = (name) => ({ feature: 'Splitting a bill', name, status: 'passed', duration: 12 });
 
@@ -20,17 +20,23 @@ When("I open the project's timeline", async ({ page, served }) => {
   await expect(page.getByRole('heading', { name: 'main', exact: true })).toBeVisible();
 });
 
-Then('the run appears directly above the older commit', async ({ page }) => {
+Then('the run appears directly above the older commit', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   const list = await entries(page);
   const run = list.indexOf('Acceptance');
   expect(run, `entries: ${list.join(' | ')}`).toBeGreaterThan(list.indexOf('feat: round shares to the cent'));
   expect(list[run + 1]).toBe('feat: split a bill between friends');
+  const both = page.locator('main a.lnk').filter({ hasText: /^(Acceptance|feat: split a bill between friends)$/ });
+  await prove(f, both.first().locator('xpath=ancestor::div[.//code][1]/..'), ['Acceptance', 'feat: split a bill between friends']);
 });
 
-Then('it names the commit it tested', async ({ page, world }) => {
+Then('it names the commit it tested', async ({ page, world, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   // the run's entry: the nearest block around its name that also holds its details
   const run = page.getByRole('link', { name: 'Acceptance', exact: true }).locator('xpath=ancestor::div[.//code][1]');
-  await expect(run.locator(`a[href$="/commit/${world.older}"]`)).toHaveText(world.older.slice(0, 7));
+  const tested = run.locator(`a[href$="/commit/${world.older}"]`);
+  await expect(tested).toHaveText(world.older.slice(0, 7));
+  await prove(f, tested, [world.older.slice(0, 7)]);
 });
 
 Given('a test run with one failing test on a commit', async ({ repo, world }) => {
@@ -41,17 +47,21 @@ Given('a test run with one failing test on a commit', async ({ repo, world }) =>
   ]);
 });
 
-Then("that commit's run shows one failure", async ({ page }) => {
+Then("that commit's run shows one failure", async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await expect(page.getByRole('img', { name: '1 failed', exact: true })).toBeVisible();
   await expect(page.getByRole('img', { name: '1 passed', exact: true })).toBeVisible();
+  await prove(f, page.getByRole('img', { name: '1 failed', exact: true }), ['1']);
 });
 
-Then('opening the run shows the failing test with its error', async ({ page }) => {
+Then('opening the run shows the failing test with its error', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   await page.getByRole('link', { name: 'Acceptance', exact: true }).click();
   const failing = page.getByText('Uneven split', { exact: true });
   await expect(failing).toBeVisible();
   await failing.click();
   await expect(page.getByText('expected 33.34 to be 33.33')).toBeVisible();
+  await prove(f, page.getByText('expected 33.34 to be 33.33'), ['expected 33.34 to be 33.33']);
 });
 
 Given('a release whose changelog lists a new feature and a fix', async ({ repo }) => {
@@ -63,11 +73,13 @@ Given('a release whose changelog lists a new feature and a fix', async ({ repo }
   });
 });
 
-Then('the release shows the feature and the fix as its changelog says', async ({ page }) => {
+Then('the release shows the feature and the fix as its changelog says', async ({ page, $testInfo, $step }) => {
+  const f = { page, $testInfo, $step };
   const release = page.locator('main').getByText('v0.1.0', { exact: true }).first();
   await expect(release).toBeVisible();
   await expect(page.locator('main').getByText('Split a bill between friends', { exact: true })).toBeVisible();
   const fix = page.locator('main li').filter({ hasText: 'Shares add up to the' });
   await expect(fix).toHaveText('totals: Shares add up to the total (#12)');
   await expect(fix.getByRole('link', { name: '#12' })).toHaveAttribute('href', 'https://example.com/bills/pull/12');
+  await prove(f, fix.locator('xpath=ancestor::*[.//h4][1]'), ['Split a bill between friends', 'totals: Shares add up to the total (#12)']);
 });
