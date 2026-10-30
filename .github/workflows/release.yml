@@ -3,7 +3,7 @@
 name: Release
 on:
   push:
-    tags: ['v*']
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*'] # full versions: v1.2.3, v1.2.3-rc.1; not v1, which follows them
 permissions:
   contents: write
 jobs:
