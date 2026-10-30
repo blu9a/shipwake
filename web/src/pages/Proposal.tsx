@@ -123,7 +123,7 @@ export function Proposal({
       {editing && (
         <div className={s.actions}>
           <button type="button" className={s.primary} disabled={busy || !text?.trim()} onClick={() => run(true)}>
-            {t.approveProposal}
+            {busy ? t.approving : t.approveProposal}
           </button>
           <button type="button" className={s.secondary} disabled={busy || text === saved} onClick={() => run(false)}>
             {t.saveChanges}
@@ -241,7 +241,7 @@ export function MetricProposal({
       {editing && (
         <div className={s.actions}>
           <button type="button" className={s.primary} disabled={busy || !ok} onClick={() => run(true)}>
-            {t.approveProposal}
+            {busy ? t.approving : t.approveProposal}
           </button>
           <button type="button" className={s.secondary} disabled={busy || !ok || text === saved} onClick={() => run(false)}>
             {t.saveChanges}

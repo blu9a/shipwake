@@ -51,6 +51,7 @@ type Project struct {
 	// The Git repository whose results branch holds the runs: the workspace's in local mode, and
 	// still after adopting. Empty: Spec's.
 	ResultsRepo string
+	id          string // when rebuilding one project: the ID it already has
 }
 
 // Options control a build.
@@ -91,6 +92,41 @@ func Run(ctx context.Context, o Options) error {
 		site.Projects = append(site.Projects, ref)
 	}
 	return writeJSON(filepath.Join(o.Out, "data", "site.json"), site)
+}
+
+// RunOne builds one project of a site already built, under the ID it has there, and updates its entry in
+// the site's list: after a change to one project, the others needn't be read again.
+func RunOne(ctx context.Context, o Options, i int, id string) error {
+	if o.Log == nil {
+		o.Log = func(string, ...any) {}
+	}
+	switch {
+	case o.MaxRows == 0:
+		o.MaxRows = DefaultRows
+	case o.MaxRows < 0:
+		o.MaxRows = 0
+	}
+	path := filepath.Join(o.Out, "data", "site.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	var site model.Site
+	if err := json.Unmarshal(data, &site); err != nil {
+		return err
+	}
+	if i < 0 || i >= len(o.Projects) || i >= len(site.Projects) || site.Projects[i].ID != id {
+		return Run(ctx, o) // the site no longer matches its projects: build it all
+	}
+	p := o.Projects[i]
+	p.id = id
+	ref, err := project(ctx, p, o, map[string]bool{})
+	if err != nil {
+		return fmt.Errorf("%s: %w", p.Dir, err)
+	}
+	site.Projects[i] = ref
+	site.GeneratedAt = time.Now().UTC()
+	return writeJSON(path, site)
 }
 
 var idRe = regexp.MustCompile(`[^a-z0-9-]+`)
@@ -351,7 +387,7 @@ func project(ctx context.Context, p Project, o Options, used map[string]bool) (m
 	}
 	defer l.Close()
 	idx := l.Index
-	id := strings.Trim(idRe.ReplaceAllString(strings.ToLower(idx.Name), "-"), "-")
+	id := cmp.Or(p.id, strings.Trim(idRe.ReplaceAllString(strings.ToLower(idx.Name), "-"), "-"))
 	if id == "" {
 		id = "project"
 	}
