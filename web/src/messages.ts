@@ -48,6 +48,7 @@ const en = {
   grader: 'Grader:',
   saveChanges: 'Save changes',
   approveProposal: 'Approve',
+  checkOutToApprove: (b: string) => `Check out ${b} to approve or change this proposal.`,
   storyState: {
     proposed: 'Proposed',
     approved: 'Approved',
@@ -155,6 +156,13 @@ const en = {
   roles: { before: 'Before', action: 'Action', result: 'Result' } as Record<string, string>,
   observed: 'Observed',
   passedOnRetry: 'passed on retry',
+  counts: {
+    failed: (n: number) => `${n} failed`,
+    passed: (n: number) => `${n} passed`,
+    block: (n: number) => `${n} blocking`,
+    warn: (n: number) => `${n} ${n === 1 ? 'warning' : 'warnings'}`,
+    ok: (n: number) => `${n} within limits`,
+  },
   runsHeading: 'Runs',
   changesSince: (v: string) => `Changes since ${v}`,
   approvedBy: (n: string) => `Approved by ${n}`,
@@ -218,6 +226,7 @@ const zh: Messages = {
   grader: '评分说明：',
   saveChanges: '保存修改',
   approveProposal: '批准',
+  checkOutToApprove: (b) => `检出 ${b} 后才能批准或修改这个提议。`,
   storyState: {
     proposed: '提议中',
     approved: '已批准',
@@ -328,6 +337,13 @@ const zh: Messages = {
   roles: { before: '前提', action: '操作', result: '结果' },
   observed: '实际看到',
   passedOnRetry: '重试后通过',
+  counts: {
+    failed: (n) => `${n} 个失败`,
+    passed: (n) => `${n} 个通过`,
+    block: (n) => `${n} 个阻断`,
+    warn: (n) => `${n} 个警告`,
+    ok: (n) => `${n} 个在限制内`,
+  },
   runsHeading: '运行记录',
   changesSince: (v) => `自 ${v} 以来的更改`,
   approvedBy: (n) => `由 ${n} 批准`,

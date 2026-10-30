@@ -96,6 +96,7 @@ export interface Tag {
  */
 export interface Branch {
   name: string;
+  key: string;
   updated: string;
   ahead: string[];
   behind: number;

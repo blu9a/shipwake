@@ -3,9 +3,9 @@
 // folds its branch's history the same way.
 import { Link, useParams } from '@tanstack/react-router';
 import { Fragment, type ReactNode, startTransition, use, useState } from 'react';
-import { forget, loadMetricStories, loadProject, loadSession, loadStories } from '../data';
+import { forget, loadMetricStories, loadProject, loadSession, loadStories, type MetricStory, type StoryFeature } from '../data';
 import { commitLabel, day, targetName, tr, when } from '../format';
-import type { Commit, Project, Row, RunSummary, Tag } from '../model.gen';
+import type { Branch, Commit, Project, Row, RunSummary, Tag } from '../model.gen';
 import { inHistory, type Placed } from '../order';
 import { useSettings, useT } from '../settings';
 import { Icon, kindIcon, Tally } from '../ui';
@@ -18,33 +18,85 @@ export function TrunkView() {
   return <WorkspaceTimeline key={project} project={project} />;
 }
 
-const timelineFiles = (project: string) => ({
+/** The files a timeline reads: the project, and the requirements of the trunk or of one branch. */
+const timelineFiles = (project: string, branch?: string) => ({
   project: loadProject(project),
-  stories: loadStories(project),
-  metrics: loadMetricStories(project),
+  stories: loadStories(project, branch),
+  metrics: loadMetricStories(project, branch),
 });
 
-function WorkspaceTimeline({ project }: { project: string }) {
-  // The resources themselves are state: clearing a module cache cannot invalidate calls memoized
-  // by React Compiler. Replace the promises after a workspace change, keeping other drafts mounted.
-  const [files, setFiles] = useState(() => timelineFiles(project));
-  const p = use(files.project);
-  const stories = use(files.stories);
-  const metrics = use(files.metrics);
-  const session = use(loadSession());
-  const t = useT();
-  // What waits for a decision comes first. Pending proposals take the top place; the latest
-  // entry then joins the line like the others.
-  const pending = stories.filter((f) => f.scenarios.some((x) => x.state === 'proposed'));
-  const pendingMetrics = metrics.filter((m) => m.state === 'proposed');
+/** The timeline's files as state: clearing a module cache cannot invalidate calls memoized by React
+ *  Compiler. After a workspace change the promises are replaced, keeping other drafts mounted. */
+function useTimelineFiles(project: string, branch?: string) {
+  const [files, setFiles] = useState(() => timelineFiles(project, branch));
   const changed = async () => {
-    forget(`${project}/stories.json`);
-    forget(`${project}/metric-stories.json`);
+    const dir = branch ? `${project}/branches/${branch}` : project;
+    forget(`${dir}/stories.json`);
+    forget(`${dir}/metric-stories.json`);
     forget(`${project}/index.json`);
-    const next = timelineFiles(project);
+    const next = timelineFiles(project, branch);
     await Promise.all(Object.values(next));
     startTransition(() => setFiles(next));
   };
+  return { p: use(files.project), stories: use(files.stories), metrics: use(files.metrics), changed };
+}
+
+/** What waits for a decision on a branch, for the top of its timeline; nothing when nothing does.
+ *  Each branch shows its own requirements, and they can be changed only where they are checked out. */
+function pending(
+  project: string,
+  branch: string,
+  stories: StoryFeature[],
+  metrics: MetricStory[],
+  onChange: () => Promise<void>,
+): ReactNode {
+  const features = stories.filter((f) => f.scenarios.some((x) => x.state === 'proposed'));
+  const proposed = metrics.filter((m) => m.state === 'proposed');
+  if (features.length + proposed.length === 0) return undefined;
+  return <Pending project={project} branch={branch} features={features} metrics={proposed} onChange={onChange} />;
+}
+
+function Pending({
+  project,
+  branch,
+  features,
+  metrics: proposed,
+  onChange,
+}: {
+  project: string;
+  branch: string;
+  features: StoryFeature[];
+  metrics: MetricStory[];
+  onChange: () => Promise<void>;
+}) {
+  const session = use(loadSession());
+  const here = session.checkedOut?.[project] === branch;
+  const edit = session.edit && here;
+  const on = { name: branch, elsewhere: session.edit && !here };
+  return (
+    <>
+      {features.map((f) => (
+        <Proposal
+          key={f.path}
+          project={project}
+          branch={on}
+          f={f}
+          proposed={f.scenarios.filter((x) => x.state === 'proposed')}
+          edit={edit}
+          onChange={onChange}
+          folding
+        />
+      ))}
+      {proposed.map((m) => (
+        <MetricProposal key={m.id} project={project} branch={on} m={m} edit={edit} onChange={onChange} />
+      ))}
+    </>
+  );
+}
+
+function WorkspaceTimeline({ project }: { project: string }) {
+  const { p, stories, metrics, changed } = useTimelineFiles(project);
+  const t = useT();
   const trunk = new Set(p.rows.map((r) => r.sha));
   const entries = inHistory(
     p.rows.map((r) => r.sha),
@@ -85,29 +137,8 @@ function WorkspaceTimeline({ project }: { project: string }) {
           {t.newRelease}
         </Link>
       </header>
-      <Entries
-        entries={entries}
-        top={
-          pending.length + pendingMetrics.length > 0 && (
-            <>
-              {pending.map((f) => (
-                <Proposal
-                  key={f.path}
-                  project={project}
-                  f={f}
-                  proposed={f.scenarios.filter((x) => x.state === 'proposed')}
-                  edit={session.edit}
-                  onChange={changed}
-                  folding
-                />
-              ))}
-              {pendingMetrics.map((m) => (
-                <MetricProposal key={m.id} project={project} m={m} edit={session.edit} onChange={changed} />
-              ))}
-            </>
-          )
-        }
-      />
+      {/* What waits for a decision comes first; the latest entry then joins the line like the others. */}
+      <Entries entries={entries} top={pending(project, p.trunk, stories, metrics, changed)} />
     </>
   );
 }
@@ -118,6 +149,14 @@ export function BranchView() {
   const t = useT();
   const b = p.branches.find((x) => x.name === _splat);
   if (!b) return <p className="muted">{t.notFound}</p>;
+  return <BranchTimeline key={`${project}:${b.name}`} project={project} shown={b} />;
+}
+
+function BranchTimeline({ project, shown }: { project: string; shown: Branch }) {
+  const { p, stories, metrics, changed } = useTimelineFiles(project, shown.key);
+  const t = useT();
+  // as of the newest files: an approval made here adds a commit to the branch
+  const b = p.branches.find((x) => x.name === shown.name) ?? shown;
   const base = p.commits[b.base];
   const entries = inHistory(b.ahead, [
     ...b.ahead.map((sha) => ({
@@ -140,6 +179,7 @@ export function BranchView() {
       </header>
       <Entries
         entries={entries}
+        top={pending(project, b.name, stories, metrics, changed)}
         end={
           base && (
             <div className={s.end}>
@@ -286,7 +326,11 @@ function verdict(r: RunSummary, part: 'tests' | 'metrics') {
   return {
     cls: bad ? s.bad : warn ? s.warnRun : unjudged ? s.unjudged : '',
     unjudged,
-    tally: measured ? <Tally failed={tally?.block} warn={tally?.warn} passed={tally?.ok} /> : <Tally failed={r.failed} passed={r.passed} />,
+    tally: measured ? (
+      <Tally failed={tally?.block} warn={tally?.warn} passed={tally?.ok} measured />
+    ) : (
+      <Tally failed={r.failed} passed={r.passed} />
+    ),
   };
 }
 

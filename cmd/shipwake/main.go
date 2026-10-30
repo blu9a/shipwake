@@ -454,7 +454,7 @@ func storiesCmd() *cobra.Command {
 				return err
 			}
 			defer l.Close()
-			features, err := story.Build(cmd.Context(), l.Repo, l.Runs)
+			features, err := story.Build(cmd.Context(), l.Repo, l.Trunk, l.Runs)
 			if err != nil {
 				return err
 			}

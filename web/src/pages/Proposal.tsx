@@ -8,10 +8,18 @@ import { useSettings, useT } from '../settings';
 import { MetricEditor, MetricView } from './MetricText';
 import s from './Proposal.module.css';
 
+/** The branch a proposal is on. Approving commits to the checked-out branch, so it is offered only
+ *  there; served with another one checked out, the proposal says which to check out. */
+export interface Editing {
+  name: string;
+  elsewhere: boolean;
+}
+
 /** A feature's scenarios that aren't approved yet, in a dashed box. On the timeline it folds and
  *  names its feature. */
 export function Proposal({
   project,
+  branch,
   f,
   proposed,
   edit,
@@ -19,6 +27,7 @@ export function Proposal({
   folding,
 }: {
   project: string;
+  branch: Editing;
   f: StoryFeature;
   proposed: StoryScenario[];
   edit: boolean;
@@ -54,7 +63,7 @@ export function Proposal({
     const r = await fetch(`api/${project}/${what}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...body, branch: branch.name }),
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error ?? r.statusText);
@@ -121,6 +130,7 @@ export function Proposal({
           </button>
         </div>
       )}
+      {branch.elsewhere && <p className="muted small">{t.checkOutToApprove(branch.name)}</p>}
       {error && (
         <div className={s.error} role="alert">
           {error}
@@ -147,11 +157,13 @@ export function Proposal({
  *  they are edited as text, checked line by line as Shipwake reads them, and approved. */
 export function MetricProposal({
   project,
+  branch,
   m,
   edit,
   onChange,
 }: {
   project: string;
+  branch: Editing;
   m: MetricStory;
   edit: boolean;
   onChange: () => Promise<void>;
@@ -187,7 +199,7 @@ export function MetricProposal({
     const r = await fetch(`api/${project}/${what}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...body, branch: branch.name }),
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error ?? r.statusText);
@@ -236,6 +248,7 @@ export function MetricProposal({
           </button>
         </div>
       )}
+      {branch.elsewhere && <p className="muted small">{t.checkOutToApprove(branch.name)}</p>}
       {error && (
         <div className={s.error} role="alert">
           {error}
