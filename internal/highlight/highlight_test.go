@@ -26,3 +26,18 @@ func TestLines(t *testing.T) {
 		t.Error("unknown language should not be highlighted")
 	}
 }
+
+func TestBlob(t *testing.T) {
+	Forget()
+	src := "package main\n"
+	if got := Blob("abc", "a/main.go", src); len(got) != 1 || got[0] != "k7_5" {
+		t.Fatalf("Go = %q", got)
+	}
+	// The same object under another name is read in that name's language.
+	if got := Blob("abc", "notes.unknownext", src); got != nil {
+		t.Errorf("unknown language = %q", got)
+	}
+	if got := Blob("abc", "b/main.go", src); len(got) != 1 || got[0] != "k7_5" {
+		t.Errorf("Go again = %q", got)
+	}
+}
