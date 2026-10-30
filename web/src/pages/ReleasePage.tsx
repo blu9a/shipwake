@@ -191,8 +191,9 @@ export function ReleasePage() {
       </section>
 
       <section className={s.sec}>
-        {session.edit ? (
-          // Served locally: approving creates the tag, as the person.
+        {session.edit && !session.projects?.[project]?.local ? (
+          // Served locally: approving creates the tag, as the person. In local mode nothing is written into
+          // the repository, so the page gives the command instead.
           <Tag key={version} p={p} version={version} sha={head.sha} notes={notes} blocked={blocked} />
         ) : (
           <>

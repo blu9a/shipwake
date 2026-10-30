@@ -105,8 +105,15 @@ export interface Session {
   edit: boolean;
   user: string;
   checkedOut?: Record<string, string>; // project → its checked-out branch, where approvals are committed
+  projects?: Record<string, { repo: string; workspace: string; local: boolean }>; // where each is on this machine
+  skill?: string; // the agent skill's file
 }
 let session: Promise<Session> | undefined;
+/** After opening a repository: the site and the session list one more project. */
+export const forgetSite = () => {
+  session = undefined;
+  forget('site.json');
+};
 export const loadSession = () => {
   session ??= fetch('api/session')
     .then((r) => (r.ok ? (r.json() as Promise<Session>) : { edit: false, user: '' }))

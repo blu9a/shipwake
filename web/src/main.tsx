@@ -10,13 +10,14 @@ import {
   useParams,
   useRouterState,
 } from '@tanstack/react-router';
-import { StrictMode, Suspense, use } from 'react';
+import { StrictMode, Suspense, use, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './tokens.css';
 import './app.css';
-import { loadProject, loadSite } from './data';
+import { loadProject, loadSession, loadSite } from './data';
 import { CommitPage } from './pages/CommitPage';
 import { MeasurePage } from './pages/MeasurePage';
+import { OpenPage } from './pages/OpenPage';
 import { ReleasePage } from './pages/ReleasePage';
 import { RunPage } from './pages/RunPage';
 import { BranchView, TrunkView } from './pages/Timeline';
@@ -64,6 +65,11 @@ function TopBar() {
         </Suspense>
       )}
       <span className="grow" />
+      {project && (
+        <Suspense fallback={null}>
+          <AgentPrompt project={project.id} />
+        </Suspense>
+      )}
       <SettingsMenu />
     </header>
   );
@@ -71,9 +77,10 @@ function TopBar() {
 
 function ProjectPicker({ current }: { current: string }) {
   const site = use(loadSite());
+  const session = use(loadSession());
   const t = useT();
   const name = site.projects.find((p) => p.id === current)?.name ?? current;
-  if (site.projects.length < 2)
+  if (site.projects.length < 2 && !session.edit)
     return (
       <span className="crumb" title={name}>
         {name}
@@ -91,13 +98,27 @@ function ProjectPicker({ current }: { current: string }) {
         </>
       }
     >
-      {(close) =>
-        site.projects.map((p) => (
-          <Link key={p.id} to="/$project" params={{ project: p.id }} className={`menuItem ${p.id === current ? 'on' : ''}`} onClick={close}>
-            <span className="menuLabel">{p.name}</span>
-          </Link>
-        ))
-      }
+      {(close) => (
+        <>
+          {site.projects.map((p) => (
+            <Link
+              key={p.id}
+              to="/$project"
+              params={{ project: p.id }}
+              className={`menuItem ${p.id === current ? 'on' : ''}`}
+              onClick={close}
+            >
+              <span className="menuLabel">{p.name}</span>
+            </Link>
+          ))}
+          {session.edit && (
+            <Link to="/open" className="menuItem" onClick={close}>
+              <Icon name="plus" />
+              <span className="menuLabel">{t.openRepo}</span>
+            </Link>
+          )}
+        </>
+      )}
     </Menu>
   );
 }
@@ -148,6 +169,43 @@ function BranchPicker({ project }: { project: string }) {
   );
 }
 
+/** Served locally: a prompt that hands an agent the skill and every path it needs, ready to copy. */
+function AgentPrompt({ project }: { project: string }) {
+  const session = use(loadSession());
+  const t = useT();
+  const [copied, setCopied] = useState(false);
+  const where = session.projects?.[project];
+  if (!session.edit || !where || !session.skill) return null;
+  const text = t.prompt({
+    skill: session.skill,
+    repo: where.repo,
+    branch: session.checkedOut?.[project] ?? '',
+    workspace: where.local ? where.workspace : undefined,
+  });
+  return (
+    <Menu label={t.agentPrompt} align="end" button={<Icon name="agent" size={18} />}>
+      {() => (
+        <div className="prompt">
+          <span>{t.agentPrompt}</span>
+          <pre className="mono">{text}</pre>
+          <button
+            type="button"
+            className="copy"
+            onClick={() =>
+              navigator.clipboard
+                ?.writeText(text)
+                .then(() => setCopied(true))
+                .catch(() => setCopied(false))
+            }
+          >
+            {copied ? t.copied : t.copy}
+          </button>
+        </div>
+      )}
+    </Menu>
+  );
+}
+
 function SettingsMenu() {
   const { lang, mode, setLang, setMode } = useSettings();
   const t = useT();
@@ -193,7 +251,9 @@ const indexRoute = createRoute({
     const first = site.projects[0];
     if (first) throw redirect({ to: '/$project', params: { project: first.id } });
   },
+  component: OpenPage, // nothing opened yet
 });
+const openRoute = createRoute({ getParentRoute: () => rootRoute, path: 'open', component: OpenPage });
 const trunkRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project', component: TrunkView });
 const branchRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/branch/$', component: BranchView });
 const commitRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/commit/$sha', component: CommitPage });
@@ -203,7 +263,17 @@ const measureRoute = createRoute({ getParentRoute: () => rootRoute, path: '$proj
 const releaseRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/release', component: ReleasePage });
 
 const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, trunkRoute, branchRoute, commitRoute, runRoute, watchRoute, measureRoute, releaseRoute]),
+  routeTree: rootRoute.addChildren([
+    indexRoute,
+    openRoute,
+    trunkRoute,
+    branchRoute,
+    commitRoute,
+    runRoute,
+    watchRoute,
+    measureRoute,
+    releaseRoute,
+  ]),
   history: createHashHistory(),
   scrollRestoration: true,
   defaultPreload: 'intent',

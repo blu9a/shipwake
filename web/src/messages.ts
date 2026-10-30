@@ -102,6 +102,21 @@ const en = {
   dark: 'Dark',
   settings: 'Settings',
   projects: 'Projects',
+  openRepo: 'Open a repository',
+  repoPath: 'Repository path',
+  open: 'Open',
+  agentPrompt: 'Prompt for an agent',
+  prompt: (a: { skill: string; repo: string; branch: string; workspace?: string }) =>
+    [
+      `Use Shipwake for the repository ${a.repo}${a.branch ? `, branch ${a.branch}` : ''}.`,
+      `First read the Shipwake skill: ${a.skill}`,
+      ...(a.workspace
+        ? [
+            '',
+            `The project is in local mode: its .shipwake.yaml, features, metrics, converters and results are in the workspace ${a.workspace}, a Git repository of its own, on the branch of the same name. Write and commit Shipwake's files there, never in ${a.repo}. Test code stays in ${a.repo}, as usual.`,
+          ]
+        : []),
+    ].join('\n'),
   notFound: 'Not found',
   newRelease: 'New release',
   version: 'Version',
@@ -280,6 +295,21 @@ const zh: Messages = {
   dark: '深色',
   settings: '设置',
   projects: '项目',
+  openRepo: '打开仓库',
+  repoPath: '仓库路径',
+  open: '打开',
+  agentPrompt: '给智能体的提示',
+  prompt: (a) =>
+    [
+      `为仓库 ${a.repo}${a.branch ? `（分支 ${a.branch}）` : ''}使用 Shipwake。`,
+      `先阅读 Shipwake 技能：${a.skill}`,
+      ...(a.workspace
+        ? [
+            '',
+            `这个项目处于本地模式：它的 .shipwake.yaml、场景、指标、转换器和结果都在工作区 ${a.workspace} 中，这是一个独立的 Git 仓库，使用同名分支。Shipwake 的文件请写在那里并在那里提交，不要放进 ${a.repo}。测试代码照常放在 ${a.repo} 中。`,
+          ]
+        : []),
+    ].join('\n'),
   notFound: '没有找到',
   newRelease: '新版本',
   version: '版本号',

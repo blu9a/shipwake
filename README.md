@@ -104,6 +104,9 @@ branch to origin, with `--push` or the GitHub Action's `push: true`:
 
 To remove it, delete that branch, the CI steps and the config. Nothing else depends on it.
 
+**To try it without changing the repository at all,** use [local mode](docs/local-mode.md): `shipwake serve`, then
+open the repository by its path. Its requirements, settings and runs stay in a workspace on your machine.
+
 ### Your first day
 
 The first build shows your history straight away: the trunk as merges and commits, releases with their notes (from
@@ -134,6 +137,7 @@ Trends fill in as CI records each change. To have them now, record your recent r
 - [CI](docs/ci.md): GitHub Actions, GitLab, others; publishing the site
 - [Releases](docs/releases.md): the changelog, notes in tags, approval
 - [Compatibility](docs/compatibility.md): what upgrades keep working, recorded results above all
+- [Local mode](docs/local-mode.md): trying Shipwake on a repository without writing anything into it
 - [Playwright reporter](packages/playwright/README.md): steps, screenshots, recordings and what was observed
 - [Agent skill](skill/shipwake/SKILL.md): setting Shipwake up, writing converters, drafting release notes
 
@@ -181,7 +185,7 @@ Apache-2.0.
 
 **交给你的智能体。** 把 [Shipwake 技能](skill/shipwake/SKILL.md)交给它，让它在你的仓库里接入 Shipwake。接入是智能体的工作：找到你的测试工具，记录它们的结果（格式还不支持时写一个小转换器），并为产品现有的行为提出场景，供你批准。也可以按英文部分的命令手动开始。
 
-**它会改动仓库里的什么：** 记录第一次运行时，一个与代码不共享历史的 `shipwake-results` 分支；可选的 `.shipwake.yaml`；CI 里每个测试命令后的一步；采用场景和指标时的 `.feature`、`.metric` 文件；从 Shipwake 发布时的 `CHANGELOG.md`、一个 `chore(release)` 提交和标签。你的代码、构建和测试都不会被改动。Shipwake 从不主动推送；要在 CI 中保留运行结果，用 `--push` 或 GitHub Action 的 `push: true`。移除它只需删除那个分支、CI 步骤和配置。
+**它会改动仓库里的什么：** 记录第一次运行时，一个与代码不共享历史的 `shipwake-results` 分支；可选的 `.shipwake.yaml`；CI 里每个测试命令后的一步；采用场景和指标时的 `.feature`、`.metric` 文件；从 Shipwake 发布时的 `CHANGELOG.md`、一个 `chore(release)` 提交和标签。你的代码、构建和测试都不会被改动。Shipwake 从不主动推送；要在 CI 中保留运行结果，用 `--push` 或 GitHub Action 的 `push: true`。移除它只需删除那个分支、CI 步骤和配置。想完全不改动仓库地试用，用[本地模式](docs/local-mode.md)：运行 `shipwake serve`，再按路径打开仓库；它的需求、配置和运行记录都留在你机器上的工作区里。
 
 **第一天：** 第一次构建就能看到全部历史（提交、合并、发布、分支、每个提交的改动）。智能体可以为产品现有的行为提出场景，批准之后每次变更都会以它们为准。结果从第一次记录开始积累；想马上看到趋势，可以在最近的几个版本上各运行一次并记录（见英文部分的 “Your first day”）。
 

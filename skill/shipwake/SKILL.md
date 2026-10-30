@@ -13,6 +13,15 @@ decide a verdict.
 Commands: `shipwake init | add | build | serve | check | doctor | formats | schema`. Run
 `shipwake <command> --help` for flags. Docs: `docs/` in the Shipwake repository.
 
+## Local mode
+
+If the person's prompt names a workspace, the project is in local mode: Shipwake writes nothing into the
+repository. Write `.shipwake.yaml`, `.feature` and `.metric` files and converters in the workspace, on the branch
+named like the repository's checked-out one, and commit them there; never add them to the repository. Test code
+(step definitions, test config) goes in the repository as usual, reading features from the workspace's path.
+Record runs with `shipwake add` from the repository as usual: it stores them in the workspace. See
+`docs/local-mode.md`.
+
 ## Adopt Shipwake in a repository
 
 1. Run `shipwake init` and read what it found. It changes nothing.

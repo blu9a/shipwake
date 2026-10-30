@@ -116,7 +116,6 @@ func (w *workspace) approveMetric(repo gitx.Repo, path string) (any, error) {
 	if err := os.WriteFile(filepath.Join(repo.Dir, path), []byte(text), 0o644); err != nil {
 		return nil, err
 	}
-	user, _ := repo.Git(w.ctx, "config", "user.name")
-	email, _ := repo.Git(w.ctx, "config", "user.email")
+	user, email := w.person(repo)
 	return w.commit(repo, path, fmt.Sprintf("spec: approve the metric %q\n\nApproved-by: %s <%s>", s.Name, strings.TrimSpace(user), strings.TrimSpace(email)))
 }
