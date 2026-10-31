@@ -141,17 +141,27 @@ your tests record, so the recording should show it plainly.
   not the page) and marks it, with `shipwake-playwright`:
   `await decisive(total, testInfo, 'the shares add up to 100.00', ['100.00'])`. That draws a box around it in the
   recording, attaches a screenshot and records the text actually seen, shown as "Observed" under the
-  scenario's result. Use the step's text without its keyword as the name. A result checked outside the page (a
-  file, a commit) has no box: assert it directly.
+  scenario's result. Use the step's text without its keyword as the name. Mark the element whose text shows the
+  result: an icon-only button has none to observe, so mark what it sits in (the chip, the row). A result checked
+  outside the page (a file, a commit) has no box: assert it directly.
+- **Without a Gherkin runner, the steps are still the scenario's.** Subtitles and step results come from the
+  test's steps. With plain Playwright tests, wrap each line in `test.step`, named with the line exactly as the
+  `.feature` file has it (Background lines too), and add a check that fails when the lines a test ran differ from
+  the file's: otherwise the subtitles drift from what was approved.
 - **Recordings are made to be watched.** Call `showPointer(page)` and `slowClicks(page)`, go through the product
   the way a person would (click, don't navigate to inner addresses), and leave the result on screen a moment
   before the test ends.
+- **Record the product as it ships.** Point recorded runs at a production build (a preview server or the built
+  files), not a development server: a dev server can take seconds to show the first page, and every recording
+  starts with that wait. Set the recording's size to each project's viewport (`video: { mode: 'on', size }`);
+  Playwright otherwise scales it down until the text is hard to read. Recording can stay behind a switch, such as
+  an environment variable, so everyday runs stay fast.
 - **Steps read like a person describing the product,** one behavior per scenario. Find elements by role and
   visible text, never by styling classes; wait for what the person would wait for, never a fixed time.
 - **Check your work as far as you can:**
   - If you can run the tests, run them with the reporter and look at the run in `shipwake serve`.
-  - If you can see images, open the decisive screenshots and a few frames of each recording, and confirm the box
-    is on what its step names and the screen shows what the scenario says.
+  - If you can see images, open the decisive screenshots and a few frames of each recording, its first second
+    among them, and confirm the box is on what its step names and the screen shows what the scenario says.
   - What you couldn't check, say so plainly. Never imply you checked it.
 - An approved scenario's test is never weakened, skipped or deleted to get a pass.
 
