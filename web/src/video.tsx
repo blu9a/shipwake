@@ -200,56 +200,101 @@ const isBlank = (data: Uint8ClampedArray) => {
 
 const once = (el: EventTarget, event: string) => new Promise<void>((ok) => el.addEventListener(event, () => ok(), { once: true }));
 
-/** Finds the blank stretches of a recording by sampling a hidden copy of it, about ten times a second, and
- *  says how it read it: its length and samples. */
-async function findBlanks(src: string, signal: AbortSignal): Promise<{ blanks: Blank[]; scan: string }> {
+/** Reads frames of a recording from a hidden copy of it. */
+async function openReader(src: string) {
   const v = document.createElement('video');
   v.muted = true;
   v.preload = 'auto';
   v.src = src;
   await once(v, 'loadeddata');
-  // Recordings written as they're made may not state their length: then the scan walks on until a step
-  // can't go further. (Jumping to the end first to learn it leaves the last frame on screen, which a slow
-  // machine can still show at the next step.)
-  let duration = Number.isFinite(v.duration) ? v.duration : Number.POSITIVE_INFINITY;
-  const step = Number.isFinite(duration) ? Math.max(0.1, duration / 400) : 0.1;
   const small = document.createElement('canvas');
   small.width = 48;
   small.height = 27;
   const ctx = small.getContext('2d', { willReadFrequently: true });
-  if (!ctx || duration <= 0) return { blanks: [], scan: 'unreadable' };
-  const picture = () => {
-    const c = document.createElement('canvas');
-    c.width = v.videoWidth;
-    c.height = v.videoHeight;
-    c.getContext('2d')?.drawImage(v, 0, 0);
-    return c.toDataURL('image/jpeg', 0.9);
+  if (!ctx) throw new Error('no canvas');
+  // Recordings written as they're made may not state their length: then it's learned when a seek can't go
+  // further. (Jumping to the end first to learn it leaves the last frame on screen, which a slow machine can
+  // still show at the next seek.)
+  let duration = Number.isFinite(v.duration) ? v.duration : Number.POSITIVE_INFINITY;
+  return {
+    get duration() {
+      return duration;
+    },
+    /** Goes to `t`; false past the end, which it then knows. */
+    async seek(t: number) {
+      v.currentTime = t;
+      await once(v, 'seeked');
+      if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) await once(v, 'loadeddata'); // the frame itself
+      if (!Number.isFinite(duration) && v.currentTime < t - 0.001) {
+        duration = v.currentTime; // the last frame: the recording ends here
+        return false;
+      }
+      return t < duration;
+    },
+    blank() {
+      ctx.drawImage(v, 0, 0, small.width, small.height);
+      return isBlank(ctx.getImageData(0, 0, small.width, small.height).data);
+    },
+    picture() {
+      const c = document.createElement('canvas');
+      c.width = v.videoWidth;
+      c.height = v.videoHeight;
+      c.getContext('2d')?.drawImage(v, 0, 0);
+      return c.toDataURL('image/jpeg', 0.9);
+    },
+    close() {
+      v.removeAttribute('src');
+      v.load();
+    },
   };
-  const seek = async (t: number) => {
-    v.currentTime = t;
-    await once(v, 'seeked');
-    if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) await once(v, 'loadeddata'); // the frame itself
-  };
-  const out: Blank[] = [];
-  let good: number | undefined; // the last sample that showed something
-  let open: Blank | undefined;
-  let samples = 0;
-  for (let t = 0; t < duration && t < 3600 && !signal.aborted; t += step) {
-    await seek(t);
-    if (!Number.isFinite(duration) && v.currentTime < t - 0.001) {
-      duration = v.currentTime; // the last frame: the recording ends here
+}
+type Reader = Awaited<ReturnType<typeof openReader>>;
+
+/** Where the page first shows something, to a tenth of a second, in a handful of seeks: doubling until a
+ *  frame shows something, then halving the gap. The whole length when it never does. The very first frame
+ *  doesn't count: recorders often put a placeholder there, drawn before the page was. */
+async function findOpening(r: Reader): Promise<number> {
+  let lo = 0;
+  for (const t of [0.1, 0.3]) {
+    if (!(await r.seek(t))) return 0; // too short to tell
+    if (r.blank()) lo = t;
+  }
+  if (lo === 0) return 0;
+  let hi = lo * 2;
+  for (;;) {
+    if (!(await r.seek(hi))) {
+      hi = r.duration;
       break;
     }
+    if (!r.blank()) break;
+    lo = hi;
+    hi *= 2;
+  }
+  while (hi - lo > 0.1) {
+    const mid = (lo + hi) / 2;
+    if ((await r.seek(mid)) && r.blank()) lo = mid;
+    else hi = mid;
+  }
+  return Math.min(hi, r.duration);
+}
+
+/** The blank stretches after the opening, sampled about ten times a second, each with the last picture
+ *  before it; and how it read the recording: its length and samples. */
+async function findLaterBlanks(r: Reader, opening: number, signal: AbortSignal): Promise<{ blanks: Blank[]; scan: string }> {
+  const step = Number.isFinite(r.duration) ? Math.max(0.1, r.duration / 400) : 0.1;
+  const out: Blank[] = [];
+  let good = opening; // the last sample that showed something
+  let open: Blank | undefined;
+  let samples = 0;
+  for (let t = opening; t < 3600 && !signal.aborted; t += step) {
+    if (!(await r.seek(t))) break;
     samples++;
-    ctx.drawImage(v, 0, 0, small.width, small.height);
-    const blank = isBlank(ctx.getImageData(0, 0, small.width, small.height).data);
+    const blank = r.blank();
     if (blank && !open) {
-      open = { start: t, end: duration };
-      if (good !== undefined) {
-        await seek(good); // the picture it holds: the last one before it
-        open.still = picture();
-        await seek(t);
-      }
+      open = { start: t, end: r.duration };
+      await r.seek(good); // the picture it holds: the last one before it
+      open.still = r.picture();
+      await r.seek(t);
     }
     if (!blank) {
       good = t;
@@ -260,40 +305,95 @@ async function findBlanks(src: string, signal: AbortSignal): Promise<{ blanks: B
       }
     }
   }
-  if (!Number.isFinite(duration)) duration = v.currentTime;
   if (open) {
-    open.end = duration;
+    open.end = r.duration;
     out.push(open);
   }
-  v.removeAttribute('src');
-  v.load();
-  return { blanks: out, scan: `${duration.toFixed(2)} s, ${samples} samples` };
+  return { blanks: out, scan: `${r.duration.toFixed(2)} s, ${samples} samples` };
 }
+
+/** How long a recording waits, dark, for its opening to be found before it plays as recorded. */
+const holdAtMost = 4000;
 
 /** Keeps a recording from showing blank screens: it starts where the page first shows something, and a
  *  blank stretch later on shows the last picture instead, held until the page is back. Subtitles stay in
- *  step, since the recording itself plays on underneath. The picture to show now, if any. */
+ *  step, since the recording itself plays on underneath. The picture to show now, if any.
+ *
+ *  The opening is found first, in a few seeks, and until then the recording waits, dark: started
+ *  early, it would show the blank start it's about to skip. The rest is scanned while it plays. */
 export function useNoBlanks(ref: RefObject<HTMLVideoElement | null>, src: string) {
-  const [blanks, setBlanks] = useState<Blank[]>([]);
+  // what the scan found, for the recording it was made for: a new one starts from nothing
+  const [found, setFound] = useState<{ src: string; opening?: number; blanks: Blank[] }>({ src: '', blanks: [] });
   const [still, setStill] = useState<string>();
+  const mine = found.src === src;
+  const opening = mine ? found.opening : undefined;
+  const blanks = mine ? found.blanks : [];
   useEffect(() => {
     const ctl = new AbortController();
-    setBlanks([]);
     setStill(undefined);
+    setFound({ src, blanks: [] });
+    if (ref.current) for (const k of ['opening', 'blanks', 'scan']) delete ref.current.dataset[k];
     if (!src) return;
-    findBlanks(src, ctl.signal)
-      .then(({ blanks: b, scan }) => {
-        if (ctl.signal.aborted) return;
-        // the scan's result, for anyone checking the player: blank stretches as start-end seconds
-        if (ref.current) {
-          ref.current.dataset.blanks = b.map((x) => `${x.start.toFixed(1)}-${x.end.toFixed(1)}`).join(' ');
-          ref.current.dataset.scan = scan; // for anyone checking the player
-        }
-        setBlanks(b);
-      })
-      .catch(() => {}); // unreadable: shown as recorded
-    return () => ctl.abort();
+    const release = (at: number) => setFound((f) => (f.src === src && f.opening === undefined ? { ...f, opening: at } : f));
+    const late = setTimeout(() => release(0), holdAtMost); // slow to read: shown as recorded
+    let reader: Reader | undefined;
+    (async () => {
+      reader = await openReader(src);
+      const start = await findOpening(reader);
+      if (ctl.signal.aborted) return;
+      if (ref.current) ref.current.dataset.opening = start.toFixed(1); // for anyone checking the player
+      release(start);
+      const lead: Blank[] = start > 0 ? [{ start: 0, end: start }] : [];
+      const { blanks: later, scan } = await findLaterBlanks(reader, start, ctl.signal);
+      if (ctl.signal.aborted) return;
+      const all = [...lead, ...later];
+      // the scan's result, for anyone checking the player: blank stretches as start-end seconds
+      if (ref.current) {
+        ref.current.dataset.blanks = all.map((x) => `${x.start.toFixed(1)}-${x.end.toFixed(1)}`).join(' ');
+        ref.current.dataset.scan = scan;
+      }
+      setFound({ src, opening: start, blanks: all });
+    })()
+      .catch(() => release(0)) // unreadable: shown as recorded
+      .finally(() => {
+        clearTimeout(late);
+        reader?.close();
+      });
+    return () => {
+      ctl.abort();
+      clearTimeout(late);
+    };
   }, [ref, src]);
+  // Until the opening is known, the recording waits, dark; then it starts there, playing if it was
+  // asked to meanwhile.
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || !src || !mine) return;
+    if (opening === undefined) {
+      delete v.dataset.wanted;
+      let wanted = !v.paused;
+      const hold = () => {
+        wanted = true;
+        v.pause();
+      };
+      // dark, as the player is before a recording loads: the frame it has may well be blank
+      v.dataset.holding = '';
+      v.style.filter = 'brightness(0)';
+      if (!v.paused) v.pause();
+      v.addEventListener('play', hold);
+      return () => {
+        v.removeEventListener('play', hold);
+        delete v.dataset.holding;
+        v.style.filter = '';
+        if (wanted) v.dataset.wanted = '1';
+      };
+    }
+    if (v.currentTime < opening) v.currentTime = opening;
+    if (v.dataset.wanted) {
+      delete v.dataset.wanted;
+      v.play().catch(() => {});
+    }
+  }, [ref, src, mine, opening]);
   useEffect(() => {
     const v = ref.current;
     if (!v || blanks.length === 0) return;

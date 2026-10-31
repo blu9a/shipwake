@@ -12,7 +12,7 @@ npm i -D shipwake-playwright
 ```ts
 // playwright.config.ts
 reporter: [['list'], ['shipwake-playwright/reporter', { outputFile: 'shipwake/run.json', name: 'Web tests' }]],
-use: { video: 'on' },
+use: { viewport: { width: 1280, height: 720 }, video: { mode: 'on', size: { width: 1280, height: 720 } } },
 ```
 
 ```sh
