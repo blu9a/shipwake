@@ -40,15 +40,29 @@ Given('a scenario recorded while its page was still blank for the first second',
 
 When("I open the scenario's recording", async ({ page, served, world }) => {
   world.video = await openRecording(page, served, 'Late page');
+  // every frame the player puts on screen, with whether it could be seen
+  await world.video.evaluate((v) => {
+    v.shown = [];
+    const note = (_now, frame) => {
+      v.shown.push({ at: frame.mediaTime, seen: v.dataset.holding === undefined });
+      v.requestVideoFrameCallback(note);
+    };
+    v.requestVideoFrameCallback(note);
+  });
 });
 
 Then('it shows the page from the start, not a blank screen', async ({ world }) => {
-  // once the player has found the blank start, it stands, still paused, where the page first shows something
-  await expect(world.video).toHaveAttribute('data-scan', /samples/, { timeout: 30000 });
-  const scan = await world.video.evaluate((v) => `${v.dataset.scan}; blank: ${v.dataset.blanks || 'none'}`);
-  expect(scan, 'the scan should find the blank first second').toMatch(/blank: 0\.0-1\.\d/);
-  await expect.poll(() => at(world.video), { timeout: 5000 }).toBeGreaterThan(0.9);
-  expect(await world.video.evaluate((v) => v.paused)).toBe(true);
+  // played straight away, as a person would, before anything has had time to look at it
+  await world.video.evaluate((v) => {
+    v.muted = true;
+    v.playbackRate = 1;
+    return v.play();
+  });
+  await expect.poll(() => world.video.evaluate((v) => v.ended || v.currentTime > 2.2), { timeout: 15000 }).toBe(true);
+  const blankSeen = await world.video.evaluate((v) => v.shown.filter((f) => f.seen && f.at < 1.1).map((f) => f.at.toFixed(2)));
+  expect(blankSeen, 'frames of the blank first second that were on screen').toEqual([]);
+  expect(await world.video.evaluate((v) => v.shown.some((f) => f.seen)), 'the page itself was shown').toBe(true);
+  await expect(world.video).toHaveAttribute('data-opening', /^1\.[1-3]$/);
 });
 
 Given('a scenario recorded while its page went blank for a second in the middle', async ({ repo }) => {
