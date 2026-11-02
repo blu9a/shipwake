@@ -60,7 +60,8 @@ jobs:
       - run: shipwake check                      # before a release: against the last release
 ```
 
-`check` exits 1 when a test run on the commit has failures, or a measurement crosses a blocking threshold.
+`check` exits 1 when a test run on the commit has failures, a measurement crosses a blocking threshold, or a
+screenshot looks different from its approved look or is new and nobody approved it ([visual review](visual-review.md)).
 Warnings are printed and don't fail. `--json` prints the verdict for other tools.
 
 ## GitLab CI

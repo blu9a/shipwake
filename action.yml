@@ -1,5 +1,5 @@
 name: Shipwake
-description: Record test, eval and performance results with the commit they tested, on a branch of your repository.
+description: Record test, eval and performance results, and the screenshots they took, with the commit they tested, on a branch of your repository.
 branding:
   icon: git-commit
   color: blue

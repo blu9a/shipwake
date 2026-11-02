@@ -38,7 +38,14 @@ lines of YAML: no code, checked against a real report, and against the tool's ow
 
 For Playwright, start with its own JSON reporter (`-f playwright`): scenarios, steps, errors, screenshots and
 videos. The [`shipwake-playwright`](../packages/playwright/README.md) reporter adds subtitles in step with
-each recording, Gherkin Background steps in their place, and helpers that mark what a result step checked.
+each recording, Gherkin Background steps in their place, and helpers that mark what a result step checked
+and take screenshots for visual review.
+
+## Screenshots for visual review
+
+An image attachment named `look: <subject>` or `look: <subject> [<variant>]`, such as
+`look: Bill row [dark, phone]`, is compared with the look approved for it. See
+[Reviewing how things look](visual-review.md).
 
 ## Shipwake's own format
 
@@ -88,5 +95,5 @@ Thresholds turn the comparisons into OK, Warning and Blocking. See [Configuratio
 ## Where results are stored
 
 The default is the branch `shipwake-results` in the same repository. Each run is a JSON file under
-`runs/`, with its attachments under `files/<run id>/`. A directory works as well (`-r ../results`), for
+`runs/`, with its attachments under `files/<run id>/`; approved looks are under `looks/`. A directory works as well (`-r ../results`), for
 example a CI artifact, a mounted volume or another repository's checkout.

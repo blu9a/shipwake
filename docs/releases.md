@@ -16,6 +16,7 @@ Open **New release** on the trunk. The page shows:
 
 - a suggested version: a minor version when a feature was merged since the last release, a patch otherwise;
 - **checks** on the newest trunk commit: tests that ran on it, measurements against the last release,
+  screenshots that look different from their approved looks or are new ([visual review](visual-review.md)),
   the version, and notes in each configured language;
 - the **notes**, one tab per language, and a preview.
 

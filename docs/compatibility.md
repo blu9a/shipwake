@@ -16,6 +16,10 @@ field existed are format 1.
 - **A run in a format newer than the Shipwake reading it is refused by name,** with the file and the
   version to upgrade to, rather than misread.
 
+Approved looks (`looks/<id>.json` beside the runs, see [visual review](visual-review.md)) follow the same
+promises: their fields only grow, and an older Shipwake leaves them alone. The pixel comparison's threshold
+and anti-aliasing rule are part of the verdict: a change to either is listed as a breaking change.
+
 The same holds for [Shipwake's JSON format](recording.md#shipwakes-own-format) that converters and
 scripts write: its `schemaVersion` is optional, and a file without it is format 1.
 

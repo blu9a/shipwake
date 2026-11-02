@@ -1,6 +1,6 @@
 ---
 name: shipwake
-description: Set up and use Shipwake in a repository. Use it to record test, eval, performance or benchmark results with the commit they tested, wire Shipwake into CI, convert a tool's output to Shipwake's run format, propose scenarios, metrics and thresholds for the person to approve, translate project text, explain what a change did to tests and measurements, or draft release notes.
+description: Set up and use Shipwake in a repository. Use it to record test, eval, performance or benchmark results with the commit they tested, wire Shipwake into CI, convert a tool's output to Shipwake's run format, propose scenarios, metrics and thresholds for the person to approve, record screenshots for visual review, translate project text, explain what a change did to tests, measurements and how things look, or draft release notes.
 ---
 
 # Shipwake
@@ -10,7 +10,7 @@ commits, releases and the runs on them. Results are stored on the orphan branch 
 Verdicts are deterministic. Your job is around them: setup, converters, drafts and explanations. You never
 decide a verdict.
 
-Commands: `shipwake init | add | build | serve | check | doctor | formats | schema`. Run
+Commands: `shipwake init | add | build | serve | check | looks | doctor | formats | schema`. Run
 `shipwake <command> --help` for flags. Docs: `docs/` in the Shipwake repository.
 
 ## Get started
@@ -155,6 +155,18 @@ your tests record, so the recording should show it plainly.
   - What you couldn't check, say so plainly. Never imply you checked it.
 - An approved scenario's test is never weakened, skipped or deleted to get a pass.
 
+## Record how things look
+
+Where how the product looks matters, screenshot each component or screen in the tests, in the variants the
+person cares about, with `shipwake-playwright`: `await look(row, testInfo, 'Bill row', ['dark', 'phone'])`. The
+attachment is named `look: Bill row [dark, phone]`; Shipwake compares it pixel by pixel with the look approved for
+that subject and variant (`docs/visual-review.md`). Keep subjects and variants stable: a new name is a new look.
+Take them on one kind of machine, with animations stopped and changing data (dates, random names) fixed.
+
+`shipwake looks --commit <sha>` lists what is the same, changed or new; `shipwake check` fails on a changed or
+new look until it is approved. Approving a look is the person's decision: show them the look's page in
+`shipwake serve`, and never run `shipwake looks approve` yourself unless they ask.
+
 ## Propose a metric
 
 Where outputs vary (agent features, ranking, performance), a requirement is a number. Write it as a `.metric`
@@ -201,7 +213,8 @@ shipwake check --commit <sha> --against previous --json
 ```
 
 Each check has the run ID (`runs/<id>.json` on the results branch), and for a measurement its `metric` ID and
-the `baseline` run it was compared with. For a failing test, read the run file: `tests[].error`,
+the `baseline` run it was compared with; a check of kind `look` names the screenshot (`look`) that changed or is
+new, and `shipwake looks --commit <sha> --json` gives its approved look and how many pixels differ. For a failing test, read the run file: `tests[].error`,
 `steps`, and `evidence`, which holds what a scenario's result step expected and what was actually seen.
 Say which commits between the baseline and this run could explain it (`git log <base>..<sha>`), and whether
 the run's context changed (another model or runner), which is often the real cause.
