@@ -1,4 +1,23 @@
 // Deterministic browser data: no personal repository, backend, network, or Git history required.
+import { crc32, deflateSync } from 'node:zlib';
+
+/** A flat PNG of one color: a screenshot's stand-in. */
+function png(w, h, [r, g, b, a = 255]) {
+  const chunk = (type, data) => {
+    const out = Buffer.alloc(12 + data.length);
+    out.writeUInt32BE(data.length, 0);
+    out.write(type, 4, 'latin1');
+    data.copy(out, 8);
+    out.writeUInt32BE(crc32(out.subarray(4, 8 + data.length)), 8 + data.length);
+    return out;
+  };
+  const head = Buffer.alloc(13);
+  head.writeUInt32BE(w, 0);
+  head.writeUInt32BE(h, 4);
+  head.set([8, 6, 0, 0, 0], 8);
+  const row = Buffer.concat([Buffer.from([0]), Buffer.from(Array.from({ length: w }, () => [r, g, b, a]).flat())]);
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', head), chunk('IDAT', deflateSync(Buffer.concat(Array(h).fill(row)))), chunk('IEND', Buffer.alloc(0))]);
+}
 export const head = 'b'.repeat(40);
 export const base = 'a'.repeat(40);
 export const branch = 'feat/responsive-components-with-a-very-long-unbroken-branch-name';
@@ -73,6 +92,35 @@ export const project = {
     [base]: { sha: base, short: 'aaaaaaa', parents: [], author: 'Responsive test', date: previousStart, subject: 'Initial release' },
   },
 };
+// Visual review: a subject with a long name in four variants, two of them changed, and a new one.
+const longSubject = `Bill row ${'WithAVeryLongUnbrokenComponentName'.repeat(3)}`;
+const look = (subject, variant, status, i, size = [640, 120]) => {
+  const name = variant ? `${subject} [${variant}]` : subject;
+  const approved = status === 'new' ? undefined : {
+    id: `a${i}`, subject, variant, commit: base, run: 'tests', path: `approved-${i}.png`, hash: 'a'.repeat(64),
+    width: size[0], height: size[1], by: 'Responsive test <test@example.com>', at: previousStart,
+  };
+  return { id: `look-${i}`, name, subject, variant, status, run: 'tests', path: `look-${i}.png`, hash: 'b'.repeat(64),
+    width: size[0], height: size[1], approved, pixels: status === 'changed' ? 1234567 : undefined, diff: status === 'changed' ? 'diff.png' : undefined };
+};
+export const looks = {
+  commit: head,
+  looks: [
+    look(longSubject, 'light, phone', 'same', 1, [320, 72]),
+    look(longSubject, 'light, desktop', 'same', 2),
+    look(longSubject, `dark, phone, ${'VariantWithoutBreaks'.repeat(3)}`, 'changed', 3, [320, 72]),
+    look(longSubject, 'dark, desktop', 'changed', 4),
+    look('Receipt card', '', 'new', 5, [280, 140]),
+    look('Each pays', '', 'same', 6, [300, 50]),
+  ],
+};
+project.looks = { [head]: { same: 3, changed: [looks.looks[2].name, looks.looks[3].name], new: ['Receipt card'] } };
+const images = Object.fromEntries(looks.looks.flatMap((l, i) => [
+  [`/data/fixture/files/tests/${l.path}`, png(l.width, l.height, i % 2 ? [37, 99, 235] : [17, 17, 19])],
+  ...(l.approved ? [[`/data/fixture/files/tests/${l.approved.path}`, png(l.width, l.height, [22, 163, 74])]] : []),
+]));
+images['/data/fixture/looks/diffs/diff.png'] = png(640, 120, [229, 72, 77, 64]);
+
 const detail = (sha) => ({
   sha, tags: [], files: [{ path, status: 'M', added: 123456, deleted: 12345 }],
   scenarios: [{ feature: 'Responsive components', title: 'A scenario with readable results on narrow screens', change: 'added',
@@ -82,6 +130,8 @@ export const files = {
   '/data/site.json': { version: 1, generatedAt: start, projects: [{ id: project.id, name: project.name }, { id: 'empty', name: 'Empty project' }] },
   '/data/fixture/index.json': project,
   '/data/fixture/stories.json': [],
+  [`/data/fixture/looks/${head}.json`]: looks,
+  ...images,
   '/data/empty/stories.json': [],
   '/data/empty/index.json': { ...project, id: 'empty', name: 'Empty project', rows: [], tags: [], runs: [], branches: [], commits: {} },
   ...Object.fromEntries(Object.entries(runs).map(([id, r]) => [`/data/fixture/runs/${id}.json`, r])),
@@ -93,4 +143,5 @@ export const files = {
 export const routes = [
   '/fixture', `/fixture/branch/${branch}`, `/fixture/commit/${head}`,
   '/fixture/run/current', '/fixture/run/tests', '/fixture/measure/current/latency', '/fixture/release', '/empty',
+  `/fixture/look/${head}/look-3`, `/fixture/look/${head}/look-5`,
 ];

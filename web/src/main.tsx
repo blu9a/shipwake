@@ -16,6 +16,7 @@ import './tokens.css';
 import './app.css';
 import { loadProject, loadSession, loadSite } from './data';
 import { CommitPage } from './pages/CommitPage';
+import { LookPage } from './pages/Looks';
 import { MeasurePage } from './pages/MeasurePage';
 import { OpenPage } from './pages/OpenPage';
 import { ReleasePage } from './pages/ReleasePage';
@@ -260,6 +261,7 @@ const commitRoute = createRoute({ getParentRoute: () => rootRoute, path: '$proje
 const runRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/run/$run', component: RunPage });
 const watchRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/run/$run/watch/$', component: WatchPage });
 const measureRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/measure/$run/$metric', component: MeasurePage });
+const lookRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/look/$sha/$look', component: LookPage });
 const releaseRoute = createRoute({ getParentRoute: () => rootRoute, path: '$project/release', component: ReleasePage });
 
 const router = createRouter({
@@ -272,6 +274,7 @@ const router = createRouter({
     runRoute,
     watchRoute,
     measureRoute,
+    lookRoute,
     releaseRoute,
   ]),
   history: createHashHistory(),
