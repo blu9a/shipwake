@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"slices"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -16,11 +16,12 @@ import (
 // Check is one verdict about a commit.
 type Check struct {
 	Status string `json:"status"` // ok, warn or fail
-	Kind   string `json:"kind"`   // tests or measurement
+	Kind   string `json:"kind"`   // tests, measurement or look
 	Text   string `json:"text"`
 	Run    string `json:"run"`                // the run's ID: runs/<id>.json on the results branch
 	Metric string `json:"metric,omitempty"`   // the measurement's ID
 	Base   string `json:"baseline,omitempty"` // the run compared with
+	Look   string `json:"look,omitempty"`     // the screenshot's name, such as "Button [dark]"
 }
 
 func checkCmd() *cobra.Command {
@@ -28,10 +29,11 @@ func checkCmd() *cobra.Command {
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "check [repo]",
-		Short: "Judge a commit: failing tests and measurements over their thresholds (exit 1 when something blocks)",
+		Short: "Judge a commit: failing tests, measurements over their thresholds, looks nobody approved (exit 1 when something blocks)",
 		Long: "Check looks at the runs recorded for a commit. A test run with failures blocks; a measurement over\n" +
-			"its blocking threshold blocks; over its warning threshold it warns. Use it as a CI gate, before\n" +
-			"merging or releasing.",
+			"its blocking threshold blocks; over its warning threshold it warns; a screenshot that looks different\n" +
+			"from the look approved for it, or is new, blocks until someone approves it (shipwake looks). Use it\n" +
+			"as a CI gate, before merging or releasing.",
 		Example: "  shipwake check                    # HEAD: against the last release, else the previous run\n" +
 			"  shipwake check --against previous # what this change did\n" +
 			"  shipwake check --json",
@@ -54,7 +56,10 @@ func checkCmd() *cobra.Command {
 			if against != "auto" && against != "release" && against != "previous" {
 				return fmt.Errorf("--against %q: want release or previous", against)
 			}
-			checks := judgeCommit(l, sha, against)
+			checks, err := judgeCommit(ctx, l, sha, against)
+			if err != nil {
+				return err
+			}
 			worst := "ok"
 			for _, ch := range checks {
 				if ch.Status == "fail" || (ch.Status == "warn" && worst == "ok") {
@@ -90,32 +95,11 @@ func checkCmd() *cobra.Command {
 }
 
 // judgeCommit returns the checks for one commit: the latest run of each test suite and each
-// measurement series recorded on it. A run that can be compared (one on the series' runner) is
-// preferred over a newer one that can't, so a run on another machine never hides a regression.
-func judgeCommit(l *build.Loaded, sha, against string) []Check {
-	comparable := map[string]bool{}
-	for _, s := range l.Index.Runs {
-		comparable[s.ID] = s.Comparable
-	}
-	latest := map[string]*model.Run{}
-	for _, r := range l.Runs {
-		if r.Commit != sha {
-			continue
-		}
-		key := r.Name
-		o, ok := latest[key]
-		if !ok || comparable[r.ID] && !comparable[o.ID] || comparable[r.ID] == comparable[o.ID] && r.Start.After(o.Start) {
-			latest[key] = r
-		}
-	}
-	keys := make([]string, 0, len(latest))
-	for k := range latest {
-		keys = append(keys, k)
-	}
-	slices.Sort(keys)
+// measurement series recorded on it (build.Decisive), and how their screenshots compare with the looks
+// approved for them.
+func judgeCommit(ctx context.Context, l *build.Loaded, sha, against string) ([]Check, error) {
 	var checks []Check
-	for _, k := range keys {
-		r := latest[k]
+	for _, r := range l.Decisive(sha) {
 		if len(r.Tests) > 0 {
 			var failed, retried int
 			for _, t := range r.Tests {
@@ -165,7 +149,27 @@ func judgeCommit(l *build.Loaded, sha, against string) []Check {
 			checks = append(checks, Check{Status: "ok", Kind: "measurement", Run: r.ID, Text: fmt.Sprintf("%s: %s within thresholds", r.Name, plural(ok, "measurement"))})
 		}
 	}
-	return checks
+	ls, _, err := l.ReviewLooks(ctx, sha)
+	if err != nil {
+		return nil, err
+	}
+	same := 0
+	for _, lk := range ls.Looks {
+		switch lk.Status {
+		case "same":
+			same++
+		case "changed":
+			checks = append(checks, Check{Status: "fail", Kind: "look", Run: lk.Run, Look: lk.Name,
+				Text: fmt.Sprintf("Looks: %q looks different from its approved look (%s), and nobody approved the new one", lk.Name, plural(lk.Pixels, "pixel"))})
+		default:
+			checks = append(checks, Check{Status: "fail", Kind: "look", Run: lk.Run, Look: lk.Name,
+				Text: fmt.Sprintf("Looks: %q is new and waits for a first approval", lk.Name)})
+		}
+	}
+	if same > 0 {
+		checks = append(checks, Check{Status: "ok", Kind: "look", Text: fmt.Sprintf("Looks: %s as approved", plural(same, "screenshot"))})
+	}
+	return checks, nil
 }
 
 // hasRelease reports whether a run is compared with a run at the last release.

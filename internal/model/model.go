@@ -44,6 +44,60 @@ type Project struct {
 	// In local mode, the workspace's commits (proposals, edits, approvals), each placed above a commit of
 	// the repository, as runs are.
 	Kept []Kept `json:"kept,omitempty"`
+	// Visual review, by commit: how its screenshots compare with the looks approved for them. Only commits
+	// whose runs recorded screenshots are listed; their details are in looks/<sha>.json.
+	Looks map[string]LookTally `json:"looks,omitempty"`
+}
+
+// LookTally is what the index needs about a commit's screenshots: how many look as approved, and which
+// ones nobody approved yet, by name ("Button [dark, phone]").
+type LookTally struct {
+	Same    int      `json:"same,omitempty"`
+	Changed []string `json:"changed,omitempty"` // they differ from the look approved for them
+	New     []string `json:"new,omitempty"`     // nothing was approved for them yet
+}
+
+// Looks is a commit's screenshots in visual review: data/<project>/looks/<sha>.json. A screenshot is an
+// attachment named "look: <subject>" or "look: <subject> [<variant>]"; the commit's newest run of each
+// series counts, as for its other verdicts.
+type Looks struct {
+	Commit string `json:"commit"`
+	Looks  []Look `json:"looks"`
+}
+
+// Look is one screenshot compared with the look approved for its subject and variant: the newest
+// approval made on this commit or one before it.
+type Look struct {
+	ID      string `json:"id"` // its subject and variant, readable and safe in an address
+	Name    string `json:"name"`
+	Subject string `json:"subject"`
+	Variant string `json:"variant,omitempty"`
+	Status  string `json:"status"` // same, changed or new
+	Run     string `json:"run"`    // the run that recorded it
+	Path    string `json:"path"`   // in that run's files
+	Hash    string `json:"hash"`   // SHA-256 of the file
+	Width   int    `json:"width"`
+	Height  int    `json:"height"`
+	// The approved look it is compared with; absent for a new one.
+	Approved *LookApproval `json:"approved,omitempty"`
+	Pixels   int           `json:"pixels,omitempty"` // how many pixels differ from the approved look
+	Diff     string        `json:"diff,omitempty"`   // those pixels highlighted, in looks/diffs/, as large as the bigger image
+}
+
+// LookApproval is a person's approval of how something looks, kept with the runs (looks/<id>.json in the
+// results store) and committed there with Approved-by. Later commits are compared with it.
+type LookApproval struct {
+	ID      string    `json:"id"`
+	Subject string    `json:"subject"`
+	Variant string    `json:"variant,omitempty"`
+	Commit  string    `json:"commit"` // the commit whose screenshot was approved
+	Run     string    `json:"run"`
+	Path    string    `json:"path"` // the screenshot, in the run's files
+	Hash    string    `json:"hash"` // SHA-256 of the screenshot
+	Width   int       `json:"width"`
+	Height  int       `json:"height"`
+	By      string    `json:"by"` // who approved it: "Name <email>"
+	At      time.Time `json:"at"`
 }
 
 // Kept is a commit in a local mode project's workspace, where its requirements are kept.

@@ -10,6 +10,7 @@ import { type Lang, messages } from '../messages';
 import type { Project, Row, RunSummary } from '../model.gen';
 import { useSettings, useT } from '../settings';
 import { Segmented, StatusIcon } from '../ui';
+import { lookChecks } from './Looks';
 import { NotesText } from './notes';
 import s from './ReleasePage.module.css';
 import tl from './Timeline.module.css';
@@ -19,6 +20,7 @@ interface CheckRow {
   status: Status;
   text: string;
   to?: { run: string };
+  look?: boolean; // about the commit's screenshots: links to the commit, where they are reviewed
 }
 
 const langName = (l: string) => {
@@ -106,7 +108,12 @@ export function ReleasePage() {
         <p className="muted">{t.nothingNew(last.name)}</p>
       </>
     );
-  const checks = [...runChecks(p, head.sha, t), ...versionChecks(p, version, t), ...p.languages.map((l, i) => noteCheck(l, i, notes, t))];
+  const checks: CheckRow[] = [
+    ...runChecks(p, head.sha, t),
+    ...lookChecks(p, head.sha, t),
+    ...versionChecks(p, version, t),
+    ...p.languages.map((l, i) => noteCheck(l, i, notes, t)),
+  ];
   const blocked = checks.some((ch) => ch.status === 'bad');
   return (
     <>
@@ -152,6 +159,10 @@ export function ReleasePage() {
               <StatusIcon status={ch.status === 'ok' ? 'passed' : ch.status === 'bad' ? 'failed' : 'warn'} />
               {ch.to ? (
                 <Link className="lnk" to="/$project/run/$run" params={{ project, run: ch.to.run }}>
+                  {ch.text}
+                </Link>
+              ) : ch.look ? (
+                <Link className="lnk" to="/$project/commit/$sha" params={{ project, sha: head.sha }}>
                   {ch.text}
                 </Link>
               ) : (

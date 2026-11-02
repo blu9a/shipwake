@@ -32,6 +32,9 @@ well they do it.
 - **Measured where outputs vary.** Agent features and other non-deterministic behavior need numbers, not pass or
   fail. Metrics are written as sentences ("Blocks a release below 100%") and approved like scenarios; evaluations
   show each case before and now, so quality doesn't drift from release to release.
+- **See what a change did to how it looks.** Screenshots your tests take are compared with the looks you approved:
+  a change shows only the ones that look different, before and after side by side or one over the other, the
+  changed pixels highlighted, light and dark, phone and desktop together. A look nobody approved holds the release.
 - **Releases that say what changed for the product.** A release lists the requirements it added or changed and the
   changes it brings, checked before you approve it, in `CHANGELOG.md` and an annotated tag with who approved it.
 - **Rebuildable.** Approved features with their recordings describe the product well enough to rebuild it.
@@ -153,6 +156,7 @@ Trends fill in as CI records each change. To have them now, record your recent r
 - [Configuration](docs/config.md): names, languages, thresholds, translations, the changelog
 - [CI](docs/ci.md): GitHub Actions, GitLab, others; publishing the site
 - [Releases](docs/releases.md): the changelog, notes in tags, approval
+- [Reviewing how things look](docs/visual-review.md): screenshots compared with approved looks, approving them
 - [Compatibility](docs/compatibility.md): what upgrades keep working, recorded results above all
 - [Local mode](docs/local-mode.md): trying Shipwake on a repository without writing anything into it
 - [Playwright reporter](packages/playwright/README.md): steps, screenshots, recordings and what was observed
@@ -184,6 +188,7 @@ https://github.com/user-attachments/assets/b93ea56a-dda3-49ba-b66e-f073cebf5c12
 - **看演示，而不是读代码。** 一键把一个功能的所有场景连成一段视频播放，每一步都有字幕。一分钟就能看出智能体是不是做多了，或者行为是否和你预期的不一样。
 - **为产品服务的测试。** 智能体会成百上千地写测试，其中很多锁定了没人决定过的细节，比如重试次数或限流参数，这些又会束缚之后的智能体。当质量以已批准的功能为锚点，这类测试就可以在所有功能仍然正常的前提下被清理。
 - **在输出不确定的地方用度量。** 智能体功能和其他不确定的行为需要数字，而不只是通过或失败。指标用句子来写（“低于 100% 时阻止发布”），像场景一样被批准；评测展示每个用例之前和现在的结果，让质量不会随着版本悄悄下滑。
+- **看清一次变更让界面变成了什么样。** 测试拍下的截图会与你批准过的外观逐像素对比：一次变更只显示看起来不同的截图，批准的外观和新的并排或叠加对比，变化的像素被标出，浅色和深色、手机和桌面宽度放在一起。没人批准的外观会挡住发布。
 - **说清楚产品变了什么的发布。** 一个发布会列出它新增或修改的需求和带来的变更，在你批准前经过检查，记录在 `CHANGELOG.md` 和带批准人的附注标签里。
 - **可以重建。** 已批准的功能和它们的录屏足以描述产品，可以据此重建。
 

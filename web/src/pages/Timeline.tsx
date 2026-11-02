@@ -344,8 +344,22 @@ function CommitItem({ p, c, line }: { p: Project; c?: Commit; line: boolean }) {
         <code>{c.short}</code>
         <span>{when(c.date, lang)}</span>
         {!!c.scenarios && <span>{t.scenarios(c.scenarios)}</span>}
+        <LooksToReview p={p} sha={c.sha} />
       </div>
     </div>
+  );
+}
+
+/** A commit whose screenshots look different, or are new, says so: they wait for someone to look. */
+function LooksToReview({ p, sha }: { p: Project; sha: string }) {
+  const t = useT();
+  const tally = p.looks?.[sha];
+  const n = (tally?.changed?.length ?? 0) + (tally?.new?.length ?? 0);
+  if (!n) return null;
+  return (
+    <Link className="chip warn" to="/$project/commit/$sha" params={{ project: p.id, sha }}>
+      {t.looksToReview(n)}
+    </Link>
   );
 }
 

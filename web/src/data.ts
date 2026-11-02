@@ -1,6 +1,6 @@
 // Loads JSON once each and shares its promise. Workspace rebuilds reuse URLs, so a forgotten file
 // must come from the server rather than the browser's HTTP cache.
-import type { CommitDetail, FileDiff, Project, Run, Site } from './model.gen';
+import type { CommitDetail, FileDiff, Looks, Project, Run, Site } from './model.gen';
 
 const cache = new Map<string, Promise<unknown>>();
 
@@ -21,6 +21,10 @@ export const loadProject = (id: string) => load<Project>(`${id}/index.json`);
 export const loadCommit = (id: string, sha: string) => load<CommitDetail>(`${id}/commits/${sha}.json`);
 export const loadDiffs = (id: string, sha: string) => load<Record<string, FileDiff>>(`${id}/diffs/${sha}.json`);
 export const loadRun = (id: string, run: string) => load<Run>(`${id}/runs/${run}.json`);
+/** A commit's screenshots compared with their approved looks (visual review). */
+export const loadLooks = (id: string, sha: string) => load<Looks>(`${id}/looks/${sha}.json`);
+/** The image that highlights where a look changed. */
+export const diffUrl = (id: string, name: string) => `data/${id}/looks/diffs/${name}`;
 /** Forgets a loaded file, so the next use() fetches it again (after the workspace changed it). */
 export const forget = (path: string) => cache.delete(path);
 

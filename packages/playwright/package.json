@@ -1,7 +1,7 @@
 {
   "name": "shipwake-playwright",
   "version": "0.1.0",
-  "description": "Shipwake reporter and recording helpers for Playwright: every step, attachments as files, observed evidence.",
+  "description": "Shipwake reporter and recording helpers for Playwright: every step, attachments as files, observed evidence, screenshots for visual review.",
   "license": "Apache-2.0",
   "type": "module",
   "exports": {

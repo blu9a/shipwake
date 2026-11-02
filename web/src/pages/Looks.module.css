@@ -1,0 +1,329 @@
+/* Visual review: a commit's looks, and one look compared with the approved one. */
+.looks {
+  margin-bottom: 8px;
+}
+
+/* A subject: its state and name, then its variants in a strip. */
+.subject {
+  border-top: 1px solid var(--line);
+}
+.same > summary {
+  border-top: 1px solid var(--line);
+}
+.looks > .subject:first-child,
+.looks > .same:first-child > summary {
+  border-top: 0;
+}
+.subjectHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 4px 14px;
+  font-size: 14px;
+}
+.name {
+  font-weight: 600;
+  flex-basis: 8rem;
+}
+.chev {
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+  transform: rotate(-90deg);
+  transition: transform 0.15s;
+}
+.same[open] > summary .chev {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chev {
+    transition: none;
+  }
+}
+
+/* Screenshot strips scroll on their own; the page never does. */
+.strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px 14px 14px;
+}
+.shot {
+  flex: none;
+  display: grid;
+  gap: 6px;
+  width: max-content;
+  max-width: 220px;
+  color: inherit;
+}
+.thumb {
+  display: grid;
+  place-items: center;
+  height: 92px;
+  min-width: 92px;
+  box-sizing: border-box;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    repeating-conic-gradient(color-mix(in srgb, var(--fill) 55%, transparent) 0 25%, transparent 0 50%) 0 0 / 12px 12px,
+    var(--bg);
+}
+.thumb img {
+  display: block;
+  max-width: 196px;
+  max-height: 78px;
+  width: auto;
+  height: auto;
+  border-radius: 3px;
+}
+.changed .thumb {
+  border: 2px solid var(--b-warn);
+}
+.new .thumb {
+  border: 2px solid var(--b-add);
+}
+.current .thumb {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.shot:hover .thumb {
+  border-color: var(--ink-2);
+}
+.cap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.current .cap {
+  color: var(--ink);
+  font-weight: 600;
+}
+.dot {
+  flex: none;
+  align-self: center;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.changed .dot {
+  background: var(--b-warn);
+}
+.new .dot {
+  background: var(--b-add);
+}
+.capText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.capStatus {
+  flex: none;
+  font-weight: 600;
+}
+.changed .capStatus {
+  color: var(--t-warn);
+}
+.new .capStatus {
+  color: var(--t-add);
+}
+
+/* A look's page */
+.title {
+  font-size: 20px;
+  font-weight: 650;
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+.variants {
+  margin: 16px 0 0;
+  border: 1px solid var(--card-line);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+}
+.variants .strip {
+  padding: 14px;
+}
+.verdict {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+.verdictLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.verdictLine > .grow {
+  flex-basis: 12rem;
+}
+.variant {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--fill);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.approvedBy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.approvedBy svg {
+  flex: none;
+  color: var(--t-add);
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 18px 0 12px;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.toggle input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #e5484d;
+}
+
+.stage {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+.controls + .stage {
+  margin-top: 0;
+}
+.side {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@container (max-width: 520px) {
+  .side {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.fig {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  align-content: start;
+}
+.fig figcaption {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.ends {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.frameWrap {
+  width: 100%;
+  min-width: 0;
+}
+/* The screenshots' own pixels, on a quiet checkerboard where they are transparent. */
+.frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--card-line);
+  border-radius: 10px;
+  background:
+    repeating-conic-gradient(color-mix(in srgb, var(--fill) 55%, transparent) 0 25%, transparent 0 50%) 0 0 / 16px 16px,
+    var(--bg);
+  box-shadow: var(--card-shadow);
+}
+.img,
+.diff {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+}
+.diff {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.clip,
+.fade {
+  position: absolute;
+  inset: 0;
+}
+.clip {
+  clip-path: inset(0 0 0 var(--pos, 50%));
+}
+.slideArea {
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+.handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos, 50%);
+  width: 2px;
+  margin-left: -1px;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--bg) 70%, transparent);
+}
+.range {
+  width: 100%;
+  margin: 4px 0 0;
+  accent-color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 20px;
+}
+.secondary {
+  font-weight: 600;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: var(--radius-pill);
+  padding: 9px 18px;
+}
+.secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 0;
+  font-weight: 600;
+  color: var(--t-add);
+}

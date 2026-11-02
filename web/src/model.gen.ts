@@ -8,6 +8,8 @@ export interface Shipwake {
     [k: string]: FileDiff;
   };
   run: Run;
+  looks: Looks;
+  lookApproval: LookApproval;
   config: Config;
 }
 /**
@@ -57,6 +59,9 @@ export interface Project {
   };
   truncated?: boolean;
   kept?: Kept[];
+  looks?: {
+    [k: string]: LookTally;
+  };
 }
 /**
  * This interface was referenced by `Shipwake`'s JSON-Schema
@@ -185,6 +190,15 @@ export interface Kept {
   by?: string;
   date: string;
   commit: string;
+}
+/**
+ * This interface was referenced by `Shipwake`'s JSON-Schema
+ * via the `definition` "LookTally".
+ */
+export interface LookTally {
+  same?: number;
+  changed?: string[];
+  new?: string[];
 }
 /**
  * This interface was referenced by `Shipwake`'s JSON-Schema
@@ -338,6 +352,50 @@ export interface Case {
   output?: string;
   score: number;
   reason?: string;
+}
+/**
+ * This interface was referenced by `Shipwake`'s JSON-Schema
+ * via the `definition` "Looks".
+ */
+export interface Looks {
+  commit: string;
+  looks: Look[];
+}
+/**
+ * This interface was referenced by `Shipwake`'s JSON-Schema
+ * via the `definition` "Look".
+ */
+export interface Look {
+  id: string;
+  name: string;
+  subject: string;
+  variant?: string;
+  status: string;
+  run: string;
+  path: string;
+  hash: string;
+  width: number;
+  height: number;
+  approved?: LookApproval;
+  pixels?: number;
+  diff?: string;
+}
+/**
+ * This interface was referenced by `Shipwake`'s JSON-Schema
+ * via the `definition` "LookApproval".
+ */
+export interface LookApproval {
+  id: string;
+  subject: string;
+  variant?: string;
+  commit: string;
+  run: string;
+  path: string;
+  hash: string;
+  width: number;
+  height: number;
+  by: string;
+  at: string;
 }
 /**
  * This interface was referenced by `Shipwake`'s JSON-Schema

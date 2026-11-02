@@ -9,8 +9,10 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/cs
 const server = createServer(async (req, res) => {
   const pathname = decodeURIComponent(new URL(req.url, 'http://127.0.0.1').pathname);
   if (Object.hasOwn(files, pathname)) {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
-    return res.end(JSON.stringify(files[pathname]));
+    const body = files[pathname];
+    const image = Buffer.isBuffer(body);
+    res.writeHead(200, { 'Content-Type': image ? 'image/png' : 'application/json', 'Cache-Control': 'no-store' });
+    return res.end(image ? body : JSON.stringify(body));
   }
   const file = resolve(root, `.${pathname === '/' ? '/index.html' : pathname}`);
   if (!file.startsWith(root + sep)) { res.writeHead(403); return res.end(); }

@@ -8,6 +8,7 @@ import { useSettings, useT } from '../settings';
 import { Icon, Segmented } from '../ui';
 import s from './CommitPage.module.css';
 import { FileTree } from './FileTree';
+import { CommitLooks } from './Looks';
 
 export function CommitPage() {
   const { project, sha } = useParams({ from: '/$project/commit/$sha' });
@@ -55,6 +56,7 @@ export function CommitPage() {
         <dt>{t.releasedIn}</dt>
         <dd>{d.tags.length ? d.tags.join(', ') : <span className="muted">{t.notReleased}</span>}</dd>
       </dl>
+      <CommitLooks project={project} sha={sha} />
       {d.scenarios.length > 0 && <Scenarios list={d.scenarios} />}
       <Files key={sha} project={project} sha={sha} files={d.files} added={added} deleted={deleted} />
     </>

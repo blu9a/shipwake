@@ -382,6 +382,154 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "Look": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "run": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "approved": {
+          "$ref": "#/$defs/LookApproval"
+        },
+        "pixels": {
+          "type": "integer"
+        },
+        "diff": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "subject",
+        "status",
+        "run",
+        "path",
+        "hash",
+        "width",
+        "height"
+      ]
+    },
+    "LookApproval": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "run": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "by": {
+          "type": "string"
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "subject",
+        "commit",
+        "run",
+        "path",
+        "hash",
+        "width",
+        "height",
+        "by",
+        "at"
+      ]
+    },
+    "LookTally": {
+      "properties": {
+        "same": {
+          "type": "integer"
+        },
+        "changed": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "new": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Looks": {
+      "properties": {
+        "commit": {
+          "type": "string"
+        },
+        "looks": {
+          "items": {
+            "$ref": "#/$defs/Look"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "commit",
+        "looks"
+      ]
+    },
     "Metric": {
       "properties": {
         "id": {
@@ -507,6 +655,12 @@
             "$ref": "#/$defs/Kept"
           },
           "type": "array"
+        },
+        "looks": {
+          "additionalProperties": {
+            "$ref": "#/$defs/LookTally"
+          },
+          "type": "object"
         }
       },
       "additionalProperties": false,
@@ -964,6 +1118,12 @@
     "run": {
       "$ref": "#/$defs/Run"
     },
+    "looks": {
+      "$ref": "#/$defs/Looks"
+    },
+    "lookApproval": {
+      "$ref": "#/$defs/LookApproval"
+    },
     "config": {
       "$ref": "#/$defs/Config"
     }
@@ -976,6 +1136,8 @@
     "commit",
     "diffs",
     "run",
+    "looks",
+    "lookApproval",
     "config"
   ],
   "title": "Shipwake"

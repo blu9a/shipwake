@@ -140,7 +140,10 @@ type Loaded struct {
 	Trunk string    // the trunk for Git: its local branch, or origin's
 	Spec  gitx.Repo // where Shipwake's files and their history are: Repo, or its workspace
 	Local bool      // Spec is a workspace beside the repository
-	clean []func()
+	// The looks people approved, from the results store.
+	Approvals []model.LookApproval
+	ancestors map[[2]string]bool
+	clean     []func()
 }
 
 // Close removes temporary copies of the results.
@@ -265,6 +268,10 @@ func Load(ctx context.Context, p Project, maxRows int, log func(string, ...any))
 			idx.Runs = append(idx.Runs, summarize(*r))
 			l.Runs = append(l.Runs, r)
 			l.Files[r.ID] = st.FilesDir(r.ID)
+		}
+		if l.Approvals, err = st.Approvals(); err != nil {
+			l.Close()
+			return nil, err
 		}
 	}
 	judge.Apply(idx, l.Runs)
@@ -419,6 +426,10 @@ func project(ctx context.Context, p Project, o Options, used map[string]bool) (m
 				return model.ProjectRef{}, err
 			}
 		}
+	}
+
+	if err := writeLooks(ctx, l, dir); err != nil {
+		return model.ProjectRef{}, err
 	}
 
 	// Commit pages: details and diffs for every commit the index mentions.
