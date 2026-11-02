@@ -235,6 +235,16 @@ func (w *workspace) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 		reply(w.approveMetric(repo, req.Path))
+	case parts[1] == "approve-looks" && r.Method == http.MethodPost:
+		var req struct {
+			Commit string
+			Looks  []string // their IDs
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			reply(nil, err)
+			return
+		}
+		reply(w.approveLooks(proj, req.Commit, req.Looks))
 	case parts[1] == "release" && r.Method == http.MethodPost:
 		var req struct {
 			Version, Commit, Notes string
@@ -368,6 +378,32 @@ func (w *workspace) approve(repo gitx.Repo, path string, scenarios []string) (an
 	msg := fmt.Sprintf("spec: approve %d %s of %q\n\nApproved-by: %s <%s>", approved, map[bool]string{true: "scenario", false: "scenarios"}[approved == 1],
 		gherkin.Parse(string(data)).Name, strings.TrimSpace(user), strings.TrimSpace(email))
 	return w.commit(repo, path, msg)
+}
+
+// approveLooks approves screenshots of a commit as the person, with the runs: a commit with Approved-by
+// on the results branch, never pushed. Unlike requirements, it needs no branch checked out.
+func (w *workspace) approveLooks(p served, commit string, ids []string) (any, error) {
+	if len(ids) == 0 {
+		return nil, fmt.Errorf("say which looks to approve")
+	}
+	user, email := w.person(p.code)
+	approved, err := build.ApproveLooks(w.ctx, w.opts.Projects[p.index], commit, ids, false, user+" <"+email+">", false)
+	if err != nil {
+		return nil, err
+	}
+	if err := build.RunOne(w.ctx, w.opts, p.index, w.idOf(p)); err != nil {
+		return nil, err
+	}
+	return map[string]any{"approved": len(approved)}, nil
+}
+
+func (w *workspace) idOf(p served) string {
+	for id, x := range w.projects {
+		if x.index == p.index {
+			return id
+		}
+	}
+	return ""
 }
 
 // versionRe is a release tag: v1.2.3, or a pre-release such as v1.2.3-rc.1. The page orders them.

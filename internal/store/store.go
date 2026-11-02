@@ -1,7 +1,9 @@
-// Package store keeps normalized runs on disk: one JSON file per run and its attachments.
+// Package store keeps normalized runs on disk: one JSON file per run and its attachments, and the looks
+// people approved.
 //
 //	<dir>/runs/<id>.json
 //	<dir>/files/<id>/<name>
+//	<dir>/looks/<id>.json
 //
 // The directory can live anywhere: an orphan branch's work tree, a CI artifact, a separate repository.
 // Nothing is written into the project's own source.
@@ -118,6 +120,46 @@ func (s Store) List() ([]model.Run, error) {
 	}
 	slices.SortFunc(runs, func(a, b model.Run) int { return a.Start.Compare(b.Start) })
 	return runs, nil
+}
+
+// SaveApproval keeps a person's approval of a look: looks/<id>.json.
+func (s Store) SaveApproval(a model.LookApproval) error {
+	if err := os.MkdirAll(filepath.Join(s.Dir, "looks"), 0o755); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(a, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(s.Dir, "looks", a.ID+".json"), data, 0o644)
+}
+
+// Approvals reads every approved look, oldest first.
+func (s Store) Approvals() ([]model.LookApproval, error) {
+	entries, err := os.ReadDir(filepath.Join(s.Dir, "looks"))
+	if os.IsNotExist(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var res []model.LookApproval
+	for _, e := range entries {
+		if !strings.HasSuffix(e.Name(), ".json") {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(s.Dir, "looks", e.Name()))
+		if err != nil {
+			return nil, err
+		}
+		var a model.LookApproval
+		if err := json.Unmarshal(data, &a); err != nil {
+			return nil, fmt.Errorf("looks/%s: %w", e.Name(), err)
+		}
+		res = append(res, a)
+	}
+	slices.SortFunc(res, func(a, b model.LookApproval) int { return a.At.Compare(b.At) })
+	return res, nil
 }
 
 // FilesDir is where a run's attachments are.

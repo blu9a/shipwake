@@ -46,7 +46,7 @@ func main() {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	root.AddCommand(storiesCmd(), initCmd(), addCmd(), adoptCmd(), buildCmd(), serveCmd(), checkCmd(), doctorCmd(), formatsCmd(), schemaCmd(), versionCmd())
+	root.AddCommand(storiesCmd(), initCmd(), addCmd(), adoptCmd(), buildCmd(), serveCmd(), checkCmd(), looksCmd(), doctorCmd(), formatsCmd(), schemaCmd(), versionCmd())
 	if err := root.ExecuteContext(ctx); err != nil {
 		var exit exitError
 		if errors.As(err, &exit) {
@@ -440,6 +440,8 @@ func schemaCmd() *cobra.Command {
 				Commit model.CommitDetail        `json:"commit"`
 				Diffs  map[string]model.FileDiff `json:"diffs"`
 				Run    model.Run                 `json:"run"`
+				Looks  model.Looks               `json:"looks"`
+				Look   model.LookApproval        `json:"lookApproval"`
 				Config model.Config              `json:"config"`
 			}{})
 			s.Title = "Shipwake"
